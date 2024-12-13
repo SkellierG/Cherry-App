@@ -3,14 +3,13 @@
 ## 📚 Documentation
 For details on multiplatform compilation and other inquiries, refer to the comprehensive documentation:
 
-- [Main Documentation Index](Docs-Index.md)  
+- [Main Documentation Index](./docs/Docs-Index.md)  
 - [Expo Default README](./EXPO.md)
 
 ## 🛠️ Versions and Changelog
 Explore the version history and detailed changelog for releases and tests:
 
-- [Version History]()
-- [Main Changelog Index]()
+- [Main Changelog Index](./CHANGELOG.md)
 
 ---
 
