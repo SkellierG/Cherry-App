@@ -42,3 +42,5 @@ windows/
 .obsidian/
 docs/CHANGELOG/
 dist/
+.env
+secret

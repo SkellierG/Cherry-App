@@ -8,9 +8,6 @@
   "author": "",
   "license": "ISC",
   "description": "",
-  "dependencies": {
-    "desktop-cherry-app": "file:"
-  },
   "devDependencies": {
     "electron": "^33.2.1",
     "electron-builder": "^25.1.8"
