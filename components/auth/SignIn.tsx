@@ -18,9 +18,21 @@ export default function SignIn() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setLoading] = useState(false)
+  const [formError, setFormError] = useState<string | null>(null) 
   const router = useRouter()
 
+  function validateFields() {
+    if (!email || !password) {
+      setFormError(i18n.t('errors.auth.Fields_required')) 
+      return false
+    }
+    setFormError(null)
+    return true
+  }
+
   async function signInWithEmail() {
+    if (!validateFields()) return 
+
     setLoading(true)
     const { error, data } = await supabase.auth.signInWithPassword({
       email: email,
@@ -32,7 +44,11 @@ export default function SignIn() {
   }
 
   return (
-<View className='justify-center px-4 '>
+    <View className='justify-center px-4 '>
+      {formError && (
+        <Text className="text-red-500 text-center mb-4">{formError}</Text>
+      )}
+
       <View className='mb-4'>
         <TextInput
           outlineColor='#c42b4c'

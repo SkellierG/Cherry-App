@@ -14,8 +14,8 @@ const i18n = new I18n({
     },
 });
 
-console.log('english', en)
-console.log('español', es)
+console.log('english', JSON.stringify(en, null, 2))
+console.log('español', JSON.stringify(es, null, 2))
 
 i18n.enableFallback = true;
 i18n.locale = /*getLocales()[0].languageCode ||*/ 'es';

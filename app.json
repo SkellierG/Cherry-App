@@ -1,13 +1,14 @@
 {
   "expo": {
     "name": "Cherry App",
-    "slug": "cherry-app",
+    "slug": "Cherry-App",
     "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/favicon.png",
     "scheme": "cherryapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "jsEngine": "hermes",
     "ios": {
       "supportsTablet": true
     },
@@ -40,14 +41,16 @@
         }
       ],
       "expo-secure-store",
-      "expo-localization"
+      "expo-localization",
+      "@react-native-google-signin/google-signin"
     ],
     "experiments": {
       "typedRoutes": true
     },
+    "platforms": ["ios", "android"],
     "extra": {
+      "expoPublicGoogleClientId": "385065874204-q8skell9bhpra8csedo0jc1nb30n313r.apps.googleusercontent.com",
       "supportsRTL": true,
-      "plugins": ["expo-localization"],
       "router": {
         "origin": false
       },
