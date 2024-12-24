@@ -3,10 +3,21 @@
   "compilerOptions": {
     "jsx": "react",
     "strict": true,
+    "allowImportingTsExtensions": true,
     "skipLibCheck": true,
+    "baseUrl": "./",
     "paths": {
       "@/*": [
         "./*"
+      ],
+      "@components/*": [
+        "./components/*"
+      ],
+      "@hooks/*": [
+        "./hooks/*"
+      ],
+      "@utils/*": [
+        "./utils/*"
       ]
     }
   },
@@ -14,6 +25,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts"
+    "expo-env.d.ts",
+    "nativewind-env.d.ts"
   ]
 }

@@ -1,17 +1,22 @@
 {
   "expo": {
-    "name": "cherry-app",
+    "name": "Cherry App",
     "slug": "cherry-app",
     "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/favicon.png",
-    "scheme": "myapp",
+    "scheme": "cherryapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
     },
     "android": {
+      "permissions": [
+        "INTERNET",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/favicon.png",
         "backgroundColor": "#ffffff"
@@ -33,12 +38,16 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-secure-store",
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true
     },
     "extra": {
+      "supportsRTL": true,
+      "plugins": ["expo-localization"],
       "router": {
         "origin": false
       },
