@@ -20,7 +20,7 @@ export default function GoogleAuth() {
 
     return (
         <GoogleSigninButton
-        size={GoogleSigninButton.Size.Wide}
+        size={GoogleSigninButton.Size.Standard}
         color={GoogleSigninButton.Color.Dark}
         onPress={async () => {
             try {

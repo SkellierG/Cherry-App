@@ -9,6 +9,7 @@ export default function GoogleAuth() {
     return <View>
     <GoogleOAuthProvider clientId={env.EXPO_PUBLIC_GOOGLE_CLIENT_ID}>
         <GoogleLogin
+            theme='outline'
             onSuccess={async credentialResponse => {
                 if (credentialResponse.credential) {
                     const { data, error } = await supabase.auth.signInWithIdToken({

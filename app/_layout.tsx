@@ -3,6 +3,7 @@ import { Slot, useRouter } from "expo-router";
 import "../global.css";
 import LoadingScreen from "@/components/Loading";
 import { supabase } from "@/utils/supabase";
+import { View } from "react-native";
 
 export default function RootLayout() {
   const router = useRouter();
@@ -34,7 +35,7 @@ export default function RootLayout() {
     return <LoadingScreen />;
   }
 
-  return <Slot />;
+  return <View className=" bg-red-100"><Slot/></View>
 }
 
 const checkPreviusAuth = async () => {

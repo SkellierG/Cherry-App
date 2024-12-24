@@ -1,7 +1,11 @@
 const { getDefaultConfig } = require('expo/metro-config.js');
 const { withNativeWind } = require("nativewind/metro");
 
-const config = getDefaultConfig(process.cwd());
+/** @type {import('expo/metro-config').MetroConfig} */
+const config = getDefaultConfig(process.cwd(), {
+    // Do not disable CSS support when using Tailwind.
+    isCSSEnabled: true
+});
 
 config.resolver.sourceExts.push('js', 'jsx', 'ts', 'tsx');
 

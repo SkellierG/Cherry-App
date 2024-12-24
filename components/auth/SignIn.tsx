@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Alert, View, AppState, Button, TextInput, Text } from 'react-native'
+import { Alert, View, AppState, Text } from 'react-native'
+import { Button, TextInput } from 'react-native-paper'
 import { supabase } from '../../utils/supabase'
 import { useRouter } from 'expo-router'
 import i18n from '@/utils/translations'
@@ -31,20 +32,24 @@ export default function SignIn() {
   }
 
   return (
-<View className='justify-center px-4'>
+<View className='justify-center px-4 '>
       <View className='mb-4'>
         <TextInput
+          outlineColor='#c42b4c'
+          selectionColor='#c42b4c'
           onChangeText={(text) => setEmail(text)}
           value={email}
           textContentType='emailAddress'
           maxLength={320}
           placeholder={i18n.t('auth.exampleemail')}
           autoCapitalize="none"
-          className='border rounded p-3'
+          className='bg-red-50'
         />
       </View>
       <View className='mb-4'>
         <TextInput
+          outlineColor='#c42b4c'
+          selectionColor='#c42b4c'
           onChangeText={(text) => setPassword(text)}
           value={password}
           secureTextEntry={true}
@@ -52,15 +57,15 @@ export default function SignIn() {
           textContentType='password'
           placeholder={i18n.t('auth.password')}
           autoCapitalize="none"
-          className='border rounded p-3'
+          className='bg-red-50'
         />
       </View>
       <View className='mb-4'>
-        <Button title={i18n.t('auth.Sign_in')} disabled={isLoading} onPress={() => signInWithEmail()} />
+        <Button buttonColor='#c42b4c' textColor='#ffdee5' disabled={isLoading} onPress={() => signInWithEmail()}>{i18n.t('auth.Sign_in')}</Button>
       </View>
       <View className='flex-row justify-center'>
         <Text>{i18n.t('auth.Dont_have_an_account')}
-          <Text className=' text-indigo-600 btn'
+          <Text className='underline text-blue-600 hover:text-blue-800 visited:text-purple-600'
             disabled={isLoading}
             onPress={() => router.push('/auth/sign-up')}>
               {i18n.t('auth.Sign_up')}

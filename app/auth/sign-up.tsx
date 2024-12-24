@@ -1,8 +1,12 @@
+import SignUp from "@/components/auth/SignUp"
 import React from "react"
-import { View, Text } from "react-native"
+import { View } from "react-native"
 
 export default function SignUpScreen() {
-    return <View>
-        <Text>Sign Up Screen</Text>
+    return <View className=" h-screen bg-red-100">
+        <View className="mt-20">
+            <SignUp />
+        </View>
     </View>
+
 }
