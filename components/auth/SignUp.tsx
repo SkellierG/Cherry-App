@@ -35,6 +35,12 @@ export default function SignIn() {
         const { data, error } = await supabase.auth.signUp({
             email: email,
             password: password,
+            options: {
+                    data: {
+                    name: name,
+                    lastname: lastname
+                }
+            }
         })
         console.log(data)
         if (error) Alert.alert(error.message)
@@ -124,7 +130,7 @@ export default function SignIn() {
                 <Text>{i18n.t('auth.Already_have_an_account')}
                     <Text className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
                         disabled={isLoading}
-                        onPress={() => router.push('/auth/sign-in')}>
+                        onPress={() => router.replace('/auth/sign-in')}>
                         {i18n.t('auth.Sign_in')}
                     </Text>
                 </Text>

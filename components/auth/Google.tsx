@@ -45,13 +45,17 @@ export default function GoogleAuth() {
                 }
             } catch (error: any) {
                 if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-                    Alert.alert('SIGN_IN_CANCELLED', error.message);
+                  console.log(error);
+                  Alert.alert('SIGN_IN_CANCELLED', error.message);
                 } else if (error.code === statusCodes.IN_PROGRESS) {
-                    Alert.alert('IN_PROGRESS', error.message);
+                  console.log(error);
+                  Alert.alert('IN_PROGRESS', error.message);
                 } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-                    Alert.alert('PLAY_SERVICES_NOT_AVAILABLE', error.message);
+                  console.log(error);
+                  Alert.alert('PLAY_SERVICES_NOT_AVAILABLE', error.message);
                 } else {
-                    Alert.alert('UNEXPECTED_ERROR', error.message);
+                  console.log(error);
+                  Alert.alert('UNEXPECTED_ERROR', error.message);
                 }
             }
         }}
