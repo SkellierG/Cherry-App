@@ -5,7 +5,7 @@ import LoadingScreen from "@/components/Loading";
 import { supabase } from "@/utils/supabase";
 import { View } from "react-native";
 
-export default function RootLayout() {
+export default function Index() {
   const router = useRouter();
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -26,7 +26,7 @@ export default function RootLayout() {
       if (isAuthenticated) {
         router.replace("/home");
       } else {
-        router.replace("/auth/sign-in");
+        router.replace("/sign-in");
       }
     }
   }, [isAuthenticated, isLoading]);
@@ -35,7 +35,7 @@ export default function RootLayout() {
     return <LoadingScreen />;
   }
 
-  return <View className=" bg-red-100"><Slot/></View>
+  return <View></View>
 }
 
 const checkPreviusAuth = async () => {

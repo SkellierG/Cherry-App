@@ -130,7 +130,7 @@ export default function SignIn() {
                 <Text>{i18n.t('auth.Already_have_an_account')}
                     <Text className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
                         disabled={isLoading}
-                        onPress={() => router.replace('/auth/sign-in')}>
+                        onPress={() => router.replace('/sign-in')}>
                         {i18n.t('auth.Sign_in')}
                     </Text>
                 </Text>
