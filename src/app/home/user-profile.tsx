@@ -1,4 +1,4 @@
-import { supabase } from "@/utils/supabase"
+import { supabase } from "@utils/supabase"
 import React from "react"
 import { View, Text, Button } from "react-native"
 

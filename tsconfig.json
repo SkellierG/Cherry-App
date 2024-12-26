@@ -8,16 +8,22 @@
     "baseUrl": "./",
     "paths": {
       "@/*": [
-        "./*"
+        "./src/*"
       ],
       "@components/*": [
-        "./components/*"
+        "./src/components/*"
       ],
       "@hooks/*": [
-        "./hooks/*"
+        "./src/hooks/*"
       ],
       "@utils/*": [
-        "./utils/*"
+        "./src/utils/*"
+      ],
+      "@assets/*": [
+        "./assets/*"
+      ],
+      "@app/*": [
+        "./src/app/*"
       ]
     }
   },

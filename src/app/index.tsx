@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Slot, useRouter } from "expo-router";
-import "../global.css";
-import LoadingScreen from "@/components/Loading";
-import { supabase } from "@/utils/supabase";
+import { useRouter } from "expo-router";
+import "../../global.css";
+import LoadingScreen from "@components/Loading";
+import { supabase } from "@utils/supabase";
 import { View } from "react-native";
 
 export default function Index() {

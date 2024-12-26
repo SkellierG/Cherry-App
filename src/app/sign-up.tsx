@@ -1,4 +1,4 @@
-import SignUp from "@/components/auth/SignUp"
+import SignUp from "@components/auth/SignUp"
 import React from "react"
 import { View } from "react-native"
 
