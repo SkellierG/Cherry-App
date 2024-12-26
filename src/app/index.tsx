@@ -1,48 +1,50 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
-import "../../global.css";
-import LoadingScreen from "@components/Loading";
+import "@/global.css";
+import LoadingScreen from "@screens/Loading";
 import { supabase } from "@utils/supabase";
 import { View } from "react-native";
+import { useUser } from "@contexts/user";
 
 export default function Index() {
-  const router = useRouter();
+	const userContext = useUser();
 
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+	const router = useRouter();
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      const userToken = await checkPreviusAuth()
-      setIsAuthenticated(Boolean(userToken))
-      setIsLoading(false);
-    };
+	const [isAuthenticated, setIsAuthenticated] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);
 
-    checkAuth();
-  }, []);
+	useEffect(() => {
+		const checkAuth = async () => {
+			const userToken = await checkPreviusAuth();
+			setIsAuthenticated(Boolean(userToken));
+			setIsLoading(false);
+		};
 
-  useEffect(() => {
-    if (!isLoading) {
-      if (isAuthenticated) {
-        router.replace("/home");
-      } else {
-        router.replace("/sign-in");
-      }
-    }
-  }, [isAuthenticated, isLoading]);
+		checkAuth();
+	}, []);
 
-  if (isLoading) {
-    return <LoadingScreen />;
-  }
+	useEffect(() => {
+		if (!isLoading) {
+			if (isAuthenticated) {
+				router.replace("/home");
+			} else {
+				router.replace("/auth/sign-in");
+			}
+		}
+	}, [isAuthenticated, isLoading]);
 
-  return <View></View>
+	if (isLoading) {
+		return <LoadingScreen />;
+	}
+
+	return <View />;
 }
 
 const checkPreviusAuth = async () => {
-  const { data, error } = await supabase.auth.getSession()
+	const { data, error } = await supabase.auth.getSession();
 
-  if (data.session) {
-    return data.session?.access_token
-  }
+	if (data.session) {
+		return data.session?.access_token;
+	}
 };
-

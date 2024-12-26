@@ -1,0 +1,6 @@
+{
+	"extends": "universe/native",
+	"tabWidth": 2,
+	"useTabs": true,
+	"endOfLine": "lf"
+}

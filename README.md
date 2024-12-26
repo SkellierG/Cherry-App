@@ -1,12 +1,14 @@
 # Project Documentation
 
 ## 📚 Documentation
+
 For details on multiplatform compilation and other inquiries, refer to the comprehensive documentation:
 
-- [Main Documentation Index](./docs/Docs-Index.md)  
+- [Main Documentation Index](./docs/Docs-Index.md)
 - [Expo Default README](./EXPO.md)
 
 ## 🛠️ Versions and Changelog
+
 Explore the version history and detailed changelog for releases and tests:
 
 - [Main Changelog Index](./CHANGELOG.md)
@@ -14,7 +16,6 @@ Explore the version history and detailed changelog for releases and tests:
 ---
 
 For further assistance, feel free to check the above resources or contact the development team.
-
 
 # 🚨License
 

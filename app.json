@@ -1,64 +1,64 @@
 {
-  "expo": {
-    "name": "Cherry App",
-    "slug": "Cherry-App",
-    "version": "0.1.0",
-    "orientation": "portrait",
-    "icon": "./assets/images/favicon.png",
-    "scheme": "cherryapp",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "jsEngine": "hermes",
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "permissions": [
-        "INTERNET",
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE"
-      ],
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/favicon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "com.skellierg.cherryapp"
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
-    },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/splash-screen.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
-        }
-      ],
-      "expo-secure-store",
-      "expo-localization",
-      "@react-native-google-signin/google-signin"
-    ],
-    "experiments": {
-      "typedRoutes": true
-    },
-    "platforms": ["ios", "android"],
-    "extra": {
-      "SUPABASE_URL": "https://caoduwcuvrdckoqbrcsd.supabase.co",
-      "SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhb2R1d2N1dnJkY2tvcWJyY3NkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM3MDQzOTgsImV4cCI6MjA0OTI4MDM5OH0.ISnhowkJc4QnqN0fDf6ng0adZVq35qeghJoocGaX9hk",
-      "GOOGLE_CLIENT_ID": "385065874204-q8skell9bhpra8csedo0jc1nb30n313r.apps.googleusercontent.com",
-      "supportsRTL": true,
-      "router": {
-        "origin": false
-      },
-      "eas": {
-        "projectId": "897f8555-8a66-4dd9-ba03-115600ada996"
-      }
-    }
-  }
+	"expo": {
+		"name": "Cherry App",
+		"slug": "Cherry-App",
+		"version": "0.1.0",
+		"orientation": "portrait",
+		"icon": "./assets/images/favicon.png",
+		"scheme": "cherryapp",
+		"userInterfaceStyle": "automatic",
+		"newArchEnabled": true,
+		"jsEngine": "hermes",
+		"ios": {
+			"supportsTablet": true
+		},
+		"android": {
+			"permissions": [
+				"INTERNET",
+				"READ_EXTERNAL_STORAGE",
+				"WRITE_EXTERNAL_STORAGE"
+			],
+			"adaptiveIcon": {
+				"foregroundImage": "./assets/images/favicon.png",
+				"backgroundColor": "#ffffff"
+			},
+			"package": "com.skellierg.cherryapp"
+		},
+		"web": {
+			"bundler": "metro",
+			"output": "static",
+			"favicon": "./assets/images/favicon.png"
+		},
+		"plugins": [
+			"expo-router",
+			[
+				"expo-splash-screen",
+				{
+					"image": "./assets/images/splash-screen.png",
+					"imageWidth": 200,
+					"resizeMode": "contain",
+					"backgroundColor": "#ffffff"
+				}
+			],
+			"expo-secure-store",
+			"expo-localization",
+			"@react-native-google-signin/google-signin"
+		],
+		"experiments": {
+			"typedRoutes": true
+		},
+		"platforms": ["ios", "android"],
+		"extra": {
+			"SUPABASE_URL": "https://caoduwcuvrdckoqbrcsd.supabase.co",
+			"SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhb2R1d2N1dnJkY2tvcWJyY3NkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM3MDQzOTgsImV4cCI6MjA0OTI4MDM5OH0.ISnhowkJc4QnqN0fDf6ng0adZVq35qeghJoocGaX9hk",
+			"GOOGLE_CLIENT_ID": "385065874204-q8skell9bhpra8csedo0jc1nb30n313r.apps.googleusercontent.com",
+			"supportsRTL": true,
+			"router": {
+				"origin": false
+			},
+			"eas": {
+				"projectId": "897f8555-8a66-4dd9-ba03-115600ada996"
+			}
+		}
+	}
 }

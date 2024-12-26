@@ -4,9 +4,9 @@
 node_modules/
 
 # Expo
-.expo/
-dist/
-web-build/
+.expo/*
+dist/*
+web-build/*
 expo-env.d.ts
 
 # Native
@@ -37,11 +37,11 @@ yarn-error.*
 
 app-example
 
-android/
-windows/
-.obsidian/
-docs/CHANGELOG/
-dist/
+android/*
+windows/*
+.obsidian/*
+docs/CHANGELOG/*
+dist/*
 .env
 secret
-old-src/
+old-src/*

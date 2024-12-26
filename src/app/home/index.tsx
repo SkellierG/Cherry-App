@@ -1,10 +1,24 @@
-import { supabase } from "@/utils/supabase"
-import React from "react"
-import { View, Text, Button } from "react-native"
+import { View } from "tamagui";
+import React from "react";
+import DummyScreen from "@screens/dummy";
+import { supabase } from "@utils/supabase";
+import { useRouter } from "expo-router";
 
 export default function HomeScreen() {
-    return <View>
-        <Text>Home Screen</Text>
-        <Button title="Borrar sesion" onPress={() => supabase.auth.signOut()}></Button>
-    </View>
+	const router = useRouter();
+	const signout = () => {
+		supabase.auth.signOut();
+		router.replace("/auth/sign-in");
+		console.log("cerrar sesion");
+	};
+
+	return (
+		<View>
+			<DummyScreen
+				screenName="home"
+				buttonTitle="cerrar sesion"
+				buttonFunction={signout}
+			/>
+		</View>
+	);
 }
