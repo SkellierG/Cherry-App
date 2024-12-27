@@ -1,16 +1,5 @@
 import React, { createContext, useReducer, useContext } from "react";
-import { User } from "@supabase/supabase-js";
-
-export interface UserState {
-	user: User | null;
-	isAuthenticated: boolean;
-	isProfiled: boolean;
-}
-
-export type UserAction =
-	| { type: "SIGNIN"; payload: User }
-	| { type: "SIGNOUT" }
-	| { type: "PROFILE" };
+import { UserState, UserAction, UserContextType } from "../types/user";
 
 const initialState: UserState = {
 	user: null,
@@ -42,11 +31,6 @@ const userReducer = (state: UserState, action: UserAction): UserState => {
 			return state;
 	}
 };
-
-interface UserContextType {
-	userState: UserState;
-	userDispatch: React.Dispatch<UserAction>;
-}
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 

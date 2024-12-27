@@ -5,13 +5,11 @@ import LoadingScreen from "@screens/Loading";
 import { supabase } from "@utils/supabase";
 import { View } from "react-native";
 import { useUser } from "@contexts/user";
-import { Session } from "@supabase/supabase-js";
-
-type fetchSessionResponse = Session | null;
+import { FetchSessionResponse } from "../types/user";
 
 export default function Index() {
 	const { userDispatch } = useUser();
-	const [sessionData, setSessionData] = useState<fetchSessionResponse>(null);
+	const [sessionData, setSessionData] = useState<FetchSessionResponse>(null);
 
 	const router = useRouter();
 
@@ -23,7 +21,7 @@ export default function Index() {
 	//obtener informacion
 	useEffect(() => {
 		const checkAuth = async (): Promise<void> => {
-			const session: fetchSessionResponse = await fetchSession();
+			const session: FetchSessionResponse = await fetchSession();
 			setSessionData(session);
 			setIsAuthenticated(
 				Boolean(sessionData?.access_token) && Boolean(sessionData?.user),
@@ -49,6 +47,12 @@ export default function Index() {
 					userDispatch({ type: "PROFILE" });
 					router.replace("/home");
 				}
+				if (
+					sessionData?.user.user_metadata.isOauth &&
+					!sessionData?.user.user_metadata.isProfiled
+				) {
+					router.replace("/auth/profile");
+				}
 				router.replace("/auth/sign-up");
 			} else {
 				userDispatch({ type: "SIGNOUT" });
@@ -71,7 +75,7 @@ export default function Index() {
 	return <View />;
 }
 
-const fetchSession = async (): Promise<fetchSessionResponse> => {
+const fetchSession = async (): Promise<FetchSessionResponse> => {
 	try {
 		await new Promise((resolve) => setTimeout(resolve, 5000)); //eliminar despues
 
