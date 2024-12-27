@@ -1,5 +1,5 @@
 import { config, tokens } from "@tamagui/config/v3";
-import * as themes from "@/theme-output";
+import * as themes from "@/assets/themes/theme-output";
 import { createTamagui } from "tamagui";
 
 const customConfig = config;

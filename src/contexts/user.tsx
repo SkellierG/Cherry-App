@@ -1,12 +1,24 @@
 import React, { createContext, useReducer, useContext } from "react";
+import { User } from "@supabase/supabase-js";
 
-const initialState = {
+export interface UserState {
+	user: User | null;
+	isAuthenticated: boolean;
+	isProfiled: boolean;
+}
+
+export type UserAction =
+	| { type: "SIGNIN"; payload: User }
+	| { type: "SIGNOUT" }
+	| { type: "PROFILE" };
+
+const initialState: UserState = {
 	user: null,
 	isAuthenticated: false,
 	isProfiled: false,
 };
 
-const userReducer = (state: any, action: any) => {
+const userReducer = (state: UserState, action: UserAction): UserState => {
 	switch (action.type) {
 		case "SIGNIN":
 			return {
@@ -19,6 +31,7 @@ const userReducer = (state: any, action: any) => {
 				...state,
 				user: null,
 				isAuthenticated: false,
+				isProfiled: false,
 			};
 		case "PROFILE":
 			return {
@@ -30,19 +43,24 @@ const userReducer = (state: any, action: any) => {
 	}
 };
 
-const UserContext = createContext<any>(null);
+interface UserContextType {
+	userState: UserState;
+	userDispatch: React.Dispatch<UserAction>;
+}
+
+const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
-	const [state, dispatch] = useReducer(userReducer, initialState);
+	const [userState, userDispatch] = useReducer(userReducer, initialState);
 
 	return (
-		<UserContext.Provider value={{ state, dispatch }}>
+		<UserContext.Provider value={{ userState, userDispatch }}>
 			{children}
 		</UserContext.Provider>
 	);
 };
 
-export const useUser = () => {
+export const useUser = (): UserContextType => {
 	const context = useContext(UserContext);
 	if (!context) {
 		throw new Error("useUser must be used within a UserProvider");

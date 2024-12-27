@@ -5,7 +5,7 @@ import DummyScreen from "@screens/dummy";
 export default function SignUpScreen() {
 	return (
 		<View>
-			<DummyScreen screenName="sign up" buttonFunction={null} />
+			<DummyScreen screenName="sign up" buttonFunction={undefined} />
 		</View>
 	);
 }

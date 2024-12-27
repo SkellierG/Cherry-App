@@ -10,6 +10,7 @@ import { TamaguiProvider } from "tamagui";
 import { tamaguiConfig } from "@/tamagui.config";
 import React from "react";
 import { UserProvider } from "@contexts/user";
+import RNPaperThemeProvider from "@/assets/themes/rn-paper";
 
 export default function RootLayout() {
 	const colorScheme = useColorScheme();
@@ -17,13 +18,15 @@ export default function RootLayout() {
 	return (
 		<TamaguiProvider config={tamaguiConfig} defaultTheme={colorScheme!}>
 			<ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-				<UserProvider>
-					<Stack
-						screenOptions={{
-							headerShown: false,
-						}}
-					></Stack>
-				</UserProvider>
+				<RNPaperThemeProvider>
+					<UserProvider>
+						<Stack
+							screenOptions={{
+								headerShown: false,
+							}}
+						></Stack>
+					</UserProvider>
+				</RNPaperThemeProvider>
 			</ThemeProvider>
 		</TamaguiProvider>
 	);
