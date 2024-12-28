@@ -9,7 +9,7 @@ import { supabase } from "@utils/supabase";
 import { useRouter } from "expo-router";
 import { Alert } from "react-native";
 import environment from "@utils/environment";
-import { useUser } from "../contexts/user";
+import { useUser } from "@contexts/user";
 
 interface GoogleAuthProps {
 	children?: ReactNode;
@@ -40,25 +40,35 @@ const GoogleAuth: React.FC<GoogleAuthProps> = ({
 						provider: "google",
 						token: userInfo.data.idToken,
 					});
-					console.log(error, data);
 					if (error) {
 						throw error;
 					}
 
+					console.info(data);
 					const user = data.session.user;
 
 					if (user) {
-						// Registrar o actualizar perfil en la base de datos
-						const { error: profileError } = await supabase
+						const { data: profile, error: profileError } = await supabase
 							.from("profiles")
-							.update({
-								is_oauth: true,
-							})
-							.eq("id", user.id);
+							.select("is_oauth, is_profiled")
+							.eq("id", user.id)
+							.single();
 
 						if (profileError) {
-							console.error("Error updating profiles:", profileError);
+							console.error("Error fetching profiles:", profileError);
 							throw profileError;
+						}
+
+						if (!profile.is_oauth) {
+							const { error: updateError } = await supabase
+								.from("profiles")
+								.update({ is_oauth: true })
+								.eq("id", user.id);
+
+							if (updateError) {
+								console.error("Error updating profiles:", updateError);
+								throw updateError;
+							}
 						}
 
 						userDispatch({
@@ -66,14 +76,11 @@ const GoogleAuth: React.FC<GoogleAuthProps> = ({
 							payload: user,
 						});
 
-						// Verificar si el usuario ya tiene un perfil completo
-						if (user.user_metadata.isProfiled) {
-							userDispatch({
-								type: "PROFILE",
-							});
+						if (profile.is_profiled) {
+							userDispatch({ type: "PROFILE" });
 							router.replace("/home");
 						} else {
-							router.replace("/auth/profile");
+							router.push("/auth/profile");
 						}
 					} else {
 						throw new Error("Unexpected error in Google OAuth");
@@ -85,8 +92,6 @@ const GoogleAuth: React.FC<GoogleAuthProps> = ({
 			} else {
 				throw new Error("No ID token present!");
 			}
-
-			//TODO: error handler
 		} catch (error: any) {
 			if (error.code === statusCodes.SIGN_IN_CANCELLED) {
 				console.log(error);

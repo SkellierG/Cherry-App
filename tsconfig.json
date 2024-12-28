@@ -16,7 +16,7 @@
 			"@screens/*": ["./src/screens/*"],
 			"@services/*": ["./src/services/*"],
 			"@contexts/*": ["./src/contexts/*"],
-			"@types/*": ["./src/types/*"],
+			"@types/*": ["./src/types/*"]
 		}
 	},
 	"include": [

@@ -6,7 +6,12 @@ import {
 	MD3Theme,
 	PaperProvider,
 } from "react-native-paper";
-import { light_export } from "./theme-output";
+import {
+	light_export,
+	dark_export,
+	light_accent_export,
+	dark_accent_export,
+} from "./theme-output";
 
 const theme: MD3Theme = {
 	...DefaultTheme,
@@ -16,7 +21,7 @@ const theme: MD3Theme = {
 		//The primary key color is used to derive roles for key components across the UI,
 		//such as the FAB, prominent buttons, active states, as well as the tint of elevated
 		//surfaces.
-		primary: light_export.color10,
+		primary: light_export.color8, //text selection color
 		onPrimary: light_export.color4,
 		primaryContainer: light_export.color4,
 		onPrimaryContainer: light_export.color4,
@@ -40,12 +45,12 @@ const theme: MD3Theme = {
 		background: light_export.color4,
 		onBackground: light_export.color4,
 		surface: light_export.color4,
-		onSurface: light_export.color4,
+		onSurface: dark_export.color1, //text color
 		//The neutral variant key color is used to derive medium emphasis text and icons,
 		//surface variants, and component outlines.
-		surfaceVariant: light_export.color4,
+		surfaceVariant: light_export.color0,
 		outline: light_export.color4,
-		onSurfaceVariant: light_export.color4,
+		onSurfaceVariant: light_accent_export.color4,
 
 		backdrop: light_export.color4,
 		outlineVariant: light_export.color4,

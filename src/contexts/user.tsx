@@ -17,7 +17,6 @@ const userReducer = (state: UserState, action: UserAction): UserState => {
 			};
 		case "SIGNOUT":
 			return {
-				...state,
 				user: null,
 				isAuthenticated: false,
 				isProfiled: false,

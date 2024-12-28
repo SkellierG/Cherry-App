@@ -55,7 +55,7 @@ export function hslStringToRgb(hslaString: string) {
 
 	// Devuelve el color en formato RGBA
 
-    //console.log(`rgba(${r}, ${g}, ${b}, ${a})`);
+	//console.log(`rgba(${r}, ${g}, ${b}, ${a})`);
 
 	return `rgba(${r}, ${g}, ${b}, ${a})`;
 }

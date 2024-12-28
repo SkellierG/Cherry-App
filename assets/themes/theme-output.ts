@@ -729,13 +729,15 @@ const n34 = t([
 	[28, 0],
 ]);
 
-console.log("light", JSON.stringify(light, null, 2));
-console.log("dark", JSON.stringify(dark, null, 2));
-console.log(JSON.stringify(convertHslaToRgba(light), null, 2));
-console.log(JSON.stringify(convertHslaToRgba(dark), null, 2));
+//console.log("light", JSON.stringify(light, null, 2));
+//console.log("dark", JSON.stringify(dark, null, 2));
+//console.log(JSON.stringify(convertHslaToRgba(light), null, 2));
+//console.log(JSON.stringify(convertHslaToRgba(dark), null, 2));
 
 export const light_export: Theme = convertHslaToRgba(light);
 export const dark_export: Theme = convertHslaToRgba(dark);
+export const light_accent_export: Theme = convertHslaToRgba(light_accent);
+export const dark_accent_export: Theme = convertHslaToRgba(dark_accent);
 
 export const dark_accent_SwitchThumb = n34;
 export const dark_accent_SliderThumb = n34;

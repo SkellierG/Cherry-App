@@ -1,11 +1,15 @@
-import { View } from "tamagui";
+import SignUpScreen from "@screens/signUp";
+import GoogleAuth from "@services/googleAuth";
 import React from "react";
-import DummyScreen from "@screens/dummy";
+import { View } from "react-native";
 
-export default function SignUpScreen() {
+export default function SignUp() {
 	return (
-		<View>
-			<DummyScreen screenName="sign up" />
+		<View className="bg-red-50 h-screen">
+			<SignUpScreen />
+			<View className="flex-1 justify-top items-center mt-5">
+				<GoogleAuth />
+			</View>
 		</View>
 	);
 }
