@@ -5,6 +5,12 @@ import { useRouter } from "expo-router";
 import i18n from "@utils/translations";
 import AuthTextInput from "@components/AuthTextInput";
 import { Button } from "tamagui";
+import {
+	validateEmail,
+	validateName,
+	validatePassword,
+} from "@utils/checkFormsData";
+import constants from "@utils/constants";
 
 export default function SignUpScreen() {
 	const [name, setName] = useState("");
@@ -23,31 +29,47 @@ export default function SignUpScreen() {
 	const router = useRouter();
 
 	function validateFields() {
-		if (!name) {
-			setNameFormError(i18n.t("auth.Name_required"));
+		const { isValid: isValidName, errorMessage: errorMessageName } =
+			validateName(name);
+		const { isValid: isValidLastname, errorMessage: errorMessageLastname } =
+			validateName(lastname);
+		const { isValid: isValidEmail, errorMessage: errorMessageEmail } =
+			validateEmail(email);
+		const { isValid: isValidPassword, errorMessage: errorMessagePassword } =
+			validatePassword(password);
+		const {
+			isValid: isValidConfirmPassword,
+			errorMessage: errorMessageConfirmPassword,
+		} = validatePassword(confirmPassword);
+
+		if (!isValidName) {
+			setNameFormError(errorMessageName || "");
 			return false;
 		}
-		if (!lastname) {
-			setLastnameFormError(i18n.t("auth.Lastname_required"));
+		if (!isValidLastname) {
+			setLastnameFormError(errorMessageLastname || "");
 			return false;
 		}
-		if (!email) {
-			setEmailFormError(i18n.t("auth.Email_required"));
+		if (!isValidEmail) {
+			setEmailFormError(errorMessageEmail || "");
 			return false;
 		}
-		if (!password) {
-			setPasswordFormError(i18n.t("auth.Password_required"));
+		if (!isValidPassword) {
+			setPasswordFormError(errorMessagePassword || "");
 			return false;
 		}
-		if (!confirmPassword) {
-			setConfirmPasswordFormError(i18n.t("auth.Confirmpassword_required"));
+		if (!isValidConfirmPassword) {
+			setConfirmPasswordFormError(errorMessageConfirmPassword || "");
 			return false;
 		}
+
 		if (password !== confirmPassword) {
-			setPasswordFormError(i18n.t("auth.passwod_dont_match"));
-			setConfirmPasswordFormError(i18n.t("auth.passwod_dont_match"));
+			const trans = i18n.t("auth.validation.password_match");
+			setPasswordFormError(trans);
+			setConfirmPasswordFormError(trans);
 			return false;
 		}
+
 		setNameFormError("");
 		setLastnameFormError("");
 		setEmailFormError("");
@@ -60,10 +82,12 @@ export default function SignUpScreen() {
 		if (!validateFields()) return;
 
 		setLoading(true);
+
 		const { data, error } = await supabase.auth.signUp({
 			email: email,
 			password: password,
 			options: {
+				emailRedirectTo: `${constants.baseAdress}/auth/email-validation`,
 				data: {
 					avatar_url: null,
 					full_name: `${name} ${lastname}`,
@@ -71,24 +95,25 @@ export default function SignUpScreen() {
 				},
 			},
 		});
-		console.log(data);
-		if (error) {
-			Alert.alert(error.message);
-			console.error(
-				"code",
-				error?.code,
-				"message",
-				error?.message,
-				"name",
-				error?.name,
-				"stack",
-				error?.stack,
-				"status",
-				error?.status,
+
+		console.log("Sign-up response:", JSON.stringify(data, null, 2));
+
+		if (data && data.user) {
+			console.log(
+				"Identities array:",
+				JSON.stringify(data.user.identities, null, 2),
 			);
+
+			if (data.user.identities && data.user.identities.length > 0) {
+				console.log("Sign-up successful!");
+			} else {
+				console.log("Email address is already taken.");
+				router.push("/auth/email-verification");
+			}
+		} else {
+			console.error("An error occurred during sign-up:", error?.message);
 		}
-		if (data.session)
-			Alert.alert("Please check your inbox for email verification!");
+
 		setLoading(false);
 	}
 
@@ -96,28 +121,47 @@ export default function SignUpScreen() {
 		<View className="mt-20">
 			<AuthTextInput
 				placeholder={i18n.t("auth.name")}
-				stateErrorForm={nameFormError}
-				onChangeText={(nam) => setName(nam)}
+				stateFormError={nameFormError}
+				setValue={setName}
+				maxLength={40}
+				autoCapitalize="words"
+				autoComplete="name"
+				textContentType="name"
 			></AuthTextInput>
 			<AuthTextInput
 				placeholder={i18n.t("auth.lastname")}
-				stateErrorForm={lastnameFormError}
-				onChangeText={(las) => setLastname(las)}
+				stateFormError={lastnameFormError}
+				setValue={setLastname}
+				maxLength={40}
+				autoCapitalize="words"
+				autoComplete="name"
+				textContentType="familyName"
 			></AuthTextInput>
 			<AuthTextInput
 				placeholder={i18n.t("auth.example_email")}
-				stateErrorForm={emailFormError}
-				onChangeText={(ema) => setEmail(ema)}
+				stateFormError={emailFormError}
+				setValue={setEmail}
+				maxLength={320}
+				autoComplete="email"
+				textContentType="emailAddress"
 			></AuthTextInput>
 			<AuthTextInput
 				placeholder={i18n.t("auth.password")}
-				stateErrorForm={passwordFormError}
-				onChangeText={(pass) => setPassword(pass)}
+				stateFormError={passwordFormError}
+				setValue={setPassword}
+				maxLength={64}
+				autoComplete="password"
+				textContentType="password"
+				secureTextEntry
 			></AuthTextInput>
 			<AuthTextInput
 				placeholder={i18n.t("auth.confirm_password")}
-				stateErrorForm={confirmPasswordFormError}
-				onChangeText={(pass) => setConfirmPassword(pass)}
+				stateFormError={confirmPasswordFormError}
+				setValue={setConfirmPassword}
+				maxLength={64}
+				autoComplete="password"
+				textContentType="password"
+				secureTextEntry
 			></AuthTextInput>
 			<View className="pl-3 pr-3">
 				<Button disabled={isLoading} onPress={signUpWithEmail}>

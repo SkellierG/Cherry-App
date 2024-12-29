@@ -1,24 +1,36 @@
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import { View, StyleSheet } from "react-native";
-import { TextInput, HelperText } from "react-native-paper";
+import { TextInput, HelperText, TextInputProps } from "react-native-paper";
 
-interface AuthTextInputProps {
+type setValue<T> = Dispatch<SetStateAction<T>> | null;
+
+interface AuthTextInputProps<T> {
 	placeholder?: string;
-	stateErrorForm?: string | null;
-	value?: string;
+	stateFormError?: string | null;
+	setValue?: setValue<T>;
 	windView?: string;
 	windTextInput?: string;
+	maxLength?: number;
+	autoCapitalize?: TextInputProps["autoCapitalize"];
+	autoComplete?: TextInputProps["autoComplete"];
+	textContentType?: TextInputProps["textContentType"];
+	secureTextEntry?: boolean;
 	onChangeText?: (text: string) => void;
 }
 
-const AuthTextInput: React.FC<AuthTextInputProps> = ({
+const AuthTextInput = <T extends unknown>({
 	placeholder = "Enter text",
-	stateErrorForm = null,
-	value,
+	stateFormError = null,
+	setValue = null,
 	windView = "mb-4 pl-3 pr-3",
 	windTextInput = "",
-	onChangeText,
-}) => {
+	maxLength = 100,
+	autoCapitalize = "none",
+	autoComplete,
+	textContentType,
+	secureTextEntry,
+	onChangeText = (text) => setValue?.(text as T),
+}: AuthTextInputProps<T>) => {
 	return (
 		<View className={windView}>
 			<TextInput
@@ -26,13 +38,17 @@ const AuthTextInput: React.FC<AuthTextInputProps> = ({
 				className={windTextInput}
 				mode="outlined"
 				placeholder={placeholder}
-				value={value}
 				onChangeText={onChangeText}
-				error={!!stateErrorForm}
+				error={Boolean(stateFormError)}
+				maxLength={maxLength}
+				autoCapitalize={autoCapitalize}
+				autoComplete={autoComplete}
+				textContentType={textContentType}
+				secureTextEntry={secureTextEntry}
 			/>
-			{stateErrorForm && (
-				<HelperText type="error" visible={!!stateErrorForm}>
-					{stateErrorForm}
+			{stateFormError && (
+				<HelperText type="error" visible={Boolean(stateFormError)}>
+					{stateFormError}
 				</HelperText>
 			)}
 		</View>

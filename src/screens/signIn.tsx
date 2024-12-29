@@ -7,6 +7,7 @@ import { useUser } from "@contexts/user";
 import { Button } from "tamagui";
 import { Text, View } from "react-native";
 import AuthTextInput from "../components/AuthTextInput";
+import { validateEmail, validatePassword } from "../utils/checkFormsData";
 
 export default function SignInScreen() {
 	const router = useRouter();
@@ -14,40 +15,25 @@ export default function SignInScreen() {
 
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
-	const [emailFormError, setEmailFormError] = useState<string | null>(null);
-	const [passwordFormError, setPasswordFormError] = useState<string | null>(
-		null,
-	);
+	const [emailFormError, setEmailFormError] = useState("");
+	const [passwordFormError, setPasswordFormError] = useState("");
 	const [isLoading, setLoading] = useState(false);
 
-	useEffect(() => {
-		const handleAppStateChange = (state: string) => {
-			if (state === "active") {
-				supabase.auth.startAutoRefresh();
-			} else {
-				supabase.auth.stopAutoRefresh();
-			}
-		};
-
-		const subscription = AppState.addEventListener(
-			"change",
-			handleAppStateChange,
-		);
-
-		return () => {
-			subscription.remove();
-		};
-	}, []);
-
 	function validateFields() {
-		if (!email) {
-			setEmailFormError(i18n.t("auth.Email_required"));
+		const { isValid: isValidEmail, errorMessage: errorMessageEmail } =
+			validateEmail(email);
+		const { isValid: isValidPassword, errorMessage: errorMessagePassword } =
+			validatePassword(password);
+
+		if (!isValidEmail) {
+			setEmailFormError(errorMessageEmail || "");
 			return false;
 		}
-		if (!password) {
-			setPasswordFormError(i18n.t("auth.Password_required"));
+		if (!isValidPassword) {
+			setPasswordFormError(errorMessagePassword || "");
 			return false;
 		}
+
 		setEmailFormError("");
 		setPasswordFormError("");
 		return true;
@@ -107,13 +93,20 @@ export default function SignInScreen() {
 		<View className=" mt-20">
 			<AuthTextInput
 				placeholder={i18n.t("auth.example_email")}
-				stateErrorForm={emailFormError}
-				onChangeText={(text) => setEmail(text)}
+				stateFormError={emailFormError}
+				setValue={setEmail}
+				maxLength={320}
+				autoComplete="email"
+				textContentType="emailAddress"
 			></AuthTextInput>
 			<AuthTextInput
 				placeholder={i18n.t("auth.password")}
-				stateErrorForm={passwordFormError}
-				onChangeText={(pass) => setPassword(pass)}
+				stateFormError={passwordFormError}
+				setValue={setPassword}
+				maxLength={64}
+				autoComplete="password"
+				textContentType="password"
+				secureTextEntry
 			></AuthTextInput>
 			<View className="pl-3 pr-3">
 				<Button disabled={isLoading} onPress={() => signInWithSupabase()}>
