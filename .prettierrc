@@ -1,6 +1,6 @@
 {
 	"extends": "universe/native",
-	"tabWidth": 1,
+	"tabWidth": 2,
 	"useTabs": true,
 	"endOfLine": "lf"
 }

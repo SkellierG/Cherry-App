@@ -5,7 +5,7 @@ import { View } from "react-native";
 
 export default function SignUp() {
 	return (
-		<View className="bg-red-50 h-screen">
+		<View className="bg-default h-screen">
 			<SignUpScreen />
 			<View className="flex-1 justify-top items-center mt-5">
 				<GoogleAuth />

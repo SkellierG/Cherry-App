@@ -1,13 +1,11 @@
-import { View } from "tamagui";
+import { View } from "react-native";
 import React from "react";
-import DummyScreen from "@screens/dummy";
-import EraseSession from "@components/eraseSession";
+import ProfileScreen from "@screens/profile";
 
 export default function Profile() {
 	return (
-		<View>
-			<DummyScreen screenName="profile" />
-			<EraseSession />
+		<View className="bg-default h-screen">
+			<ProfileScreen />
 		</View>
 	);
 }

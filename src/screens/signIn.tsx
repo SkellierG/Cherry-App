@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { Alert, AppState } from "react-native";
+import React, { useState } from "react";
+import { Alert } from "react-native";
 import { supabase } from "@utils/supabase";
 import { useRouter } from "expo-router";
 import i18n from "@utils/translations";
 import { useUser } from "@contexts/user";
 import { Button } from "tamagui";
 import { Text, View } from "react-native";
-import AuthTextInput from "../components/AuthTextInput";
-import { validateEmail, validatePassword } from "../utils/checkFormsData";
+import AuthTextInput from "@components/AuthTextInput";
+import { validateEmail, validatePassword } from "@utils/checkFormsData";
 
 export default function SignInScreen() {
 	const router = useRouter();
@@ -114,7 +114,7 @@ export default function SignInScreen() {
 				</Button>
 			</View>
 			<View className="mt-4 flex items-center justify-center">
-				<Text className="text-center">
+				<Text className="text-default">
 					{i18n.t("auth.Dont_have_an_account")}
 					<Text
 						className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"

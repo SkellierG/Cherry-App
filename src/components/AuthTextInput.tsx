@@ -15,6 +15,9 @@ interface AuthTextInputProps<T> {
 	autoComplete?: TextInputProps["autoComplete"];
 	textContentType?: TextInputProps["textContentType"];
 	secureTextEntry?: boolean;
+	editable?: boolean;
+	text?: string;
+	customStyle?: any;
 	onChangeText?: (text: string) => void;
 }
 
@@ -29,12 +32,15 @@ const AuthTextInput = <T extends unknown>({
 	autoComplete,
 	textContentType,
 	secureTextEntry,
+	editable,
+	text,
+	customStyle,
 	onChangeText = (text) => setValue?.(text as T),
 }: AuthTextInputProps<T>) => {
 	return (
 		<View className={windView}>
 			<TextInput
-				style={styles.input}
+				style={StyleSheet.create(customStyle)?.input || styles.input}
 				className={windTextInput}
 				mode="outlined"
 				placeholder={placeholder}
@@ -45,9 +51,15 @@ const AuthTextInput = <T extends unknown>({
 				autoComplete={autoComplete}
 				textContentType={textContentType}
 				secureTextEntry={secureTextEntry}
+				editable={editable}
+				value={text}
 			/>
 			{stateFormError && (
-				<HelperText type="error" visible={Boolean(stateFormError)}>
+				<HelperText
+					style={styles.helperText}
+					type="error"
+					visible={Boolean(stateFormError)}
+				>
 					{stateFormError}
 				</HelperText>
 			)}
@@ -60,5 +72,8 @@ export default AuthTextInput;
 const styles = StyleSheet.create({
 	input: {
 		backgroundColor: "white",
+	},
+	helperText: {
+		color: "red",
 	},
 });

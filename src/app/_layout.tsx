@@ -6,11 +6,11 @@ import {
 import { Stack } from "expo-router";
 import { useColorScheme } from "react-native";
 import { TamaguiProvider } from "tamagui";
-
-import { tamaguiConfig } from "@/tamagui.config";
+import { ThemeProvider as RNThemeProvider } from "@assets/themes/themeContext";
+import { tamaguiConfig } from "../../tamagui.config";
 import React from "react";
 import { UserProvider } from "@contexts/user";
-import RNPaperThemeProvider from "@/assets/themes/rn-paper";
+import RNPaperThemeProvider from "@assets/themes/rn-paper";
 
 export default function RootLayout() {
 	const colorScheme = useColorScheme();
@@ -18,15 +18,17 @@ export default function RootLayout() {
 	return (
 		<TamaguiProvider config={tamaguiConfig} defaultTheme={colorScheme!}>
 			<ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-				<RNPaperThemeProvider>
-					<UserProvider>
-						<Stack
-							screenOptions={{
-								headerShown: false,
-							}}
-						></Stack>
-					</UserProvider>
-				</RNPaperThemeProvider>
+				<RNThemeProvider>
+					<RNPaperThemeProvider>
+						<UserProvider>
+							<Stack
+								screenOptions={{
+									headerShown: false,
+								}}
+							></Stack>
+						</UserProvider>
+					</RNPaperThemeProvider>
+				</RNThemeProvider>
 			</ThemeProvider>
 		</TamaguiProvider>
 	);

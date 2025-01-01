@@ -27,6 +27,7 @@ const GoogleAuth: React.FC<GoogleAuthProps> = ({
 	GoogleSignin.configure({
 		scopes: ["https://www.googleapis.com/auth/drive.readonly"],
 		webClientId: environment.EXPO_PUBLIC_GOOGLE_CLIENT_ID,
+		offlineAccess: true,
 	});
 
 	const googleOauth = async (): Promise<void> => {

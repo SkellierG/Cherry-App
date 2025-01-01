@@ -97,6 +97,9 @@ export default function SignUpScreen() {
 		});
 
 		console.log("Sign-up response:", JSON.stringify(data, null, 2));
+		setLoading(false);
+		Alert.alert("dev: EMAIL SIGN UP IS NOT SUPPORTED YET!");
+		return;
 
 		if (data && data.user) {
 			console.log(
@@ -169,12 +172,14 @@ export default function SignUpScreen() {
 				</Button>
 			</View>
 			<View className="mt-4 flex items-center justify-center">
-				<Text>
+				<Text className="text-default">
 					{i18n.t("auth.Already_have_an_account")}
 					<Text
 						className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
 						disabled={isLoading}
-						onPress={() => router.replace("/auth/sign-in")}
+						onPress={() => {
+							router.dismiss();
+						}}
 					>
 						{i18n.t("auth.Sign_in")}
 					</Text>

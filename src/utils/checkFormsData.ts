@@ -79,7 +79,7 @@ export function validatePassword(password: string): ValidationResult {
 
 export function validateName(name: string): ValidationResult {
 	const minLength = 3; // Longitud mínima para un nombre
-	const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s-]+$/; // Aceptar solo letras, espacios y guiones
+	const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$/; // Aceptar solo letras, espacios y guiones
 
 	if (!name) {
 		return { isValid: false, errorMessage: i18n.t("auth.validation.name.empty") };

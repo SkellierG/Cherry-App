@@ -1,3 +1,23 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Archivo global CSS */
+
+.bg-default {
+    background-color: hsla(340, 59%, 94%, 1);
+}
+
+.text-default {
+    color: #000;
+}
+
+@media (prefers-color-scheme: dark) {
+    .bg-default {
+        background-color: hsla(340, 59%, 14%, 1);
+    }
+
+    .text-default {
+        color: #fff;
+    }
+}

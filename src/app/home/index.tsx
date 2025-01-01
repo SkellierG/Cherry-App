@@ -13,7 +13,7 @@ export default function HomeScreen() {
 	};
 
 	return (
-		<View>
+		<View className=" bg-primary">
 			<DummyScreen
 				screenName="home"
 				buttonTitle="cerrar sesion"

@@ -5,7 +5,7 @@ import EraseSession from "@components/eraseSession";
 
 export default function Profile() {
 	return (
-		<View>
+		<View className="bg-default h-screen">
 			<DummyScreen screenName="email-verification" />
 			<EraseSession />
 		</View>
