@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
-import "@/global.css";
+import "../../global.css";
 import LoadingScreen from "@screens/Loading";
 import { supabase } from "@utils/supabase";
 import { View } from "react-native";
 import { useUser } from "@contexts/user";
-import { FetchSessionResponse } from "../types/user";
+import { FetchSessionResponse } from "../types/users";
 
 export default function Index() {
 	const { userDispatch } = useUser();

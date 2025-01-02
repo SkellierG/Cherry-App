@@ -5,8 +5,11 @@ import React, {
 	ReactNode,
 	useEffect,
 } from "react";
-import { useColorScheme } from "react-native";
-import { dark_export_theme, light_export_theme } from "./tamagui-rnp-adapter";
+
+import {
+	dark_export_theme,
+	light_export_theme,
+} from "@assets/themes/tamagui-rnp-adapter";
 import { MD3Theme } from "react-native-paper";
 
 // Definir el estado del tema

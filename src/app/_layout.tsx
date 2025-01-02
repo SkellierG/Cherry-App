@@ -6,7 +6,7 @@ import {
 import { Stack } from "expo-router";
 import { useColorScheme } from "react-native";
 import { TamaguiProvider } from "tamagui";
-import { ThemeProvider as RNThemeProvider } from "@assets/themes/themeContext";
+import { ThemeProvider as RNThemeProvider } from "@contexts/theme";
 import { tamaguiConfig } from "../../tamagui.config";
 import React from "react";
 import { UserProvider } from "@contexts/user";
