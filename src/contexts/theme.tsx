@@ -7,10 +7,13 @@ import React, {
 } from "react";
 
 import {
+	dark_default_theme,
 	dark_export_theme,
+	light_default_theme,
 	light_export_theme,
 } from "@assets/themes/tamagui-rnp-adapter";
 import { MD3Theme } from "react-native-paper";
+import { useColorScheme } from "react-native";
 
 // Definir el estado del tema
 interface ThemeState {
@@ -22,16 +25,16 @@ type ThemeAction = { type: "WHITE_THEME" | "DARK_THEME" };
 
 // Estado inicial del tema (modo claro por defecto)
 const initialState: ThemeState = {
-	theme: light_export_theme,
+	theme: light_default_theme,
 };
 
 // Reducer para cambiar entre los temas claro y oscuro
 const themeReducer = (state: ThemeState, action: ThemeAction): ThemeState => {
 	switch (action.type) {
 		case "WHITE_THEME":
-			return { theme: light_export_theme };
+			return { theme: light_default_theme };
 		case "DARK_THEME":
-			return { theme: dark_export_theme };
+			return { theme: dark_default_theme };
 		default:
 			return state;
 	}

@@ -13,16 +13,16 @@ export const light_export_theme: MD3Theme = {
 		//The primary key color is used to derive roles for key components across the UI,
 		//such as the FAB, prominent buttons, active states, as well as the tint of elevated
 		//surfaces.
-		primary: light_export.color8, //text selection color
+		primary: light_export.color8, // text selection color
 		onPrimary: light_export.color4,
 		primaryContainer: light_export.color4,
 		onPrimaryContainer: light_export.color4,
 		//The secondary key color is used for less prominent components in the UI
 		//such as filter chips, while expanding the opportunity for color expression.
 		secondary: light_export.color4,
-		onSecondary: light_export.color4,
-		secondaryContainer: light_export.color4,
-		onSecondaryContainer: light_export.color4,
+		onSecondary: light_export.color,
+		secondaryContainer: light_export.color4, //slection in Drawer
+		onSecondaryContainer: light_export.color10, //slected text in Drawer
 		//The tertiary key color is used to derive the roles of contrasting accents
 		//that can be used to balance primary and secondary colors or bring heightened
 		//attention to an element.
@@ -37,12 +37,12 @@ export const light_export_theme: MD3Theme = {
 		background: light_export.color4,
 		onBackground: light_export.color4,
 		surface: light_export.color4,
-		onSurface: dark_export.color1, //text color
+		onSurface: dark_export.color1, // text color
 		//The neutral variant key color is used to derive medium emphasis text and icons,
 		//surface variants, and component outlines.
 		surfaceVariant: light_export.color0,
 		outline: light_export.color4,
-		onSurfaceVariant: light_export.color4,
+		onSurfaceVariant: light_export.color10, // unselected text Drawer and text input plaholder
 
 		backdrop: light_export.color4,
 		outlineVariant: light_export.color4,
@@ -53,20 +53,20 @@ export const dark_export_theme: MD3Theme = {
 	...DarkDefaultTheme,
 	// Specify custom property in nested object
 	colors: {
-		...DefaultTheme.colors,
+		...DarkDefaultTheme.colors,
 		//The primary key color is used to derive roles for key components across the UI,
 		//such as the FAB, prominent buttons, active states, as well as the tint of elevated
 		//surfaces.
-		primary: dark_export.color8, //text selection color
+		primary: dark_export.color8, // text selection color
 		onPrimary: dark_export.color4,
 		primaryContainer: dark_export.color4,
 		onPrimaryContainer: dark_export.color4,
 		//The secondary key color is used for less prominent components in the UI
 		//such as filter chips, while expanding the opportunity for color expression.
 		secondary: dark_export.color4,
-		onSecondary: dark_export.color4,
-		secondaryContainer: dark_export.color4,
-		onSecondaryContainer: dark_export.color4,
+		onSecondary: dark_export.color,
+		secondaryContainer: dark_export.color4, //slection in Drawer
+		onSecondaryContainer: dark_export.color10, //slected text in Drawer
 		//The tertiary key color is used to derive the roles of contrasting accents
 		//that can be used to balance primary and secondary colors or bring heightened
 		//attention to an element.
@@ -81,14 +81,28 @@ export const dark_export_theme: MD3Theme = {
 		background: dark_export.color4,
 		onBackground: dark_export.color4,
 		surface: dark_export.color4,
-		onSurface: dark_export.color1, //text color
+		onSurface: dark_export.color1, // text color
 		//The neutral variant key color is used to derive medium emphasis text and icons,
 		//surface variants, and component outlines.
 		surfaceVariant: dark_export.color0,
 		outline: dark_export.color4,
-		onSurfaceVariant: dark_export.color4,
+		onSurfaceVariant: dark_export.color10, // unselected text Drawer and text input plaholder
 
 		backdrop: dark_export.color4,
 		outlineVariant: dark_export.color4,
+	},
+};
+
+export const dark_default_theme: MD3Theme = {
+	...DarkDefaultTheme,
+	colors: {
+		...DarkDefaultTheme.colors,
+	},
+};
+
+export const light_default_theme: MD3Theme = {
+	...DefaultTheme,
+	colors: {
+		...DefaultTheme.colors,
 	},
 };

@@ -109,7 +109,11 @@ export default function SignInScreen() {
 				secureTextEntry
 			></AuthTextInput>
 			<View className="pl-3 pr-3">
-				<Button disabled={isLoading} onPress={() => signInWithSupabase()}>
+				<Button
+					theme={"red_active"}
+					disabled={isLoading}
+					onPress={() => signInWithSupabase()}
+				>
 					{i18n.t("auth.Sign_in")}
 				</Button>
 			</View>

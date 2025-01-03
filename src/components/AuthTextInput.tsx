@@ -1,3 +1,9 @@
+import {
+	dark_default_theme,
+	light_default_theme,
+} from "@assets/themes/tamagui-rnp-adapter";
+import { dark_export, light_export } from "@assets/themes/theme-output";
+import { useDynamicStyles } from "@hooks/useDynamicStyles";
 import React, { Dispatch, SetStateAction } from "react";
 import { View, StyleSheet } from "react-native";
 import { TextInput, HelperText, TextInputProps } from "react-native-paper";
@@ -37,6 +43,18 @@ const AuthTextInput = <T extends unknown>({
 	customStyle,
 	onChangeText = (text) => setValue?.(text as T),
 }: AuthTextInputProps<T>) => {
+	const styles = useDynamicStyles((theme) => ({
+		input: {
+			backgroundColor:
+				theme === "dark"
+					? dark_default_theme.colors.surface
+					: light_default_theme.colors.surface,
+		},
+		helperText: {
+			color: theme === "dark" ? "salmon" : "red",
+		},
+	}));
+
 	return (
 		<View className={windView}>
 			<TextInput
@@ -68,12 +86,3 @@ const AuthTextInput = <T extends unknown>({
 };
 
 export default AuthTextInput;
-
-const styles = StyleSheet.create({
-	input: {
-		backgroundColor: "white",
-	},
-	helperText: {
-		color: "red",
-	},
-});

@@ -81,6 +81,10 @@ export default function SignUpScreen() {
 	async function signUpWithEmail() {
 		if (!validateFields()) return;
 
+		Alert.alert("dev: EMAIL SIGN UP IS NOT SUPPORTED YET!");
+		setLoading(false);
+		return;
+
 		setLoading(true);
 
 		const { data, error } = await supabase.auth.signUp({
@@ -98,8 +102,6 @@ export default function SignUpScreen() {
 
 		console.log("Sign-up response:", JSON.stringify(data, null, 2));
 		setLoading(false);
-		Alert.alert("dev: EMAIL SIGN UP IS NOT SUPPORTED YET!");
-		return;
 
 		if (data && data.user) {
 			console.log(
@@ -167,7 +169,11 @@ export default function SignUpScreen() {
 				secureTextEntry
 			></AuthTextInput>
 			<View className="pl-3 pr-3">
-				<Button disabled={isLoading} onPress={signUpWithEmail}>
+				<Button
+					theme={"red_active"}
+					disabled={isLoading}
+					onPress={signUpWithEmail}
+				>
 					{i18n.t("auth.Sign_up")}
 				</Button>
 			</View>

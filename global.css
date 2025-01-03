@@ -5,19 +5,19 @@
 /* Archivo global CSS */
 
 .bg-default {
-    background-color: hsla(340, 59%, 94%, 1);
+    background-color: #ffffff;
 }
 
 .text-default {
-    color: #000;
+    color: #000000;
 }
 
 @media (prefers-color-scheme: dark) {
     .bg-default {
-        background-color: hsla(340, 59%, 14%, 1);
+        background-color: #131614;
     }
 
     .text-default {
-        color: #fff;
+        color: #ffffff;
     }
 }

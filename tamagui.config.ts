@@ -5,8 +5,8 @@ import { createTamagui } from "tamagui";
 const customConfig = config;
 
 //@ts-ignore
-customConfig.themes = themes;
-customConfig.tokens = tokens;
+//customConfig.themes = themes;
+//customConfig.tokens = tokens;
 
 export const tamaguiConfig = createTamagui(customConfig);
 

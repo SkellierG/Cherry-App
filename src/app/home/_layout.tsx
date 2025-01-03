@@ -1,114 +1,78 @@
-import React, { useState } from "react";
+import { Drawer } from "expo-router/drawer";
+import React from "react";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+
+import { View } from "tamagui";
 import {
-	View,
-	StyleSheet,
-	TouchableWithoutFeedback,
-	Animated,
-} from "react-native";
-import { Drawer, IconButton } from "react-native-paper";
-import { useRouter, Slot } from "expo-router";
-import { dark_export } from "@assets/themes/theme-output";
+	DrawerContentScrollView,
+	DrawerItemList,
+} from "@react-navigation/drawer";
 
-export default function Layout() {
-	const [drawerVisible, setDrawerVisible] = useState(false);
-	const [active, setActive] = useState("home");
-	const router = useRouter();
-	const slideAnimation = React.useRef(new Animated.Value(-250)).current;
-
-	// Función para abrir el Drawer
-	const openDrawer = () => {
-		setDrawerVisible(true);
-		Animated.timing(slideAnimation, {
-			toValue: 0,
-			duration: 300,
-			useNativeDriver: false,
-		}).start();
-	};
-
-	// Función para cerrar el Drawer
-	const closeDrawer = () => {
-		Animated.timing(slideAnimation, {
-			toValue: -250,
-			duration: 300,
-			useNativeDriver: false,
-		}).start(() => setDrawerVisible(false));
-	};
-
+export default function HomeLayout() {
 	return (
-		<View style={{ flex: 1 }}>
-			{/* Header global con el icono del Drawer */}
-			<View style={styles.header}>
-				<IconButton
-					icon="menu"
-					size={24}
-					onPress={openDrawer}
-					style={styles.menuButton}
-				/>
-			</View>
-
-			{/* Drawer deslizante */}
-			{drawerVisible && (
-				<TouchableWithoutFeedback onPress={closeDrawer}>
-					<View style={styles.overlay} />
-				</TouchableWithoutFeedback>
-			)}
-
-			<Animated.View style={[styles.drawer, { left: slideAnimation }]}>
-				<Drawer.Section>
-					<Drawer.Item
-						label="Inicio"
-						active={active === "home"}
-						onPress={() => {
-							setActive("home");
-							router.push("/home");
-							closeDrawer();
-						}}
-					/>
-					<Drawer.Item
-						label="Configuración"
-						active={active === "settings"}
-						onPress={() => {
-							setActive("settings");
-							router.push("/home/settings");
-							closeDrawer();
-						}}
-					/>
-				</Drawer.Section>
-			</Animated.View>
-
-			{/* Contenido de las pantallas con margen superior */}
-			<Slot />
-		</View>
+		<Drawer drawerContent={CustomDrawerComponent}>
+			<Drawer.Screen
+				name="index"
+				options={{
+					title: "Home",
+					drawerLabel: "Home",
+					drawerIcon: ({ color, size, focused }) => {
+						return <MaterialIcons name="home" size={size} color={color} />;
+					},
+				}}
+			/>
+			<Drawer.Screen
+				name="administration"
+				options={{
+					title: "Administration",
+					drawerLabel: "Administration",
+					drawerIcon: ({ color, size, focused }) => {
+						return <Ionicons name="stats-chart" size={size} color={color} />;
+					},
+				}}
+			/>
+			<Drawer.Screen
+				name="notifications"
+				options={{
+					title: "Notifications",
+					drawerLabel: "Notifications",
+					drawerIcon: ({ color, size, focused }) => {
+						return <Ionicons name="notifications" size={size} color={color} />;
+					},
+				}}
+			/>
+			<Drawer.Screen
+				name="profile"
+				options={{
+					title: "Profile",
+					drawerLabel: "Profile",
+					drawerIcon: ({ color, size, focused }) => {
+						return <FontAwesome5 name="user-alt" size={size} color={color} />;
+					},
+				}}
+			/>
+			<Drawer.Screen
+				name="settings"
+				options={{
+					title: "Settings",
+					drawerLabel: "Settings",
+					drawerIcon: ({ color, size, focused }) => {
+						return <Ionicons name="settings" size={size} color={color} />;
+					},
+				}}
+			/>
+		</Drawer>
 	);
 }
 
-const styles = StyleSheet.create({
-	header: {
-		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "flex-start",
-		backgroundColor: dark_export.color2,
-		height: 56,
-		paddingLeft: 10,
-		zIndex: 2,
-	},
-	menuButton: {
-		marginTop: 10,
-		marginLeft: 10,
-		zIndex: 3,
-	},
-	overlay: {
-		...StyleSheet.absoluteFillObject,
-		backgroundColor: "rgba(0, 0, 0, 0.5)",
-		zIndex: 1,
-	},
-	drawer: {
-		position: "absolute",
-		top: 0,
-		bottom: 0,
-		width: 250,
-		backgroundColor: dark_export.color2,
-		zIndex: 2,
-		paddingTop: 50,
-	},
-});
+function CustomDrawerComponent(props: any) {
+	return (
+		<View style={{ flex: 1 }}>
+			<DrawerContentScrollView {...props}>
+				<DrawerItemList {...props} />
+			</DrawerContentScrollView>
+		</View>
+	);
+}
