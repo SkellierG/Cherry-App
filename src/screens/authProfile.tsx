@@ -7,8 +7,17 @@ import { router } from "expo-router";
 import { validateName } from "@utils/checkFormsData";
 import { useUser } from "@contexts/user";
 import { supabase } from "@utils/supabase";
+import { useDynamicStyles } from "@hooks/useDynamicStyles";
+import { Profile } from "../types/users";
+import DeviceStorage from "@utils/deviceStorage";
 
 export default function ProfileScreen() {
+	const styles = useDynamicStyles((theme) => ({
+		input: {
+			backgroundColor: theme === "dark" ? "grey" : "lightgrey",
+		},
+	}));
+
 	const { userState, userDispatch } = useUser();
 
 	const [isLoading, setIsLoading] = useState(false);
@@ -17,6 +26,9 @@ export default function ProfileScreen() {
 
 	const [nameFormError, setNameFormError] = useState("");
 	const [lastnameFormError, setLastnameFormError] = useState("");
+
+	const fullName = userState.user?.user_metadata.full_name || "";
+	const [firstName, lastName] = fullName.split(" ").slice(0, 2);
 
 	function validateFields() {
 		const { isValid: isValidName, errorMessage: errorMessageName } =
@@ -40,12 +52,20 @@ export default function ProfileScreen() {
 	}
 	async function completeProfile() {
 		if (!validateFields()) return;
-
+		setIsLoading(true);
 		try {
 			if (userState.user?.id) {
+				const newProfile: Profile = {
+					id: userState.user.id,
+					avatar_url: userState.user.user_metadata.avatar_url,
+					name: name,
+					lastname: lastname,
+					is_profiled: true,
+				};
+
 				const { error: updateError } = await supabase
 					.from("profiles")
-					.update({ is_profiled: true })
+					.update(newProfile)
 					.eq("id", userState.user.id);
 
 				if (updateError) {
@@ -54,11 +74,21 @@ export default function ProfileScreen() {
 				}
 				userDispatch({
 					type: "PROFILE",
+					payload: newProfile,
 				});
+				await DeviceStorage.setItem(
+					"profileData",
+					JSON.stringify({
+						...newProfile,
+						is_oauth: userState.profile?.is_oauth,
+					}),
+				);
 				router.replace("/home");
 			} else throw new Error("User id not found");
 		} catch (error) {
 			Alert.alert("Unexpected error", JSON.stringify(error, null, 2));
+		} finally {
+			setIsLoading(false);
 		}
 	}
 
@@ -85,15 +115,19 @@ export default function ProfileScreen() {
 			<AuthTextInput
 				text={userState.user?.email}
 				editable={false}
-				customStyle={{ input: { backgroundColor: "lightgray" } }}
+				customStyle={styles}
 			></AuthTextInput>
 			<View className="pl-3 pr-3">
-				<Button disabled={isLoading} onPress={completeProfile}>
+				<Button
+					theme={"red_active"}
+					disabled={isLoading}
+					onPress={completeProfile}
+				>
 					{i18n.t("auth.Complete_profile")}
 				</Button>
 			</View>
 			<View className="mt-4 flex items-center justify-center">
-				<Text className="text-center">
+				<Text className="text-center text-default">
 					{i18n.t("auth.In_other_moment")}
 					<Text
 						className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"

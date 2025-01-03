@@ -10,6 +10,8 @@ import { useRouter } from "expo-router";
 import { Alert } from "react-native";
 import environment from "@utils/environment";
 import { useUser } from "@contexts/user";
+import DeviceStorage from "@utils/deviceStorage";
+import { Profile } from "../types/users";
 
 interface GoogleAuthProps {
 	children?: ReactNode;
@@ -49,22 +51,24 @@ const GoogleAuth: React.FC<GoogleAuthProps> = ({
 					const user = data.session.user;
 
 					if (user) {
-						const { data: profile, error: profileError } = await supabase
+						const { data: profileData, error: profileError } = await supabase
 							.from("profiles")
-							.select("is_oauth, is_profiled")
+							.select("id, is_oauth, is_profiled, name, lastname, avatar_url")
 							.eq("id", user.id)
 							.single();
 
-						if (profileError) {
+						if (!profileData || profileError) {
 							console.error("Error fetching profiles:", profileError);
 							throw profileError;
 						}
 
-						if (!profile.is_oauth) {
+						if (!profileData.is_oauth) {
 							const { error: updateError } = await supabase
 								.from("profiles")
 								.update({ is_oauth: true })
 								.eq("id", user.id);
+
+							profileData.is_oauth = true;
 
 							if (updateError) {
 								console.error("Error updating profiles:", updateError);
@@ -72,13 +76,29 @@ const GoogleAuth: React.FC<GoogleAuthProps> = ({
 							}
 						}
 
+						console.info("profile", JSON.stringify(profileData, null, 2));
+
 						userDispatch({
 							type: "SIGNIN",
-							payload: user,
+							payload: {
+								user: user,
+								session: data.session,
+								isAuthenticated: true,
+							},
 						});
 
-						if (profile.is_profiled) {
-							userDispatch({ type: "PROFILE" });
+						await DeviceStorage.setItem(
+							"sessionData",
+							JSON.stringify(data.session),
+						);
+						await DeviceStorage.setItem("userData", JSON.stringify(data.user));
+						await DeviceStorage.setItem(
+							"profileData",
+							JSON.stringify(profileData),
+						);
+
+						if (profileData.is_profiled) {
+							userDispatch({ type: "PROFILE", payload: profileData });
 							router.replace("/home");
 						} else {
 							router.push("/auth/profile");

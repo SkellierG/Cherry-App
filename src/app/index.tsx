@@ -7,15 +7,21 @@ import { View } from "react-native";
 import { useUser } from "@contexts/user";
 import { FetchSessionResponse } from "../types/users";
 import DeviceStorage from "@utils/deviceStorage";
+import { useConnectivity } from "@contexts/internet";
 
 export default function Index() {
 	const { userDispatch } = useUser();
+	const { isConnected } = useConnectivity();
 	const [sessionData, setSessionData] = useState<FetchSessionResponse>(null);
 	const router = useRouter();
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
 	const [profileData, setProfileData] = useState({
+		id: null,
 		is_oauth: false,
 		is_profiled: false,
+		name: null,
+		lastname: null,
+		avatar_url: null,
 	});
 	const [isLoading, setIsLoading] = useState(true);
 
@@ -29,7 +35,7 @@ export default function Index() {
 					setIsAuthenticated(true);
 					const { data: profile, error } = await supabase
 						.from("profiles")
-						.select("is_oauth, is_profiled")
+						.select("id, is_oauth, is_profiled, name, lastname, avatar_url")
 						.eq("id", session.user.id)
 						.single();
 
@@ -37,6 +43,7 @@ export default function Index() {
 					setProfileData(profile);
 
 					await DeviceStorage.setItem("sessionData", JSON.stringify(session));
+					await DeviceStorage.setItem("userData", JSON.stringify(session.user));
 					await DeviceStorage.setItem("profileData", JSON.stringify(profile));
 				} else {
 					setIsAuthenticated(false);
@@ -45,23 +52,32 @@ export default function Index() {
 			} catch (error) {
 				console.error("Error checking authentication:", error);
 				setIsAuthenticated(false);
-
-				// Si no hay conexión, intenta obtener los datos de AsyncStorage
-				const cachedSession = await DeviceStorage.getItem("sessionData");
-				const cachedProfile = await DeviceStorage.getItem("profileData");
-
-				if (cachedSession && cachedProfile) {
-					setSessionData(JSON.parse(cachedSession));
-					setProfileData(JSON.parse(cachedProfile));
-					setIsAuthenticated(true);
-				}
 			} finally {
 				setIsLoading(false);
 			}
 		};
 
-		checkAuth();
-	}, []);
+		const checkAuthNoInternet = async () => {
+			const cachedSession: string | null =
+				await DeviceStorage.getItem("sessionData");
+			const cachedProfile: string | null =
+				await DeviceStorage.getItem("profileData");
+
+			if (cachedSession && cachedProfile) {
+				setSessionData(JSON.parse(cachedSession));
+				setProfileData(JSON.parse(cachedProfile));
+				setIsAuthenticated(true);
+			} else {
+				setIsAuthenticated(false);
+			}
+		};
+
+		if (!isConnected) {
+			checkAuthNoInternet();
+		} else {
+			checkAuth();
+		}
+	}, [isConnected]);
 
 	// Actualizar el contexto
 	useEffect(() => {
@@ -72,11 +88,18 @@ export default function Index() {
 
 				userDispatch({
 					type: "SIGNIN",
-					//@ts-ignore
-					payload: sessionData.user,
+					payload: {
+						//@ts-ignore
+						user: sessionData.user,
+						session: sessionData,
+						isAuthenticated: true,
+					},
 				});
 				if (profileData.is_profiled) {
-					userDispatch({ type: "PROFILE" });
+					userDispatch({
+						type: "PROFILE",
+						payload: profileData,
+					});
 					router.replace("/home");
 					return;
 				}

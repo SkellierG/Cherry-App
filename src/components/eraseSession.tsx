@@ -4,6 +4,7 @@ import { supabase } from "@utils/supabase";
 import { useRouter } from "expo-router";
 import { useUser } from "@contexts/user";
 import { Alert } from "react-native";
+import DeviceStorage from "@utils/deviceStorage";
 
 const EraseSession: React.FC = () => {
 	const { userState, userDispatch } = useUser();
@@ -23,7 +24,7 @@ const EraseSession: React.FC = () => {
 			const { error: profileError } = await supabase
 				.from("profiles")
 				.update({
-					id: undefined,
+					id: user.id,
 					updated_at: undefined,
 					avatar_url: undefined,
 					name: undefined,
@@ -38,12 +39,17 @@ const EraseSession: React.FC = () => {
 				throw profileError;
 			}
 
+			await DeviceStorage.removeItem("sessionData");
+			await DeviceStorage.removeItem("userData");
+			await DeviceStorage.removeItem("profileData");
+
 			userDispatch({ type: "SIGNOUT" });
 			Alert.alert("Success", "You have been logged out");
 			router.replace("/auth/sign-in");
 		} catch (error: any) {
 			console.error("Logout Error:", error.message);
 			Alert.alert("Error", error.message || "An unexpected error occurred");
+			router.replace("/auth/sign-in");
 		}
 	};
 

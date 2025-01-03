@@ -1,6 +1,6 @@
 import { View } from "react-native";
 import React from "react";
-import ProfileScreen from "@screens/profile";
+import ProfileScreen from "@screens/authProfile";
 
 export default function Profile() {
 	return (

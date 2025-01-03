@@ -2,10 +2,9 @@ import {
 	dark_default_theme,
 	light_default_theme,
 } from "@assets/themes/tamagui-rnp-adapter";
-import { dark_export, light_export } from "@assets/themes/theme-output";
 import { useDynamicStyles } from "@hooks/useDynamicStyles";
 import React, { Dispatch, SetStateAction } from "react";
-import { View, StyleSheet } from "react-native";
+import { View } from "react-native";
 import { TextInput, HelperText, TextInputProps } from "react-native-paper";
 
 type setValue<T> = Dispatch<SetStateAction<T>> | null;
@@ -58,7 +57,7 @@ const AuthTextInput = <T extends unknown>({
 	return (
 		<View className={windView}>
 			<TextInput
-				style={StyleSheet.create(customStyle)?.input || styles.input}
+				style={customStyle?.input || styles.input}
 				className={windTextInput}
 				mode="outlined"
 				placeholder={placeholder}

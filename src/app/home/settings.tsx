@@ -3,22 +3,14 @@ import React from "react";
 import DummyScreen from "@screens/dummy";
 import { supabase } from "@utils/supabase";
 import { useRouter } from "expo-router";
+import EraseSession from "@components/eraseSession";
+import PullToRefresh from "@components/PullToRefresh";
 
 export default function HomeScreen() {
-	const router = useRouter();
-	const signout = () => {
-		supabase.auth.signOut();
-		router.replace("/auth/sign-in");
-		console.log("cerrar sesion");
-	};
-
 	return (
-		<View>
-			<DummyScreen
-				screenName="Settings"
-				buttonTitle="cerrar sesion"
-				buttonFunction={signout}
-			/>
-		</View>
+		<PullToRefresh>
+			<DummyScreen screenName="Settings" />
+			<EraseSession />
+		</PullToRefresh>
 	);
 }

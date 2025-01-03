@@ -8,6 +8,8 @@ import { Button } from "tamagui";
 import { Text, View } from "react-native";
 import AuthTextInput from "@components/AuthTextInput";
 import { validateEmail, validatePassword } from "@utils/checkFormsData";
+import { Profile } from "../types/users";
+import DeviceStorage from "@utils/deviceStorage";
 
 export default function SignInScreen() {
 	const router = useRouter();
@@ -56,31 +58,46 @@ export default function SignInScreen() {
 
 			const user = data?.user;
 			if (!user) {
-				Alert.alert(i18n.t("auth.Login_failed"), i18n.t("auth.Unexpected_error"));
-				return;
-			}
-
-			const { data: profile, error: profileError } = await supabase
-				.from("profiles")
-				.select("is_oauth, is_profiled")
-				.eq("id", user.id)
-				.single();
-			if (profileError || !profile) {
 				Alert.alert(
-					i18n.t("auth.Profile_error"),
-					profileError?.message || i18n.t("auth.Profile_not_found"),
+					i18n.t("auth.Login_failed"),
+					i18n.t("auth.Unexpected_error"),
 				);
 				return;
 			}
 
-			userDispatch({ type: "SIGNIN", payload: user });
+			const { data: profileData, error: profileError } = await supabase
+				.from("profiles")
+				.select("id, is_oauth, is_profiled, name, lastname, avatar_url")
+				.eq("id", user.id)
+				.single();
 
-			if (profile.is_profiled) {
-				userDispatch({ type: "PROFILE" });
+			if (!profileData || profileError) {
+				Alert.alert(
+					i18n.t("auth.Profile_error"),
+					profileData ? profileError : i18n.t("auth.Profile_not_found"),
+				);
+				return;
+			}
+			console.info("profile", JSON.stringify(profileData, null, 2));
+			userDispatch({
+				type: "SIGNIN",
+				payload: {
+					user: data.user,
+					session: data.session,
+					isAuthenticated: true,
+				},
+			});
+
+			if (profileData.is_profiled) {
+				userDispatch({ type: "PROFILE", payload: profileData });
 				router.replace("/home");
 			} else {
 				router.replace("/auth/profile");
 			}
+
+			await DeviceStorage.setItem("sessionData", JSON.stringify(data.session));
+			await DeviceStorage.setItem("userData", JSON.stringify(data.user));
+			await DeviceStorage.setItem("profileData", JSON.stringify(profileData));
 		} catch (error: any) {
 			console.error(error);
 			Alert.alert(i18n.t("auth.Unexpected_error"), error.message);

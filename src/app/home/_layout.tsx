@@ -3,8 +3,7 @@ import React from "react";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-
-import { View } from "tamagui";
+import { View } from "react-native";
 import {
 	DrawerContentScrollView,
 	DrawerItemList,
@@ -69,7 +68,7 @@ export default function HomeLayout() {
 
 function CustomDrawerComponent(props: any) {
 	return (
-		<View style={{ flex: 1 }}>
+		<View className="flex-1">
 			<DrawerContentScrollView {...props}>
 				<DrawerItemList {...props} />
 			</DrawerContentScrollView>

@@ -1,11 +1,11 @@
 import { View } from "tamagui";
 import React from "react";
-import DummyScreen from "@screens/dummy";
+import ProfileScreen from "@screens/dashboardProfile";
 
-export default function ProfileScreen() {
+export default function Profile() {
 	return (
 		<View>
-			<DummyScreen screenName="Profile" />
+			<ProfileScreen />
 		</View>
 	);
 }
