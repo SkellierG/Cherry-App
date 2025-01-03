@@ -1,7 +1,29 @@
 import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const getDeviceStorage = () => {
+type StorageInterface = {
+	getItem: (key: string) => Promise<string | null>;
+	setItem: (key: string, value: string) => Promise<void>;
+	removeItem: (key: string) => Promise<void>;
+};
+
+const createMemoryStorage = (): StorageInterface => {
+	let memoryStorage: Record<string, string> = {};
+
+	return {
+		async getItem(key: string) {
+			return memoryStorage[key] || null;
+		},
+		async setItem(key: string, value: string) {
+			memoryStorage[key] = value;
+		},
+		async removeItem(key: string) {
+			delete memoryStorage[key];
+		},
+	};
+};
+
+const getDeviceStorage = (): StorageInterface => {
 	if (Platform.OS === "web") {
 		try {
 			if (typeof localStorage !== "undefined") {
@@ -10,13 +32,15 @@ const getDeviceStorage = () => {
 
 				return {
 					async getItem(key: string) {
-						return localStorage.getItem(key);
+						return Promise.resolve(localStorage.getItem(key));
 					},
 					async setItem(key: string, value: string) {
 						localStorage.setItem(key, value);
+						return Promise.resolve();
 					},
 					async removeItem(key: string) {
 						localStorage.removeItem(key);
+						return Promise.resolve();
 					},
 				};
 			}
@@ -27,21 +51,10 @@ const getDeviceStorage = () => {
 			);
 		}
 
-		const memoryStorage: Record<string, string> = {};
-
-		return {
-			async getItem(key: string) {
-				return memoryStorage[key] || null;
-			},
-			async setItem(key: string, value: string) {
-				memoryStorage[key] = value;
-			},
-			async removeItem(key: string) {
-				delete memoryStorage[key];
-			},
-		};
+		return createMemoryStorage();
 	}
 
+	console.info("Para Android/iOS usa AsyncStorage");
 	return {
 		async getItem(key: string) {
 			return AsyncStorage.getItem(key);
@@ -55,6 +68,6 @@ const getDeviceStorage = () => {
 	};
 };
 
-const DeviceStorage = getDeviceStorage();
+const DeviceStorage: StorageInterface = getDeviceStorage();
 
 export default DeviceStorage;

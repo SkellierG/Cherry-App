@@ -3,7 +3,7 @@ import { useRouter } from "expo-router";
 import "../../global.css";
 import LoadingScreen from "@screens/Loading";
 import { supabase } from "@utils/supabase";
-import { View } from "react-native";
+import { Alert, View } from "react-native";
 import { useUser } from "@contexts/user";
 import { FetchSessionResponse } from "../types/users";
 import DeviceStorage from "@utils/deviceStorage";
@@ -67,9 +67,12 @@ export default function Index() {
 				setSessionData(JSON.parse(cachedSession));
 				setProfileData(JSON.parse(cachedProfile));
 				setIsAuthenticated(true);
+				console.log(sessionData, profileData, isAuthenticated);
 			} else {
 				setIsAuthenticated(false);
+				console.log(isAuthenticated);
 			}
+			setIsLoading(false);
 		};
 
 		if (!isConnected) {
@@ -77,7 +80,7 @@ export default function Index() {
 		} else {
 			checkAuth();
 		}
-	}, [isConnected]);
+	}, [isAuthenticated, isConnected, profileData, sessionData]);
 
 	// Actualizar el contexto
 	useEffect(() => {
@@ -107,10 +110,12 @@ export default function Index() {
 					router.replace("/auth/profile");
 					return;
 				}
+				Alert.alert("dev:SOMETHING WENT GRONG");
 				console.error("Something went wrong");
 				router.replace("/auth/sign-in");
 				return;
 			} else {
+				Alert.alert("dev: NO SESSION FOUNDED");
 				userDispatch({ type: "SIGNOUT" });
 				router.replace("/auth/sign-in");
 				return;

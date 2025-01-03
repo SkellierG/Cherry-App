@@ -49,6 +49,9 @@ const EraseSession: React.FC = () => {
 		} catch (error: any) {
 			console.error("Logout Error:", error.message);
 			Alert.alert("Error", error.message || "An unexpected error occurred");
+			await DeviceStorage.removeItem("sessionData");
+			await DeviceStorage.removeItem("userData");
+			await DeviceStorage.removeItem("profileData");
 			router.replace("/auth/sign-in");
 		}
 	};
