@@ -6,7 +6,7 @@ import AuthTextInput from "@components/AuthTextInput";
 import { router } from "expo-router";
 import { validateName } from "@utils/checkFormsData";
 import { useUser } from "@contexts/user";
-import { supabase } from "../utils/supabase..web";
+import { supabase } from "@utils/supabase";
 
 export default function ProfileScreen() {
 	const { userState, userDispatch } = useUser();

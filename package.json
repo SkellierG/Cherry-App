@@ -6,6 +6,7 @@
     "desktop-cherry-app"
   ],
   "scripts": {
+    "compile": "eas build --platform android --profile preview",
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",

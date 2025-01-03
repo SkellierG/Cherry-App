@@ -6,22 +6,19 @@ import { supabase } from "@utils/supabase";
 import { View } from "react-native";
 import { useUser } from "@contexts/user";
 import { FetchSessionResponse } from "../types/users";
+import DeviceStorage from "@utils/deviceStorage";
 
 export default function Index() {
 	const { userDispatch } = useUser();
 	const [sessionData, setSessionData] = useState<FetchSessionResponse>(null);
-
 	const router = useRouter();
-
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
 	const [profileData, setProfileData] = useState({
 		is_oauth: false,
 		is_profiled: false,
 	});
-
 	const [isLoading, setIsLoading] = useState(true);
 
-	//obtener informacion
 	useEffect(() => {
 		const checkAuth = async (): Promise<void> => {
 			try {
@@ -38,13 +35,26 @@ export default function Index() {
 
 					if (error) throw error;
 					setProfileData(profile);
+
+					await DeviceStorage.setItem("sessionData", JSON.stringify(session));
+					await DeviceStorage.setItem("profileData", JSON.stringify(profile));
 				} else {
 					setIsAuthenticated(false);
-					console.info("not session founded in supabase");
+					console.info("No session found in Supabase");
 				}
 			} catch (error) {
 				console.error("Error checking authentication:", error);
 				setIsAuthenticated(false);
+
+				// Si no hay conexión, intenta obtener los datos de AsyncStorage
+				const cachedSession = await DeviceStorage.getItem("sessionData");
+				const cachedProfile = await DeviceStorage.getItem("profileData");
+
+				if (cachedSession && cachedProfile) {
+					setSessionData(JSON.parse(cachedSession));
+					setProfileData(JSON.parse(cachedProfile));
+					setIsAuthenticated(true);
+				}
 			} finally {
 				setIsLoading(false);
 			}
@@ -53,7 +63,7 @@ export default function Index() {
 		checkAuth();
 	}, []);
 
-	//actualizar contexto
+	// Actualizar el contexto
 	useEffect(() => {
 		if (!isLoading) {
 			if (isAuthenticated) {
@@ -74,7 +84,7 @@ export default function Index() {
 					router.replace("/auth/profile");
 					return;
 				}
-				console.error("something went wrong");
+				console.error("Something went wrong");
 				router.replace("/auth/sign-in");
 				return;
 			} else {
@@ -104,7 +114,7 @@ export default function Index() {
 
 const fetchSession = async (): Promise<FetchSessionResponse> => {
 	try {
-		await new Promise((resolve) => setTimeout(resolve, 5000)); //eliminar despues
+		await new Promise((resolve) => setTimeout(resolve, 5000)); // Eliminar después
 
 		const { data, error } = await supabase.auth.getSession();
 		if (error) throw error;
