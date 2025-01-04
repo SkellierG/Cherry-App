@@ -39,11 +39,9 @@ const CompanyProfileList: React.FC<CompanyProfileListProps> = ({
 			borderRadius: 8,
 			padding: 16,
 			marginBottom: 12,
-			shadowColor: "#000",
 			shadowOffset: { width: 0, height: 1 },
 			shadowOpacity: 0.2,
 			shadowRadius: 1.41,
-			elevation: 2,
 		},
 		textContainer: {
 			flex: 1,
@@ -101,32 +99,52 @@ const CompanyProfileList: React.FC<CompanyProfileListProps> = ({
 					telefono: "",
 					email: "",
 				},
+				{
+					id: "join-new",
+					name: "Join a company",
+					description: "",
+					telefono: "",
+					email: "",
+				},
 			]}
 			keyExtractor={(item) => item.id}
-			renderItem={({ item }) =>
-				item.id === "create-new" ? (
-					<TouchableOpacity
-						style={[styles.card, styles.createCard]}
-						onPress={() => router.push("/home/profile")}
-					>
-						<Text style={styles.createText}>+ Create a new company</Text>
-					</TouchableOpacity>
-				) : (
-					<View style={styles.card}>
-						<View style={styles.textContainer}>
-							<Text className="text-default" style={styles.name}>
-								{item.name}
-							</Text>
-							<Text style={styles.description}>{item.description}</Text>
-							<Text style={styles.contact}>Email: {item.email}</Text>
-							<Text style={styles.contact}>Phone: {item.telefono}</Text>
+			renderItem={({ item }) => {
+				if (item.id === "create-new") {
+					return (
+						<TouchableOpacity
+							style={[styles.card, styles.createCard]}
+							onPress={() => router.push("/home/profile")}
+						>
+							<Text style={styles.createText}>+ Create a new company</Text>
+						</TouchableOpacity>
+					);
+				} else if (item.id === "join-new") {
+					return (
+						<TouchableOpacity
+							style={[styles.card, styles.createCard]}
+							onPress={() => router.push("/home/profile")}
+						>
+							<Text style={styles.createText}>Join a company</Text>
+						</TouchableOpacity>
+					);
+				} else {
+					return (
+						<View style={styles.card}>
+							<View style={styles.textContainer}>
+								<Text className="text-default" style={styles.name}>
+									{item.name}
+								</Text>
+								<Text style={styles.description}>{item.description}</Text>
+								<Text style={styles.contact}>Email: {item.email}</Text>
+								<Text style={styles.contact}>Phone: {item.telefono}</Text>
+							</View>
+							{item.imageSource && (
+								<Image style={styles.image} source={item.imageSource} />
+							)}
 						</View>
-						{item.imageSource && (
-							<Image style={styles.image} source={item.imageSource} />
-						)}
-					</View>
-				)
-			}
+					);
+				}
+			}}
 			contentContainerStyle={styles.container}
 		/>
 	);

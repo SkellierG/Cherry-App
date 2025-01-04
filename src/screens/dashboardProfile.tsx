@@ -6,9 +6,9 @@ import CompanyProfileList from "@components/companyProfile";
 import ProfileComponent from "@components/profile";
 import { useUser } from "@contexts/user";
 import { useDynamicStyles } from "@hooks/useDynamicStyles";
-import React, { useState } from "react";
-import { Dimensions, View, Text } from "react-native";
-import { H1, H2 } from "tamagui";
+import React from "react";
+import { View, KeyboardAvoidingView, Platform } from "react-native";
+import { H2 } from "tamagui";
 
 type ProfileScreenProps = {
 	name?: string;
@@ -25,7 +25,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({
 }) => {
 	const styles = useDynamicStyles((theme) => ({
 		view: {
-			height: Dimensions.get("window").height,
+			flex: 1,
 			backgroundColor:
 				theme === "dark"
 					? dark_default_theme.colors.background
@@ -34,6 +34,14 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({
 		text: {
 			textAlign: "center",
 			fontWeight: "bold",
+		},
+		bottom: {
+			paddingBottom: 30,
+			marginBottom: 100,
+		},
+		content: {
+			flex: 1,
+			justifyContent: "space-between",
 		},
 	}));
 
@@ -91,15 +99,22 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({
 	];
 
 	return (
-		<View style={styles.view}>
-			<ProfileComponent
-				name={`${finalName} ${finalLastname}`}
-				email={finalEmail}
-				imageSource={finalImageSource}
-			/>
-			<H2 style={styles.text}>Companyes</H2>
-			<CompanyProfileList companies={companies} />
-		</View>
+		<KeyboardAvoidingView
+			style={styles.view}
+			behavior={Platform.OS === "ios" ? "padding" : undefined}
+		>
+			<View style={styles.content}>
+				<ProfileComponent
+					name={`${finalName} ${finalLastname}`}
+					email={finalEmail}
+					imageSource={finalImageSource}
+				/>
+				<H2 style={styles.text}>Companies</H2>
+				<View style={styles.bottom}>
+					<CompanyProfileList companies={companies} />
+				</View>
+			</View>
+		</KeyboardAvoidingView>
 	);
 };
 
