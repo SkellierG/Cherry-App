@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { ScrollView, RefreshControl, View } from "react-native";
+import React, { useState, ReactNode } from "react";
+import { FlatList, RefreshControl, View, StyleSheet } from "react-native";
 
 type PullToRefreshProps = {
-	children: React.ReactNode;
+	children: ReactNode;
 	onRefreshCallback?: (
 		setRefreshing: React.Dispatch<React.SetStateAction<boolean>>,
 	) => void;
@@ -19,14 +19,16 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({
 		if (onRefreshCallback) {
 			onRefreshCallback(setRefreshing);
 		}
-		setTimeout(() => setRefreshing(false), 1000);
+		setTimeout(() => setRefreshing(false), 1000); // Fallback timeout
 	};
 
+	const renderChildren = () => <View style={styles.container}>{children}</View>;
+
 	return (
-		<ScrollView
-			contentContainerStyle={{
-				flexGrow: 1,
-			}}
+		<FlatList
+			data={[]}
+			renderItem={null}
+			ListHeaderComponent={renderChildren}
 			refreshControl={
 				<RefreshControl
 					refreshing={refreshing}
@@ -36,10 +38,14 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({
 					titleColor="#000000"
 				/>
 			}
-		>
-			{children}
-		</ScrollView>
+		/>
 	);
 };
+
+const styles = StyleSheet.create({
+	container: {
+		flexGrow: 1,
+	},
+});
 
 export default PullToRefresh;

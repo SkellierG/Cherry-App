@@ -27,9 +27,6 @@ export default function ProfileScreen() {
 	const [nameFormError, setNameFormError] = useState("");
 	const [lastnameFormError, setLastnameFormError] = useState("");
 
-	const fullName = userState.user?.user_metadata.full_name || "";
-	const [firstName, lastName] = fullName.split(" ").slice(0, 2);
-
 	function validateFields() {
 		const { isValid: isValidName, errorMessage: errorMessageName } =
 			validateName(name);

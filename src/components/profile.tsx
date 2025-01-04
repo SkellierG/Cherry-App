@@ -1,5 +1,10 @@
 import { StyleSheet, Text, View, Image } from "react-native";
 import React from "react";
+import { useDynamicStyles } from "@hooks/useDynamicStyles";
+import {
+	dark_default_theme,
+	light_default_theme,
+} from "@assets/themes/tamagui-rnp-adapter";
 
 type ProfileComponentProps = {
 	name?: string;
@@ -18,6 +23,49 @@ export default function ProfileComponent({
 	reviewed = 0,
 	contacted = 0,
 }: ProfileComponentProps) {
+	const styles = useDynamicStyles((theme) => ({
+		main: {
+			marginTop: 10,
+		},
+		imageContainer: {
+			justifyContent: "center",
+			alignItems: "center",
+		},
+		image: {
+			width: 150,
+			height: 150,
+			borderRadius: 50,
+			marginBottom: 5,
+		},
+		name: {
+			fontSize: 16,
+			fontWeight: "bold",
+		},
+		email: {
+			fontSize: 16,
+			fontWeight: "500",
+		},
+		middleSectionTextContainer: {
+			flexDirection: "row",
+			justifyContent: "space-evenly",
+			marginTop: 20,
+		},
+		middleSectionText: {
+			justifyContent: "center",
+			alignItems: "center",
+		},
+		toptext: {
+			fontSize: 16,
+			color: "white",
+			fontWeight: "bold",
+		},
+		bottomtext: {
+			fontSize: 16,
+			color: "darkgrey",
+			fontWeight: "700",
+		},
+	}));
+
 	return (
 		<View style={styles.main}>
 			<View style={styles.imageContainer}>
@@ -47,46 +95,3 @@ export default function ProfileComponent({
 		</View>
 	);
 }
-
-const styles = StyleSheet.create({
-	main: {
-		marginTop: 30,
-	},
-	imageContainer: {
-		justifyContent: "center",
-		alignItems: "center",
-	},
-	image: {
-		width: 150,
-		height: 150,
-		borderRadius: 50,
-		marginBottom: 5,
-	},
-	name: {
-		fontSize: 16,
-		fontWeight: "bold",
-	},
-	email: {
-		fontSize: 16,
-		fontWeight: "500",
-	},
-	middleSectionTextContainer: {
-		flexDirection: "row",
-		justifyContent: "space-evenly",
-		marginTop: 20,
-	},
-	middleSectionText: {
-		justifyContent: "center",
-		alignItems: "center",
-	},
-	toptext: {
-		fontSize: 16,
-		color: "white",
-		fontWeight: "bold",
-	},
-	bottomtext: {
-		fontSize: 16,
-		color: "darkgrey",
-		fontWeight: "700",
-	},
-});
