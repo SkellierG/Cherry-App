@@ -1,20 +1,17 @@
 import React, { useState } from "react";
 import { Alert } from "react-native";
 import { useRouter } from "expo-router";
-import { supabase } from "@services/supabase";
 import AuthForm from "@components/AuthForm";
 import { validateEmail, validatePassword } from "@utils/formValidation";
 import i18n from "@services/translations";
-import DeviceStorage from "@utils/deviceStorage";
-import { useUser } from "@contexts/user";
+import { useSignIn } from "@hooks/useSignIn";
 
 export default function SignInScreen() {
 	const router = useRouter();
-	const { userDispatch } = useUser();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [formErrors, setFormErrors] = useState<Record<string, string>>({});
-	const [isLoading, setLoading] = useState(false);
+	const { isLoading, handleSignIn } = useSignIn();
 
 	const validateFields = () => {
 		const errors: Record<string, string> = {};
@@ -36,61 +33,9 @@ export default function SignInScreen() {
 		if (!validateFields()) return;
 
 		try {
-			setLoading(true);
-
-			const { data, error } = await supabase.auth.signInWithPassword({
-				email,
-				password,
-			});
-			if (error) throw new Error(error.message);
-
-			const user = data?.user;
-			if (!user) {
-				Alert.alert(
-					i18n.t("auth.Login_failed"),
-					i18n.t("auth.Unexpected_error"),
-				);
-				return;
-			}
-
-			const { data: profileData, error: profileError } = await supabase
-				.from("profiles")
-				.select("id, is_oauth, is_profiled, name, lastname, avatar_url")
-				.eq("id", user.id)
-				.single();
-
-			if (!profileData || profileError) {
-				Alert.alert(
-					i18n.t("auth.Profile_error"),
-					profileData ? profileError : i18n.t("auth.Profile_not_found"),
-				);
-				return;
-			}
-
-			userDispatch({
-				type: "SIGNIN",
-				payload: {
-					user: data.user,
-					session: data.session,
-					isAuthenticated: true,
-				},
-			});
-
-			if (profileData.is_profiled) {
-				userDispatch({ type: "PROFILE", payload: profileData });
-				router.replace("/home");
-			} else {
-				router.replace("/auth/profile");
-			}
-
-			await DeviceStorage.setItem("sessionData", JSON.stringify(data.session));
-			await DeviceStorage.setItem("userData", JSON.stringify(data.user));
-			await DeviceStorage.setItem("profileData", JSON.stringify(profileData));
+			await handleSignIn(email, password);
 		} catch (error: any) {
-			console.error(error);
-			Alert.alert(i18n.t("auth.Unexpected_error"), error.message);
-		} finally {
-			setLoading(false);
+			Alert.alert("Unable to sign in. Please try again.", error.message);
 		}
 	};
 

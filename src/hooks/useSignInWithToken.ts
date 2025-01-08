@@ -5,18 +5,34 @@ import { useRouter } from "expo-router";
 import { Alert } from "react-native";
 import { useUser } from "@contexts/user";
 //@ts-ignore
-import { UseSignInHook } from "@types/hooks";
+import { UseSignInWithTokenHook } from "@types/hooks";
 
-export function useSignIn(): UseSignInHook {
+export function useSignInWithToken(): UseSignInWithTokenHook {
 	const [isLoading, setIsLoading] = useState(false);
 	const router = useRouter();
 	const { userDispatch } = useUser();
 
-	const handleSignIn = async (email: string, password: string) => {
+	const handleSignIn = async (
+		provider:
+			| "google"
+			| "apple"
+			| "azure"
+			| "facebook"
+			| "kakao"
+			| (string & {}),
+		token: string,
+		access_token?: string,
+		nonce?: string,
+	) => {
 		setIsLoading(true);
 		try {
 			const { signIn: signInData, profile } =
-				await AuthSupabase.signInWithCache(email, password);
+				await AuthSupabase.signInWitIdTokendWithCache(
+					provider,
+					token,
+					access_token,
+					nonce,
+				);
 
 			userDispatch({
 				type: "SIGNIN",

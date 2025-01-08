@@ -1,5 +1,4 @@
 import { supabase } from "@services/supabase";
-import { AuthError } from "@supabase/supabase-js";
 import {
 	GetSessionResponse,
 	IAuthService,
@@ -18,6 +17,28 @@ export class AuthService implements IAuthService {
 		const { data, error } = await supabase.auth.signInWithPassword({
 			email,
 			password,
+		});
+		if (error) handleError(error);
+		return { ...data };
+	}
+
+	async signInWitIdTokend(
+		provider:
+			| "google"
+			| "apple"
+			| "azure"
+			| "facebook"
+			| "kakao"
+			| (string & {}),
+		token: string,
+		access_token?: string,
+		nonce?: string,
+	): Promise<SignInResponse> {
+		const { data, error } = await supabase.auth.signInWithIdToken({
+			provider,
+			token,
+			access_token,
+			nonce,
 		});
 		if (error) handleError(error);
 		return { ...data };

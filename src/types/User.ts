@@ -71,6 +71,19 @@ export type SignUpResponse = {
 export interface IAuthService {
 	signInWithPassword(email: string, password: string): Promise<SignInResponse>;
 
+	signInWitIdTokend(
+		provider:
+			| "google"
+			| "apple"
+			| "azure"
+			| "facebook"
+			| "kakao"
+			| (string & {}),
+		token: string,
+		access_token?: string,
+		nonce?: string,
+	): Promise<SignInResponse>;
+
 	signUp(
 		email: string,
 		password: string,
@@ -84,8 +97,11 @@ export interface IAuthService {
 
 export interface IAuthController {
 	/**
-	 * Retrieves the session from cache if available, otherwise fetches it from the service.
-	 * @returns {Promise<{session: Session; user: User; profile: Profile;}>} The session data.
+	 * Retrieves the current session from cache if available, otherwise fetches it from the service.
+	 * The session includes user and profile data.
+	 *
+	 * @returns A promise that resolves with the session, user, and profile data.
+	 * @throws Throws an error if no session is found or profile fetching fails.
 	 */
 	getSessionWithCache(): Promise<{
 		session: Session;
@@ -94,10 +110,12 @@ export interface IAuthController {
 	}>;
 
 	/**
-	 * Signs in the user and caches the session for future use.
-	 * @param email - The email of the user.
-	 * @param password - The password of the user.
-	 * @returns {Promise<{ signIn: SignInResponse; profile: Profile }>} The result of the sign-in operation.
+	 * Signs in the user with email and password, then caches the session, user, and profile data.
+	 *
+	 * @param email - The user's email address.
+	 * @param password - The user's password.
+	 * @returns A promise that resolves with the sign-in response and profile data.
+	 * @throws Throws an error if sign-in or profile fetching fails.
 	 */
 	signInWithCache(
 		email: string,
@@ -105,11 +123,37 @@ export interface IAuthController {
 	): Promise<{ signIn: SignInResponse; profile: Profile }>;
 
 	/**
-	 * Signs up a new user and caches the session if auto-login is enabled.
-	 * @param email - The email of the user.
-	 * @param password - The password of the user.
-	 * @param options - Additional sign-up options.
-	 * @returns {Promise<SignUpResponse>} The result of the sign-up operation.
+	 * Signs in the user using a provider (e.g., Google, Apple) and an identity token, then caches the session, user, and profile data.
+	 *
+	 * @param provider - The OAuth provider (e.g., "google", "apple").
+	 * @param token - The identity token from the provider.
+	 * @param access_token - (Optional) The access token for the provider.
+	 * @param nonce - (Optional) A nonce value for added security.
+	 * @returns A promise that resolves with the sign-in response and profile data.
+	 * @throws Throws an error if sign-in or profile fetching fails.
+	 */
+	signInWitIdTokendWithCache(
+		provider:
+			| "google"
+			| "apple"
+			| "azure"
+			| "facebook"
+			| "kakao"
+			| (string & {}),
+		token: string,
+		access_token?: string,
+		nonce?: string,
+	): Promise<{ signIn: SignInResponse; profile: Profile }>;
+
+	/**
+	 * Signs up a new user with the provided email, password, and options.
+	 * If auto-login is enabled, the session is cached.
+	 *
+	 * @param email - The user's email address.
+	 * @param password - The user's password.
+	 * @param options - Additional options for sign-up.
+	 * @returns A promise that resolves with the sign-up response.
+	 * @throws Throws an error if the sign-up operation fails.
 	 */
 	signUpWithCache(
 		email: string,
@@ -118,8 +162,57 @@ export interface IAuthController {
 	): Promise<SignUpResponse>;
 
 	/**
-	 * Signs out the user and clears any cached session data.
-	 * @returns {Promise<{ success: boolean }>} Resolves when the operation is complete.
+	 * Signs out the currently logged-in user and clears cached session, user, and profile data.
+	 *
+	 * @returns A promise that resolves with a success object indicating the operation's completion.
+	 * @throws Throws an error if no user is logged in or the sign-out operation fails.
 	 */
 	signOutWithClearCache(): Promise<{ success: boolean }>;
+}
+
+export type ProfileColumns = "id" | "name" | "lastname" | "avatar_url";
+
+/**
+ * Interface for managing user profiles.
+ */
+export interface IProfileService {
+	/**
+	 * Fetch a profile by its user ID with specific columns.
+	 *
+	 * @param userId - The unique ID of the user.
+	 * @param select - An array of columns to fetch or "*" to fetch all columns.
+	 * @returns A promise that resolves to the user's profile.
+	 */
+	fetchProfileById(
+		userId: string,
+		select: ProfileColumns[] | "*",
+	): Promise<Profile>;
+
+	/**
+	 * Fetch all columns of a profile by its user ID.
+	 *
+	 * @param userId - The unique ID of the user.
+	 * @returns A promise that resolves to the user's profile with all columns.
+	 */
+	fetchProfileByIdAll(userId: string): Promise<Profile>;
+
+	/**
+	 * Update a user's profile.
+	 *
+	 * @param userId - The unique ID of the user.
+	 * @param updates - A partial object containing the fields to update.
+	 * @returns A promise that resolves to the updated profile.
+	 */
+	updateProfile(
+		userId: string,
+		updates: Partial<Profile>,
+	): Promise<{ success: boolean }>;
+
+	/**
+	 * Delete a user's profile.
+	 *
+	 * @param userId - The unique ID of the user.
+	 * @returns A promise that resolves when the profile is deleted.
+	 */
+	deleteProfile(userId: string): Promise<void>;
 }

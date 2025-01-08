@@ -18,6 +18,7 @@
 			"@contexts/*": ["src/contexts/*"],
 			"@types/*": ["src/types/*"],
 			"@modules/*": ["src/modules/*"],
+			"@api/*": ["src/api/*"],
 		}
 	},
 	"include": [

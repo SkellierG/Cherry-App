@@ -9,8 +9,10 @@ import DeviceStorage from "@utils/deviceStorage";
 //@ts-ignore
 import { Profile } from "@types/User";
 import { Session, User } from "@supabase/supabase-js";
+//@ts-ignore
+import { UseGetSessionHook } from "@types/hooks";
 
-export function useGetSession() {
+export function useGetSession(): UseGetSessionHook {
 	const [isLoading, setIsLoading] = useState(false);
 	const router = useRouter();
 	const { userDispatch } = useUser();
