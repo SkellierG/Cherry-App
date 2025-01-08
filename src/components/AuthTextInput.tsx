@@ -1,46 +1,29 @@
+import React from "react";
+import { View, TextStyle } from "react-native";
+import { TextInput, HelperText } from "react-native-paper";
 import {
 	dark_default_theme,
 	light_default_theme,
 } from "@assets/themes/tamagui-rnp-adapter";
 import { useDynamicStyles } from "@hooks/useDynamicStyles";
-import React, { Dispatch, SetStateAction } from "react";
-import { View } from "react-native";
-import { TextInput, HelperText, TextInputProps } from "react-native-paper";
-
-type setValue<T> = Dispatch<SetStateAction<T>> | null;
-
-interface AuthTextInputProps<T> {
-	placeholder?: string;
-	stateFormError?: string | null;
-	setValue?: setValue<T>;
-	windView?: string;
-	windTextInput?: string;
-	maxLength?: number;
-	autoCapitalize?: TextInputProps["autoCapitalize"];
-	autoComplete?: TextInputProps["autoComplete"];
-	textContentType?: TextInputProps["textContentType"];
-	secureTextEntry?: boolean;
-	editable?: boolean;
-	text?: string;
-	customStyle?: any;
-	onChangeText?: (text: string) => void;
-}
+//@ts-ignore
+import { AuthTextInputProps } from "@types/Auth";
 
 const AuthTextInput = <T extends unknown>({
 	placeholder = "Enter text",
-	stateFormError = null,
+	text,
 	setValue = null,
-	windView = "mb-4 pl-3 pr-3",
-	windTextInput = "",
+	stateFormError = null,
+	secureTextEntry = false,
 	maxLength = 100,
 	autoCapitalize = "none",
 	autoComplete,
 	textContentType,
-	secureTextEntry,
-	editable,
-	text,
-	customStyle,
+	editable = true,
+	customStyle = {},
 	onChangeText = (text) => setValue?.(text as T),
+	windView = "mb-4 pl-3 pr-3",
+	windTextInput = "",
 }: AuthTextInputProps<T>) => {
 	const styles = useDynamicStyles((theme) => ({
 		input: {
@@ -52,15 +35,20 @@ const AuthTextInput = <T extends unknown>({
 		helperText: {
 			color: theme === "dark" ? "salmon" : "red",
 		},
+		container: {},
 	}));
 
 	return (
-		<View className={windView}>
+		<View
+			style={customStyle?.container ? customStyle.container : styles.container}
+			className={windView}
+		>
 			<TextInput
-				style={customStyle?.input || styles.input}
+				style={customStyle?.input ? customStyle.input : styles.input}
 				className={windTextInput}
 				mode="outlined"
 				placeholder={placeholder}
+				value={text}
 				onChangeText={onChangeText}
 				error={Boolean(stateFormError)}
 				maxLength={maxLength}
@@ -69,11 +57,14 @@ const AuthTextInput = <T extends unknown>({
 				textContentType={textContentType}
 				secureTextEntry={secureTextEntry}
 				editable={editable}
-				value={text}
 			/>
 			{stateFormError && (
 				<HelperText
-					style={styles.helperText}
+					style={
+						(customStyle?.container as TextStyle)
+							? (customStyle?.container as TextStyle)
+							: styles.helperText || {}
+					}
 					type="error"
 					visible={Boolean(stateFormError)}
 				>

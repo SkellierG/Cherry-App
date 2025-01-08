@@ -5,13 +5,14 @@ import {
 	SignInResponse,
 	statusCodes,
 } from "@react-native-google-signin/google-signin";
-import { supabase } from "@utils/supabase";
+import { supabase } from "@services/supabase";
 import { useRouter } from "expo-router";
 import { Alert } from "react-native";
-import environment from "@utils/environment";
+import { environment } from "@utils/constants";
 import { useUser } from "@contexts/user";
 import DeviceStorage from "@utils/deviceStorage";
-import { Profile } from "../types/users";
+//@ts-ignore
+import { Profile } from "@types/User";
 
 interface GoogleAuthProps {
 	children?: ReactNode;

@@ -1,5 +1,6 @@
 import React, { createContext, useReducer, useContext } from "react";
-import { UserState, UserAction, UserContextType } from "../types/users";
+//@ts-ignore
+import { UserState, UserAction, UserContextType } from "@types/User";
 
 const initialState: UserState = {
 	user: null,

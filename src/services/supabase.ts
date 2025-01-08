@@ -1,7 +1,7 @@
 import "react-native-url-polyfill/auto";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
-import environment from "./environment";
-import DeviceStorage from "./deviceStorage";
+import { environment } from "@utils/constants";
+import DeviceStorage from "@utils/deviceStorage";
 
 const supabaseUrl = environment.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = environment.EXPO_PUBLIC_SUPABASE_ANON_KEY;

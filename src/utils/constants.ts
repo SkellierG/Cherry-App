@@ -7,14 +7,22 @@ const getBaseAddress = async () => {
 		return `${protocol}//${hostname}${port ? `:${port}` : ""}`;
 	} else {
 		const initialUrl = await Linking.getInitialURL();
-		return initialUrl || "myapp://"; // Deep link base por defecto
+		return initialUrl || "Cherry=App://"; // Deep link base por defecto
 	}
 };
 
-const constants = {
+export const constants = {
 	baseAdress: getBaseAddress().then((adress) => adress),
 };
 
 console.info(JSON.stringify(constants, null, 2));
 
-export default constants;
+export const environment = {
+	EXPO_PUBLIC_SUPABASE_URL: process.env.EXPO_PUBLIC_SUPABASE_URL || "NULL",
+	EXPO_PUBLIC_SUPABASE_ANON_KEY:
+		process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || "NULL",
+	EXPO_PUBLIC_GOOGLE_CLIENT_ID:
+		process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || "NULL",
+};
+
+console.log(JSON.stringify(environment, null, 2));

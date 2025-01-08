@@ -8,15 +8,16 @@
 		"skipLibCheck": true,
 		"baseUrl": "./",
 		"paths": {
-			"@components/*": ["./src/components/*"],
-			"@hooks/*": ["./src/hooks/*"],
-			"@utils/*": ["./src/utils/*"],
+			"@components/*": ["src/components/*"],
+			"@hooks/*": ["src/hooks/*"],
+			"@utils/*": ["src/utils/*"],
 			"@assets/*": ["./assets/*"],
-			"@app/*": ["./src/app/*"],
-			"@screens/*": ["./src/screens/*"],
-			"@services/*": ["./src/services/*"],
-			"@contexts/*": ["./src/contexts/*"],
-			"@types/*": ["./src/types/*"]
+			"@app/*": ["src/app/*"],
+			"@screens/*": ["src/screens/*"],
+			"@services/*": ["src/services/*"],
+			"@contexts/*": ["src/contexts/*"],
+			"@types/*": ["src/types/*"],
+			"@modules/*": ["src/modules/*"],
 		}
 	},
 	"include": [

@@ -1,9 +1,33 @@
-import i18n from "@utils/translations";
+//@ts-ignore
+import { ValidationResult } from "@types/Auth";
+import i18n from "@services/translations";
 
-type ValidationResult = {
-	isValid: boolean;
-	errorMessage?: string;
-};
+function validateMinLength(
+	value: string,
+	minLength: number,
+	fieldName: string,
+): ValidationResult {
+	if (value.length < minLength) {
+		return {
+			isValid: false,
+			errorMessage: i18n.t(`auth.validation.${fieldName}.tooShort`, {
+				minLength,
+			}),
+		};
+	}
+	return { isValid: true };
+}
+
+function validateAlpha(value: string, fieldName: string): ValidationResult {
+	const alphaRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$/;
+	if (!alphaRegex.test(value)) {
+		return {
+			isValid: false,
+			errorMessage: i18n.t(`auth.validation.${fieldName}.invalid`),
+		};
+	}
+	return { isValid: true };
+}
 
 export function validateEmail(email: string): ValidationResult {
 	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -39,12 +63,12 @@ export function validatePassword(password: string): ValidationResult {
 		};
 	}
 
-	if (password.length < minLength) {
-		return {
-			isValid: false,
-			errorMessage: i18n.t("auth.validation.password.tooShort", { minLength }),
-		};
-	}
+	const minLengthValidation = validateMinLength(
+		password,
+		minLength,
+		"password",
+	);
+	if (!minLengthValidation.isValid) return minLengthValidation;
 
 	if (!hasUpperCase) {
 		return {
@@ -78,26 +102,20 @@ export function validatePassword(password: string): ValidationResult {
 }
 
 export function validateName(name: string): ValidationResult {
-	const minLength = 3; // Longitud mínima para un nombre
-	const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$/; // Aceptar solo letras, espacios y guiones
+	const minLength = 3;
 
 	if (!name) {
-		return { isValid: false, errorMessage: i18n.t("auth.validation.name.empty") };
-	}
-
-	if (name.length < minLength) {
 		return {
 			isValid: false,
-			errorMessage: i18n.t("auth.validation.name.tooShort", { minLength }),
+			errorMessage: i18n.t("auth.validation.name.empty"),
 		};
 	}
 
-	if (!nameRegex.test(name)) {
-		return {
-			isValid: false,
-			errorMessage: i18n.t("auth.validation.name.invalid"),
-		};
-	}
+	const minLengthValidation = validateMinLength(name, minLength, "name");
+	if (!minLengthValidation.isValid) return minLengthValidation;
+
+	const alphaValidation = validateAlpha(name, "name");
+	if (!alphaValidation.isValid) return alphaValidation;
 
 	return { isValid: true };
 }
