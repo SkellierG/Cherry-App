@@ -26,3 +26,16 @@ export const environment = {
 };
 
 console.log(JSON.stringify(environment, null, 2));
+
+export const routes = {
+	auth: {
+		sign_in: "/auth/sign-in" as "/auth/sign-in",
+		sign_up: "/auth/sign-up" as "/auth/sign-up",
+		profile: "/auth/profile" as "/auth/profile",
+	},
+	dashboard: {
+		index: "/dashboard" as "/dashboard",
+		notifications: "/dashboard/notifications" as "/dashboard/notifications",
+		profile: "/dashboard/profile" as "/dashboard/profile",
+	},
+};

@@ -1,18 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import AuthForm from "@components/AuthForm";
 import { validateName } from "@utils/formValidation";
 import i18n from "@services/translations";
 import { useDynamicStyles } from "@hooks/useDynamicStyles";
-import DeviceStorage from "@utils/deviceStorage";
-import { User } from "@supabase/supabase-js";
 import { useProfile } from "@hooks/useProfile";
 import { Alert } from "react-native";
+import { useUser } from "@contexts/user";
 
 export default function ProfileScreen() {
-	const [name, setName] = useState("");
-	const [lastname, setLastname] = useState("");
+	const { userState } = useUser();
 
-	const [email, setEmail] = useState("");
+	const [NAME, LASTNAME] = (
+		userState.user?.user_metadata.full_name as string
+	).split(" ");
+
+	const [name, setName] = useState(NAME);
+	const [lastname, setLastname] = useState(LASTNAME);
 
 	const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 	const { isLoading, handleProfile } = useProfile();
@@ -39,11 +42,8 @@ export default function ProfileScreen() {
 		return Object.keys(errors).length === 0;
 	};
 
-	useEffect(() => {}, []);
-
 	const handleSubmit = async () => {
 		if (!validateFields()) return;
-		console.log("chao");
 		try {
 			await handleProfile(name, lastname);
 		} catch (error: any) {
@@ -59,6 +59,7 @@ export default function ProfileScreen() {
 					placeholder: i18n.t("auth.name"),
 					setValue: setName,
 					error: formErrors.name,
+					text: name,
 					autoCapitalize: "words",
 					autoComplete: "name",
 					textContentType: "name",
@@ -68,6 +69,7 @@ export default function ProfileScreen() {
 					placeholder: i18n.t("auth.lastname"),
 					setValue: setLastname,
 					error: formErrors.lastname,
+					text: lastname,
 					secureTextEntry: true,
 					autoCapitalize: "words",
 					autoComplete: "family-name",
@@ -75,8 +77,7 @@ export default function ProfileScreen() {
 				},
 				{
 					name: "email",
-					setValue: setEmail,
-					error: formErrors.email,
+					text: userState.user?.email,
 					autoComplete: "email",
 					textContentType: "emailAddress",
 					editable: false,

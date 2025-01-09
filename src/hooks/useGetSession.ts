@@ -11,6 +11,7 @@ import { Profile } from "@types/User";
 import { Session, User } from "@supabase/supabase-js";
 //@ts-ignore
 import { UseGetSessionHook } from "@types/hooks";
+import { routes } from "@utils/constants";
 
 export function useGetSession(): UseGetSessionHook {
 	const [isLoading, setIsLoading] = useState(false);
@@ -43,11 +44,13 @@ export function useGetSession(): UseGetSessionHook {
 					type: "PROFILE",
 					payload: cachedProfile,
 				});
-				router.replace("/dashboard");
+				router.dismiss();
+				router.replace(routes.dashboard.index);
 			} else if (cachedProfile.is_oauth) {
-				router.replace("/auth/profile");
+				router.replace(routes.auth.sign_in);
+				router.push(routes.auth.profile);
 			} else {
-				router.replace("/auth/sign-in");
+				router.replace(routes.auth.sign_in);
 				throw new Error("Something went wrong");
 			}
 		} else {
@@ -77,17 +80,22 @@ export function useGetSession(): UseGetSessionHook {
 						type: "PROFILE",
 						payload: profile,
 					});
-					router.replace("/dashboard");
+					router.dismiss();
+					router.replace(routes.dashboard.index);
 				} else if (profile.is_oauth) {
-					router.replace("/auth/profile");
+					router.replace(routes.auth.sign_in);
+					router.push(routes.auth.profile);
 				} else {
-					router.replace("/auth/sign-in");
+					router.dismiss();
+					router.replace(routes.auth.sign_in);
 					throw new Error("Something went wrong");
 				}
 			}
 		} catch (error: any) {
 			Alert.alert("Sign-In Error", error.message);
 			console.error(error);
+			router.dismiss();
+			router.replace(routes.auth.sign_in);
 		} finally {
 			setIsLoading(false);
 		}

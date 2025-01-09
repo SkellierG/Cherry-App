@@ -9,16 +9,17 @@ import { User } from "@supabase/supabase-js";
 import { Profile } from "@types/User";
 //@ts-ignore
 import { UseProfileHook } from "@types/hooks";
+import { routes } from "@utils/constants";
 
 export function useProfile(): UseProfileHook {
 	const [isLoading, setIsLoading] = useState(false);
 	const router = useRouter();
-	const { userDispatch } = useUser();
+	const { userState, userDispatch } = useUser();
 
 	const handleProfile = async (
 		name: string,
 		lastname: string,
-		avatar_url: string | null = null,
+		avatar_url: string | null = userState.user?.user_metadata.avatar_url,
 	) => {
 		setIsLoading(true);
 		try {
@@ -46,7 +47,8 @@ export function useProfile(): UseProfileHook {
 			});
 
 			DeviceStorage.setItem("profileData", JSON.stringify(newProfile));
-			router.replace("/dashboard");
+			router.dismiss();
+			router.replace(routes.dashboard.index);
 		} catch (error: any) {
 			Alert.alert("Profile Error", error.message);
 			console.error(error);

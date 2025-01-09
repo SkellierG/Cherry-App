@@ -5,7 +5,7 @@ import {
 	dark_default_theme,
 	light_default_theme,
 } from "@assets/themes/tamagui-rnp-adapter";
-import DummyScreen from "@screens/DummyScreen";
+import DashboardProfileScreen from "@screens/DashboardProfileScreen";
 
 export default function DashboardPage() {
 	const styles = useDynamicStyles((theme) => ({
@@ -19,7 +19,7 @@ export default function DashboardPage() {
 	}));
 	return (
 		<SafeAreaView style={styles.view}>
-			<DummyScreen screenName="profile" />
+			<DashboardProfileScreen />
 		</SafeAreaView>
 	);
 }

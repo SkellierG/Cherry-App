@@ -1,8 +1,6 @@
 import { Drawer } from "expo-router/drawer";
 import React from "react";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { View } from "react-native";
 import {
 	DrawerContentScrollView,
@@ -69,7 +67,8 @@ export default function TabsLayout() {
 
 function CustomDrawerComponent(props: any) {
 	return (
-		<View className="flex-1">
+		<View style={{ flex: 1 }}>
+			<View></View>
 			<DrawerContentScrollView {...props}>
 				<DrawerItemList {...props} />
 			</DrawerContentScrollView>

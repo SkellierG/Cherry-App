@@ -7,11 +7,13 @@ export default function Index() {
 	const { isLoading, handleGetSession } = useGetSession();
 
 	useEffect(() => {
-		const checkAuth = async () => {
-			await handleGetSession();
-		};
-		checkAuth();
-	}, [handleGetSession]);
+		if (!isLoading) {
+			const checkAuth = async () => {
+				await handleGetSession();
+			};
+			checkAuth();
+		}
+	}, [handleGetSession, isLoading]);
 
 	if (isLoading) {
 		return <LoadingScreen />;

@@ -6,6 +6,7 @@ import { Alert } from "react-native";
 import { useUser } from "@contexts/user";
 //@ts-ignore
 import { UseSignInHook } from "@types/hooks";
+import { routes } from "@utils/constants";
 
 export function useSignIn(): UseSignInHook {
 	const [isLoading, setIsLoading] = useState(false);
@@ -29,9 +30,10 @@ export function useSignIn(): UseSignInHook {
 
 			if (profile.is_profiled) {
 				userDispatch({ type: "PROFILE", payload: profile });
-				router.replace("/dashboard");
+				router.dismiss();
+				router.replace(routes.dashboard.index);
 			} else {
-				router.replace("/auth/profile");
+				router.push(routes.auth.profile);
 			}
 		} catch (error: any) {
 			Alert.alert("Sign-In Error", error.message);
