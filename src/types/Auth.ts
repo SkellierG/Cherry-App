@@ -53,7 +53,7 @@ export interface AuthFormProps<T> {
 		 *
 		 * @type {string}
 		 */
-		placeholder: string;
+		placeholder?: string;
 
 		/**
 		 * An optional value that can set a predefined text that appears in the input field.
@@ -70,7 +70,7 @@ export interface AuthFormProps<T> {
 		 *
 		 * @type {SetValue<T>}
 		 */
-		setValue: SetValue<T>;
+		setValue?: SetValue<T>;
 
 		/**
 		 * An optional error message that is displayed if the field has a validation issue.

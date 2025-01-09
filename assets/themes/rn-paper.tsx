@@ -1,6 +1,6 @@
 import React from "react";
 import { PaperProvider } from "react-native-paper";
-import { useTheme } from "last-old-src/contexts/theme"; // Importa el hook useTheme
+import { useTheme } from "@contexts/theme"; // Importa el hook useTheme
 
 export default function RNPaperThemeProvider({
 	children,

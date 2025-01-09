@@ -101,13 +101,16 @@ export function validatePassword(password: string): ValidationResult {
 	return { isValid: true };
 }
 
-export function validateName(name: string): ValidationResult {
+export function validateName(
+	name: string,
+	type: "name" | "lastname",
+): ValidationResult {
 	const minLength = 3;
 
 	if (!name) {
 		return {
 			isValid: false,
-			errorMessage: i18n.t("auth.validation.name.empty"),
+			errorMessage: i18n.t(`auth.validation.${type}.empty`),
 		};
 	}
 

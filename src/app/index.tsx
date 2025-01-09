@@ -1,4 +1,4 @@
-import LoadingScreen from "last-old-src/screens/Loading";
+import LoadingScreen from "@screens/LoadingScreen";
 import React, { useEffect } from "react";
 import { View } from "react-native";
 import { useGetSession } from "@hooks/useGetSession";

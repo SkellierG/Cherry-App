@@ -29,7 +29,7 @@ export function useSignIn(): UseSignInHook {
 
 			if (profile.is_profiled) {
 				userDispatch({ type: "PROFILE", payload: profile });
-				router.replace("/home");
+				router.replace("/dashboard");
 			} else {
 				router.replace("/auth/profile");
 			}

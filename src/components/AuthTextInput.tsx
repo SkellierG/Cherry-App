@@ -22,15 +22,13 @@ const AuthTextInput = <T extends unknown>({
 	editable = true,
 	customStyle = {},
 	onChangeText = (text) => setValue?.(text as T),
-	windView = "mb-4 pl-3 pr-3",
+	windView = "",
 	windTextInput = "",
 }: AuthTextInputProps<T>) => {
 	const styles = useDynamicStyles((theme) => ({
 		input: {
 			backgroundColor:
-				theme === "dark"
-					? dark_default_theme.colors.surface
-					: light_default_theme.colors.surface,
+				theme === "dark" ? dark_default_theme.colors.backdrop : "#eeeeee",
 		},
 		helperText: {
 			color: theme === "dark" ? "salmon" : "red",

@@ -43,7 +43,7 @@ export function useGetSession(): UseGetSessionHook {
 					type: "PROFILE",
 					payload: cachedProfile,
 				});
-				router.replace("/home");
+				router.replace("/dashboard");
 			} else if (cachedProfile.is_oauth) {
 				router.replace("/auth/profile");
 			} else {
@@ -77,7 +77,7 @@ export function useGetSession(): UseGetSessionHook {
 						type: "PROFILE",
 						payload: profile,
 					});
-					router.replace("/home");
+					router.replace("/dashboard");
 				} else if (profile.is_oauth) {
 					router.replace("/auth/profile");
 				} else {

@@ -33,12 +33,17 @@ const AuthForm = <T extends unknown>({
 	redirectLinkLabel,
 	onRedirect,
 }: AuthFormProps<T>) => {
-	const styles = useDynamicStyles(() => ({
+	const styles = useDynamicStyles((theme) => ({
 		formContainer: {
-			marginTop: 20,
+			marginTop: 40,
+			paddingHorizontal: 20,
+		},
+		fieldContainer: {
+			marginVertical: 5,
 		},
 		buttonContainer: {
 			paddingHorizontal: 12,
+			marginVertical: 10,
 		},
 		redirectContainer: {
 			marginTop: 16,
@@ -46,7 +51,7 @@ const AuthForm = <T extends unknown>({
 			justifyContent: "center",
 		},
 		redirectText: {
-			color: "black",
+			color: theme === "dark" ? "white" : "black",
 			fontSize: 14,
 		},
 		redirectLink: {
@@ -59,21 +64,25 @@ const AuthForm = <T extends unknown>({
 	return (
 		<View style={styles.formContainer}>
 			{fields.map((field, index) => (
-				<AuthTextInput
+				<View
 					key={field.name || index.toString()}
-					placeholder={field.placeholder}
-					stateFormError={field.error || null}
-					setValue={field.setValue}
-					text={field.text}
-					secureTextEntry={field.secureTextEntry}
-					autoCapitalize={field.autoCapitalize}
-					autoComplete={field.autoComplete}
-					textContentType={field.textContentType}
-					maxLength={field.maxLength}
-					editable={field.editable}
-					customStyle={field.customStyle}
-					onChangeText={field.onChangeText}
-				/>
+					style={styles.fieldContainer}
+				>
+					<AuthTextInput
+						placeholder={field.placeholder}
+						stateFormError={field.error || null}
+						setValue={field.setValue}
+						text={field.text}
+						secureTextEntry={field.secureTextEntry}
+						autoCapitalize={field.autoCapitalize}
+						autoComplete={field.autoComplete}
+						textContentType={field.textContentType}
+						maxLength={field.maxLength}
+						editable={field.editable}
+						customStyle={field.customStyle}
+						onChangeText={field.onChangeText}
+					/>
+				</View>
 			))}
 			<View style={styles.buttonContainer}>
 				<Button theme={"red_active"} disabled={isLoading} onPress={onSubmit}>

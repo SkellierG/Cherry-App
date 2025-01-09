@@ -23,8 +23,8 @@ export default function SignUpScreen() {
 	function validateFields(): boolean {
 		const errors: Record<string, string> = {};
 
-		const nameValidation = validateName(name);
-		const lastnameValidation = validateName(lastname);
+		const nameValidation = validateName(name, "name");
+		const lastnameValidation = validateName(lastname, "lastname");
 		const emailValidation = validateEmail(email);
 		const passwordValidation = validatePassword(password);
 		const confirmPasswordValidation = validatePassword(confirmPassword);
@@ -48,11 +48,11 @@ export default function SignUpScreen() {
 	}
 
 	async function signUpWithEmail() {
-		if (!validateFields) return;
+		if (!validateFields()) return;
 
 		setLoading(true);
 		Alert.alert("DEV: Sign Up isnt supported yet!");
-		setLoading(true);
+		setLoading(false);
 
 		return;
 		// try {

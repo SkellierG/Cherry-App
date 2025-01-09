@@ -77,3 +77,20 @@ export interface UseSignInWithTokenHook {
 		nonce?: string,
 	) => Promise<void>;
 }
+
+export interface UseProfileHook {
+	/** Indicates if the profile operation is in progress. */
+	isLoading: boolean;
+	/**
+	 * Handles updating the user profile.
+	 * @param name - The user's first name.
+	 * @param lastname - The user's last name.
+	 * @param avatar_url - (Optional) URL of the user's avatar.
+	 * @returns A promise that resolves when the profile is updated.
+	 */
+	handleProfile: (
+		name: string,
+		lastname: string,
+		avatar_url?: string | null,
+	) => Promise<void>;
+}
