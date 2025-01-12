@@ -2,7 +2,7 @@ import {
 	dark_default_theme,
 	light_default_theme,
 } from "@assets/themes/tamagui-rnp-adapter";
-import EraseSession from "@components/ErsaseSessionTest";
+import EraseSession from "@components/auth/ErsaseSessionTest";
 import ProfileShow from "@components/ProfileShow";
 import PullToRefresh from "@components/PullToRefresh";
 import { useUser } from "@contexts/user";

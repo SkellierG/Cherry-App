@@ -14,10 +14,10 @@ import {
 import { AuthService } from "./AuthService";
 import DeviceStorage from "@utils/deviceStorage";
 import { handleError } from "@utils/common";
-import { Alert } from "react-native";
 import { Session, User } from "@supabase/supabase-js";
 // eslint-disable-next-line import/no-unresolved
 import { ProfileService } from "@api/profile";
+import i18n from "@services/translations";
 
 export class AuthController implements IAuthController {
 	private authService: IAuthService;
@@ -39,34 +39,43 @@ export class AuthController implements IAuthController {
 		user: User;
 		profile: Profile;
 	}> {
-		const getSessionData: GetSessionResponse =
-			await this.authService.getSession();
+		try {
+			const getSessionData: GetSessionResponse =
+				await this.authService.getSession();
 
-		if (
-			!(getSessionData.session?.access_token && getSessionData.session?.user)
-		) {
-			throw new Error("No session found in Supabase");
+			if (
+				!(getSessionData.session?.access_token && getSessionData.session?.user)
+			) {
+				throw new Error(
+					"no previous session founded, probably user is signOut or first signIn",
+				);
+			}
+
+			const profileData = await this.profileService.fetchProfileByIdAll(
+				getSessionData.session.user.id,
+			);
+
+			await this.cacheService.setItem(
+				"sessionData",
+				JSON.stringify(getSessionData.session),
+			);
+			await this.cacheService.setItem(
+				"userData",
+				JSON.stringify(getSessionData.session.user),
+			);
+			await this.cacheService.setItem(
+				"profileData",
+				JSON.stringify(profileData),
+			);
+
+			return {
+				session: { ...getSessionData.session },
+				user: { ...getSessionData.session.user },
+				profile: { ...profileData },
+			};
+		} catch (error: any) {
+			throw error;
 		}
-
-		const profileData = await this.profileService.fetchProfileByIdAll(
-			getSessionData.session.user.id,
-		);
-
-		await this.cacheService.setItem(
-			"sessionData",
-			JSON.stringify(getSessionData.session),
-		);
-		await this.cacheService.setItem(
-			"userData",
-			JSON.stringify(getSessionData.session.user),
-		);
-		await this.cacheService.setItem("profileData", JSON.stringify(profileData));
-
-		return {
-			session: { ...getSessionData.session },
-			user: { ...getSessionData.session.user },
-			profile: { ...profileData },
-		};
 	}
 
 	async signInWithCache(
@@ -76,7 +85,10 @@ export class AuthController implements IAuthController {
 		try {
 			const signInData: SignInResponse =
 				await this.authService.signInWithPassword(email, password);
-			if (!signInData.user) throw new Error("Sign In error, user not found");
+			if (!signInData.user)
+				throw new Error(
+					"user not found in the database after signInWithPassword method",
+				);
 
 			const profileData = await this.profileService.fetchProfileByIdAll(
 				signInData.user.id,
@@ -84,7 +96,7 @@ export class AuthController implements IAuthController {
 
 			if (!profileData)
 				throw new Error(
-					profileData ? handleError(profileData) : "auth.Profile_not_found",
+					"no profile data founded in the database after fetching",
 				);
 
 			await this.cacheService.setItem(
@@ -102,8 +114,6 @@ export class AuthController implements IAuthController {
 
 			return { signIn: { ...signInData }, profile: { ...profileData } };
 		} catch (error: any) {
-			Alert.alert(error.message);
-			console.error(error);
 			throw error;
 		}
 	}
@@ -168,8 +178,6 @@ export class AuthController implements IAuthController {
 
 			return { signIn: { ...signInData }, profile: { ...profileData } };
 		} catch (error: any) {
-			Alert.alert(error.message);
-			console.error(error);
 			throw error;
 		}
 	}
@@ -217,8 +225,6 @@ export class AuthController implements IAuthController {
 
 			return { success: true };
 		} catch (error: any) {
-			Alert.alert(error.message);
-			console.error(error);
 			throw error;
 		}
 	}

@@ -7,7 +7,6 @@ import {
 	SignUpResponse,
 	//@ts-ignore
 } from "@types/User";
-import { handleError } from "@utils/common";
 
 export class AuthService implements IAuthService {
 	async signInWithPassword(
@@ -18,7 +17,7 @@ export class AuthService implements IAuthService {
 			email,
 			password,
 		});
-		if (error) handleError(error);
+		if (error) throw error;
 		return { ...data };
 	}
 
@@ -40,7 +39,7 @@ export class AuthService implements IAuthService {
 			access_token,
 			nonce,
 		});
-		if (error) handleError(error);
+		if (error) throw error;
 		return { ...data };
 	}
 
@@ -54,19 +53,19 @@ export class AuthService implements IAuthService {
 			password,
 			options,
 		});
-		if (error) handleError(error);
+		if (error) throw error;
 		return { ...data };
 	}
 
 	async getSession(): Promise<GetSessionResponse> {
 		const { data, error } = await supabase.auth.getSession();
-		if (error) handleError(error);
+		if (error) throw error;
 		return { ...data };
 	}
 
 	async signOut(): Promise<{ success: boolean }> {
 		const { error } = await supabase.auth.signOut();
-		if (error) handleError(error);
+		if (error) throw error;
 		return { success: true };
 	}
 }

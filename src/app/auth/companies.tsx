@@ -1,14 +1,13 @@
 import React from "react";
-import { Dimensions, SafeAreaView, View } from "react-native";
-import SignInScreen from "@screens/SignInScreen";
+import { Dimensions, SafeAreaView } from "react-native";
+import { useDynamicStyles } from "@hooks/useDynamicStyles";
 import {
 	dark_default_theme,
 	light_default_theme,
 } from "@assets/themes/tamagui-rnp-adapter";
-import { useDynamicStyles } from "@hooks/useDynamicStyles";
-import AuthGoogle from "@components/auth/AuthGoogle";
+import CompanyCreateScreen from "@screens/CompanyCreate";
 
-export default function SignInPage() {
+export default function CompanyCreatePage() {
 	const styles = useDynamicStyles((theme) => ({
 		view: {
 			backgroundColor:
@@ -17,17 +16,10 @@ export default function SignInPage() {
 					: light_default_theme.colors.background,
 			height: Dimensions.get("window").height,
 		},
-		authGoogleContainer: {
-			marginTop: 20,
-			alignItems: "center",
-		},
 	}));
 	return (
 		<SafeAreaView style={styles.view}>
-			<SignInScreen />
-			<View style={styles.authGoogleContainer}>
-				<AuthGoogle />
-			</View>
+			<CompanyCreateScreen />
 		</SafeAreaView>
 	);
 }

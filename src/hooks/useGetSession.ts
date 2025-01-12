@@ -2,7 +2,6 @@ import { useState } from "react";
 // eslint-disable-next-line import/no-unresolved
 import { AuthSupabase } from "@modules/auth/authController";
 import { useRouter } from "expo-router";
-import { Alert } from "react-native";
 import { useUser } from "@contexts/user";
 import { useConnectivity } from "@contexts/internet";
 import DeviceStorage from "@utils/deviceStorage";
@@ -92,10 +91,9 @@ export function useGetSession(): UseGetSessionHook {
 				}
 			}
 		} catch (error: any) {
-			Alert.alert("Sign-In Error", error.message);
-			console.error(error);
 			router.dismiss();
 			router.replace(routes.auth.sign_in);
+			throw error;
 		} finally {
 			setIsLoading(false);
 		}

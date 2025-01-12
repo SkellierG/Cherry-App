@@ -7,7 +7,7 @@ import {
 	validateName,
 	validatePassword,
 } from "@utils/formValidation";
-import AuthForm from "@components/AuthForm";
+import AuthForm from "@components/auth/AuthForm";
 
 export default function SignUpScreen() {
 	const [name, setName] = useState("");

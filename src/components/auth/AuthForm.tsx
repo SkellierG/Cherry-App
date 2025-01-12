@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text } from "react-native";
 import { Button } from "tamagui";
-import AuthTextInput from "@components/AuthTextInput";
+import AuthTextInput from "@components/auth/AuthTextInput";
 import { useDynamicStyles } from "@hooks/useDynamicStyles";
 //@ts-ignore
 import { AuthFormProps } from "@types/Auth";

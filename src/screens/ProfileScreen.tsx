@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import AuthForm from "@components/AuthForm";
+import AuthForm from "@components/auth/AuthForm";
 import { validateName } from "@utils/formValidation";
 import i18n from "@services/translations";
 import { useDynamicStyles } from "@hooks/useDynamicStyles";

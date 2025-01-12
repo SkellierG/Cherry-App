@@ -32,6 +32,7 @@ export const routes = {
 		sign_in: "/auth/sign-in" as "/auth/sign-in",
 		sign_up: "/auth/sign-up" as "/auth/sign-up",
 		profile: "/auth/profile" as "/auth/profile",
+		companies: "/auth/companies" as "/auth/companies",
 	},
 	dashboard: {
 		index: "/dashboard" as "/dashboard",
