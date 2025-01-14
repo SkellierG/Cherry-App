@@ -5,7 +5,7 @@ import {
 import EraseSession from "@components/auth/ErsaseSessionTest";
 import ProfileShow from "@components/ProfileShow";
 import PullToRefresh from "@components/PullToRefresh";
-import { useUser } from "@contexts/user";
+import { useUser } from "@contexts/auth";
 import { useDynamicStyles } from "@hooks/useDynamicStyles";
 import { AuthSupabase } from "@modules/auth/authController";
 import React, { useState } from "react";

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { AuthSupabase } from "@modules/auth/authController";
 import { useRouter } from "expo-router";
 import { Alert } from "react-native";
-import { useUser } from "@contexts/user";
+import { useAuth } from "@contexts/auth";
 //@ts-ignore
 import { UseSignInWithTokenHook } from "@types/hooks";
 import { routes } from "@utils/constants";
@@ -11,7 +11,7 @@ import { routes } from "@utils/constants";
 export function useSignInWithToken(): UseSignInWithTokenHook {
 	const [isLoading, setIsLoading] = useState(false);
 	const router = useRouter();
-	const { userDispatch } = useUser();
+	const { authDispatch } = useAuth();
 
 	const handleSignIn = async (
 		provider:
@@ -35,7 +35,7 @@ export function useSignInWithToken(): UseSignInWithTokenHook {
 					nonce,
 				);
 
-			userDispatch({
+			authDispatch({
 				type: "SIGNIN",
 				payload: {
 					user: signInData.user,
@@ -45,7 +45,7 @@ export function useSignInWithToken(): UseSignInWithTokenHook {
 			});
 
 			if (profile.is_profiled) {
-				userDispatch({ type: "PROFILE", payload: profile });
+				authDispatch({ type: "PROFILE", payload: profile });
 				router.dismiss();
 				router.replace(routes.dashboard.index);
 			} else {

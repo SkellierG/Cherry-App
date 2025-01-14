@@ -3,7 +3,7 @@ import { Tabs } from "expo-router";
 import { Image } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useUser } from "@contexts/user";
+import { useUser } from "@contexts/auth";
 
 export default function DashboardLayout() {
 	const { userState } = useUser();

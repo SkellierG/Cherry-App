@@ -1,8 +1,8 @@
-import React, { createContext, useReducer, useContext } from "react";
+import React, { createContext, useContext, useReducer } from "react";
 //@ts-ignore
-import { UserState, UserAction, UserContextType } from "@types/User";
+import { AuthState, AuthAction, AuthContextType } from "@types/Auth";
 
-const initialState: UserState = {
+const initialState: AuthState = {
 	user: null,
 	session: null,
 	profile: {
@@ -16,7 +16,7 @@ const initialState: UserState = {
 	isAuthenticated: false,
 };
 
-const userReducer = (state: UserState, action: UserAction): UserState => {
+const AuthReducer = (state: AuthState, action: AuthAction): AuthState => {
 	switch (action.type) {
 		case "SIGNIN":
 			return {
@@ -56,22 +56,22 @@ const userReducer = (state: UserState, action: UserAction): UserState => {
 	}
 };
 
-const UserContext = createContext<UserContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const UserProvider = ({ children }: { children: React.ReactNode }) => {
-	const [userState, userDispatch] = useReducer(userReducer, initialState);
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+	const [authState, authDispatch] = useReducer(AuthReducer, initialState);
 
 	return (
-		<UserContext.Provider value={{ userState, userDispatch }}>
+		<AuthContext.Provider value={{ authState, authDispatch }}>
 			{children}
-		</UserContext.Provider>
+		</AuthContext.Provider>
 	);
 };
 
-export const useUser = (): UserContextType => {
-	const context = useContext(UserContext);
+export const useAuth = (): AuthContextType => {
+	const context = useContext(AuthContext);
 	if (!context) {
-		throw new Error("useUser must be used within a UserProvider");
+		throw new Error("useAuth must be used within a AuthProvider");
 	}
 	return context;
 };

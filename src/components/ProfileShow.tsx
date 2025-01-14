@@ -1,6 +1,6 @@
 import { Text, View, Image } from "react-native";
 import React, { ReactNode } from "react";
-import { useDynamicStyles } from "last-old-src/hooks/useDynamicStyles";
+import { useDynamicStyles } from "@hooks/useDynamicStyles";
 
 type ProfileComponentProps = {
 	children?: ReactNode;

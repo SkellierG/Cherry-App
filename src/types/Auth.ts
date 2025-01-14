@@ -1,228 +1,218 @@
-import { Dispatch, SetStateAction } from "react";
-import { StyleProp, TextStyle, ViewStyle } from "react-native";
-import { Props as TextInputProps } from "react-native-paper/lib/typescript/components/TextInput/TextInput";
+import { User, Session, WeakPassword } from "@supabase/supabase-js";
 
-export type ValidationResult = {
-	isValid: boolean;
-	errorMessage?: string;
+export interface Profile {
+	id: string | null;
+	name: string | null;
+	lastname: string | null;
+	avatar_url: string | null;
+	is_profiled: boolean;
+	is_oauth?: boolean;
+}
+export interface AuthState {
+	user: User | null;
+	session: Session | null;
+	profile?: Profile;
+	isAuthenticated: boolean;
+}
+
+export type AuthAction =
+	| { type: "SIGNIN"; payload: AuthState }
+	| { type: "SIGNOUT" }
+	| { type: "PROFILE"; payload: Profile };
+
+export interface AuthContextType {
+	authState: AuthState;
+	authDispatch: React.Dispatch<AuthAction>;
+}
+
+export type FetchSessionResponse = Session | null;
+
+export type SignUpOptions =
+	| {
+			/** The redirect url embedded in the email link */
+			emailRedirectTo?: string;
+			/**
+			 * A custom data object to store the user's metadata. This maps to the `auth.users.raw_user_meta_data` column.
+			 *
+			 * The `data` should be a JSON object that includes user-specific info, such as their first and last name.
+			 */
+			data?: object;
+			/** Verification token received when the user completes the captcha on the site. */
+			captchaToken?: string;
+	  }
+	| {
+			/**
+			 * A custom data object to store the user's metadata. This maps to the `auth.users.raw_user_meta_data` column.
+			 *
+			 * The `data` should be a JSON object that includes user-specific info, such as their first and last name.
+			 */
+			data?: object;
+			/** Verification token received when the user completes the captcha on the site. Requires a configured WhatsApp sender on Twilio */
+			captchaToken?: string;
+			/** Messaging channel to use (e.g. whatsapp or sms) */
+			channel?: "sms" | "whatsapp";
+	  };
+
+export type GetSessionResponse = {
+	session: Session | null;
 };
 
-export type SetValue<T> = Dispatch<SetStateAction<T>> | null;
+export type SignInResponse = {
+	user: User;
+	session: Session;
+	weakPassword?: WeakPassword;
+};
 
-export interface AuthTextInputProps<T> {
-	placeholder?: string;
-	stateFormError?: string | null;
-	setValue?: SetValue<T>;
-	windView?: string;
-	windTextInput?: string;
-	maxLength?: number;
-	autoCapitalize?: TextInputProps["autoCapitalize"];
-	autoComplete?: TextInputProps["autoComplete"];
-	textContentType?: TextInputProps["textContentType"];
-	secureTextEntry?: boolean;
-	editable?: boolean;
-	text?: string;
-	customStyle?: any;
-	onChangeText?: (text: string) => void;
+export type SignUpResponse = {
+	user: User | null;
+	session: Session | null;
+};
+
+export interface IAuthService {
+	signInWithPassword(email: string, password: string): Promise<SignInResponse>;
+
+	signInWitIdTokend(
+		provider:
+			| "google"
+			| "apple"
+			| "azure"
+			| "facebook"
+			| "kakao"
+			| (string & {}),
+		token: string,
+		access_token?: string,
+		nonce?: string,
+	): Promise<SignInResponse>;
+
+	signUp(
+		email: string,
+		password: string,
+		options: SignUpOptions,
+	): Promise<SignUpResponse>;
+
+	getSession(): Promise<GetSessionResponse>;
+
+	signOut(): Promise<{ success: boolean }>;
 }
+
+export interface IAuthController {
+	/**
+	 * Retrieves the current session from cache if available, otherwise fetches it from the service.
+	 * The session includes user and profile data.
+	 *
+	 * @returns A promise that resolves with the session, user, and profile data.
+	 * @throws Throws an error if no session is found or profile fetching fails.
+	 */
+	getSessionWithCache(): Promise<{
+		session: Session;
+		user: User;
+		profile: Profile;
+	}>;
+
+	/**
+	 * Signs in the user with email and password, then caches the session, user, and profile data.
+	 *
+	 * @param email - The user's email address.
+	 * @param password - The user's password.
+	 * @returns A promise that resolves with the sign-in response and profile data.
+	 * @throws Throws an error if sign-in or profile fetching fails.
+	 */
+	signInWithCache(
+		email: string,
+		password: string,
+	): Promise<{ signIn: SignInResponse; profile: Profile }>;
+
+	/**
+	 * Signs in the user using a provider (e.g., Google, Apple) and an identity token, then caches the session, user, and profile data.
+	 *
+	 * @param provider - The OAuth provider (e.g., "google", "apple").
+	 * @param token - The identity token from the provider.
+	 * @param access_token - (Optional) The access token for the provider.
+	 * @param nonce - (Optional) A nonce value for added security.
+	 * @returns A promise that resolves with the sign-in response and profile data.
+	 * @throws Throws an error if sign-in or profile fetching fails.
+	 */
+	signInWitIdTokendWithCache(
+		provider:
+			| "google"
+			| "apple"
+			| "azure"
+			| "facebook"
+			| "kakao"
+			| (string & {}),
+		token: string,
+		access_token?: string,
+		nonce?: string,
+	): Promise<{ signIn: SignInResponse; profile: Profile }>;
+
+	/**
+	 * Signs up a new user with the provided email, password, and options.
+	 * If auto-login is enabled, the session is cached.
+	 *
+	 * @param email - The user's email address.
+	 * @param password - The user's password.
+	 * @param options - Additional options for sign-up.
+	 * @returns A promise that resolves with the sign-up response.
+	 * @throws Throws an error if the sign-up operation fails.
+	 */
+	signUpWithCache(
+		email: string,
+		password: string,
+		options: SignUpOptions,
+	): Promise<SignUpResponse>;
+
+	/**
+	 * Signs out the currently logged-in user and clears cached session, user, and profile data.
+	 *
+	 * @returns A promise that resolves with a success object indicating the operation's completion.
+	 * @throws Throws an error if no user is logged in or the sign-out operation fails.
+	 */
+	signOutWithClearCache(): Promise<{ success: boolean }>;
+}
+
+export type ProfileColumns = "id" | "name" | "lastname" | "avatar_url";
 
 /**
- * AuthFormProps - Interface for the properties of the `AuthForm` component.
- *
- * This interface defines the properties that the `AuthForm` component accepts. Its main purpose is to provide a type for a dynamic form structure with support for validations, redirections, and customization.
- *
- * @template T - The type of the form field values. It allows the data in the form fields to be typed flexibly.
+ * Interface for managing user profiles.
  */
-export interface AuthFormProps<T> {
+export interface IProfileService {
 	/**
-	 * An array of objects that defines each field in the form.
-	 * Each field can have various customizable properties such as name, placeholder, values, and validation rules.
+	 * Fetch a profile by its user ID with specific columns.
 	 *
-	 * @type {Array}
+	 * @param userId - The unique ID of the user.
+	 * @param select - An array of columns to fetch or "*" to fetch all columns.
+	 * @returns A promise that resolves to the user's profile.
 	 */
-	fields: {
-		/**
-		 * The unique name of the field. It is used as the key to identify the field in the form.
-		 *
-		 * @type {string}
-		 */
-		name: string;
-
-		/**
-		 * The transparent placeholder text that appears in the input field when it is empty.
-		 *
-		 * @type {string}
-		 */
-		placeholder?: string;
-
-		/**
-		 * An optional value that can set a predefined text that appears in the input field.
-		 * It can be used to show default values or other purposes like field descriptions.
-		 *
-		 * @type {string}
-		 * @optional
-		 */
-		text?: string;
-
-		/**
-		 * A function used to update the field value. It should be a setter function that modifies the value of a state.
-		 * It's important to keep the component in sync with its external state.
-		 *
-		 * @type {SetValue<T>}
-		 */
-		setValue?: SetValue<T>;
-
-		/**
-		 * An optional error message that is displayed if the field has a validation issue.
-		 * If not provided, the field will not show any errors.
-		 *
-		 * @type {string}
-		 * @optional
-		 */
-		error?: string;
-
-		/**
-		 * Determines if the field is a secure input (e.g., passwords).
-		 * If true, the text will be hidden for security reasons.
-		 *
-		 * @type {boolean}
-		 * @optional
-		 */
-		secureTextEntry?: boolean;
-
-		/**
-		 * Controls the automatic capitalization of the entered text.
-		 * It can be set to "none", "sentences", "words", or "characters".
-		 *
-		 * @type {TextInputProps["autoCapitalize"]}
-		 * @optional
-		 */
-		autoCapitalize?: TextInputProps["autoCapitalize"];
-
-		/**
-		 * Defines the autocomplete behavior of the input field.
-		 * This helps browsers or devices to autocomplete common data like emails or addresses.
-		 *
-		 * @type {TextInputProps["autoComplete"]}
-		 * @optional
-		 */
-		autoComplete?: TextInputProps["autoComplete"];
-
-		/**
-		 * Defines the type of content expected in the input field, such as "emailAddress", "password", etc.
-		 * It helps devices and browsers understand what kind of data is expected.
-		 *
-		 * @type {TextInputProps["textContentType"]}
-		 * @optional
-		 */
-		textContentType?: TextInputProps["textContentType"];
-
-		/**
-		 * Limits the maximum length of the text the user can enter in the field.
-		 *
-		 * @type {number}
-		 * @optional
-		 */
-		maxLength?: number;
-
-		/**
-		 * Determines whether the input field is editable or not.
-		 * If false, the user will not be able to modify the value of the field.
-		 *
-		 * @type {boolean}
-		 * @optional
-		 */
-		editable?: boolean;
-
-		/**
-		 * Allows customizing the style of various parts of the field, such as the input, the container, and the helper text.
-		 * - `input`: Style for the text input field.
-		 * - `container`: Style for the container of the field.
-		 * - `helperText`: Style for the helper or error text.
-		 *
-		 * @type {Object}
-		 * @optional
-		 */
-		customStyle?: {
-			input?: StyleProp<TextStyle>;
-			container?: StyleProp<ViewStyle>;
-			helperText?: StyleProp<TextStyle>;
-		};
-
-		/**
-		 * Name for the container view to customize style (optional).
-		 *
-		 * @type {string}
-		 * @optional
-		 */
-		windView?: string;
-
-		/**
-		 * Name for the text input view to customize style (optional).
-		 *
-		 * @type {string}
-		 * @optional
-		 */
-		windTextInput?: string;
-
-		/**
-		 * A function that is called each time the text in the field changes.
-		 * It allows performing additional actions on the text as it updates.
-		 *
-		 * @type {(text: string) => void}
-		 * @optional
-		 */
-		onChangeText?: (text: string) => void;
-	}[];
+	fetchProfileById(
+		userId: string,
+		select: ProfileColumns[] | "*",
+	): Promise<Profile>;
 
 	/**
-	 * Indicates if the form is in a loading state (e.g., when the information is being submitted).
+	 * Fetch all columns of a profile by its user ID.
 	 *
-	 * @type {boolean}
+	 * @param userId - The unique ID of the user.
+	 * @returns A promise that resolves to the user's profile with all columns.
 	 */
-	isLoading: boolean;
+	fetchProfileByIdAll(userId: string): Promise<Profile>;
 
 	/**
-	 * The text displayed on the submit button of the form.
+	 * Update a user's profile.
 	 *
-	 * @type {string}
+	 * @param userId - The unique ID of the user.
+	 * @param updates - A partial object containing the fields to update.
+	 * @returns A promise that resolves to the updated profile.
 	 */
-	submitLabel: string;
+	updateProfile(
+		userId: string,
+		updates: Partial<Profile>,
+	): Promise<{ success: boolean }>;
 
 	/**
-	 * A function executed when the user presses the submit button.
+	 * Delete a user's profile.
 	 *
-	 * @type {Function}
+	 * @param userId - The unique ID of the user.
+	 * @returns A promise that resolves when the profile is deleted.
 	 */
-	onSubmit: () => void;
-
-	/**
-	 * The text displayed to indicate a redirection link. Typically used to guide the user to another screen (optional).
-	 *
-	 * @type {string}
-	 * @optional
-	 */
-	redirectText?: string;
-
-	/**
-	 * The text displayed on the redirection link (optional).
-	 *
-	 * @type {string}
-	 * @optional
-	 */
-	redirectLinkLabel?: string;
-
-	/**
-	 * A function executed when the user clicks the redirection link (optional).
-	 *
-	 * @type {Function}
-	 * @optional
-	 */
-	onRedirect?: () => void;
+	deleteProfile(userId: string): Promise<void>;
 }
-
-export type StorageInterface = {
-	getItem: (key: string) => Promise<string | null>;
-	setItem: (key: string, value: string) => Promise<void>;
-	removeItem: (key: string) => Promise<void>;
-};

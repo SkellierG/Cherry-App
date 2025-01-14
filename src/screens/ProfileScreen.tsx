@@ -5,7 +5,7 @@ import i18n from "@services/translations";
 import { useDynamicStyles } from "@hooks/useDynamicStyles";
 import { useProfile } from "@hooks/useProfile";
 import { Alert } from "react-native";
-import { useUser } from "@contexts/user";
+import { useUser } from "@contexts/auth";
 
 export default function ProfileScreen() {
 	const { userState } = useUser();

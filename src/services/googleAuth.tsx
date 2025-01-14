@@ -9,10 +9,10 @@ import { supabase } from "@services/supabase";
 import { useRouter } from "expo-router";
 import { Alert } from "react-native";
 import { environment } from "@utils/constants";
-import { useUser } from "@contexts/user";
+import { useUser } from "@contexts/auth";
 import DeviceStorage from "@utils/deviceStorage";
 //@ts-ignore
-import { Profile } from "@types/User";
+import { Profile } from "@types/Auth";
 
 interface GoogleAuthProps {
 	children?: ReactNode;

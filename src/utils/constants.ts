@@ -7,7 +7,7 @@ const getBaseAddress = async () => {
 		return `${protocol}//${hostname}${port ? `:${port}` : ""}`;
 	} else {
 		const initialUrl = await Linking.getInitialURL();
-		return initialUrl || "Cherry=App://"; // Deep link base por defecto
+		return initialUrl || "Cherry=App://";
 	}
 };
 

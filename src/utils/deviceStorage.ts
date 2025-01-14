@@ -1,7 +1,7 @@
 import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 //@ts-ignore
-import { StorageInterface } from "@types/Auth";
+import { StorageInterface } from "@types/Components";
 
 const createMemoryStorage = (): StorageInterface => {
 	let memoryStorage: Record<string, string> = {};

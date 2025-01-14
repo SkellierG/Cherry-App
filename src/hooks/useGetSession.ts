@@ -2,11 +2,11 @@ import { useState } from "react";
 // eslint-disable-next-line import/no-unresolved
 import { AuthSupabase } from "@modules/auth/authController";
 import { useRouter } from "expo-router";
-import { useUser } from "@contexts/user";
+import { useAuth } from "@contexts/auth";
 import { useConnectivity } from "@contexts/internet";
 import DeviceStorage from "@utils/deviceStorage";
 //@ts-ignore
-import { Profile } from "@types/User";
+import { Profile } from "@types/Auth";
 import { Session, User } from "@supabase/supabase-js";
 //@ts-ignore
 import { UseGetSessionHook } from "@types/hooks";
@@ -15,7 +15,7 @@ import { routes } from "@utils/constants";
 export function useGetSession(): UseGetSessionHook {
 	const [isLoading, setIsLoading] = useState(false);
 	const router = useRouter();
-	const { userDispatch } = useUser();
+	const { authDispatch } = useAuth();
 	const { isConnected } = useConnectivity();
 
 	const checkAuthNoInternet = async () => {
@@ -30,7 +30,7 @@ export function useGetSession(): UseGetSessionHook {
 		)) as Profile | null;
 
 		if (cachedSession && cachedUser && cachedProfile) {
-			userDispatch({
+			authDispatch({
 				type: "SIGNIN",
 				payload: {
 					user: cachedUser,
@@ -39,7 +39,7 @@ export function useGetSession(): UseGetSessionHook {
 				},
 			});
 			if (cachedProfile.is_profiled) {
-				userDispatch({
+				authDispatch({
 					type: "PROFILE",
 					payload: cachedProfile,
 				});
@@ -66,7 +66,7 @@ export function useGetSession(): UseGetSessionHook {
 				const { session, user, profile } =
 					await AuthSupabase.getSessionWithCache();
 
-				userDispatch({
+				authDispatch({
 					type: "SIGNIN",
 					payload: {
 						user,
@@ -75,7 +75,7 @@ export function useGetSession(): UseGetSessionHook {
 					},
 				});
 				if (profile.is_profiled) {
-					userDispatch({
+					authDispatch({
 						type: "PROFILE",
 						payload: profile,
 					});

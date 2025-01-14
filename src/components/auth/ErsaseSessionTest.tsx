@@ -2,7 +2,7 @@ import React from "react";
 import { Button, View } from "tamagui";
 import { supabase } from "@services/supabase";
 import { useRouter } from "expo-router";
-import { useUser } from "@contexts/user";
+import { useUser } from "@contexts/auth";
 import { Alert } from "react-native";
 import DeviceStorage from "@utils/deviceStorage";
 import { routes } from "@utils/constants";

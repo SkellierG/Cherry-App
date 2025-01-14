@@ -9,7 +9,7 @@ import { TamaguiProvider } from "tamagui";
 import { ThemeProvider as RNThemeProvider } from "@contexts/theme";
 import { tamaguiConfig } from "../../tamagui.config";
 import React from "react";
-import { UserProvider } from "@contexts/user";
+import { AuthProvider } from "@contexts/auth";
 import RNPaperThemeProvider from "@assets/themes/rn-paper";
 import { ConnectivityProvider } from "@contexts/internet";
 
@@ -22,13 +22,13 @@ export default function RootLayout() {
 				<RNThemeProvider>
 					<RNPaperThemeProvider>
 						<ConnectivityProvider>
-							<UserProvider>
+							<AuthProvider>
 								<Stack
 									screenOptions={{
 										headerShown: false,
 									}}
 								></Stack>
-							</UserProvider>
+							</AuthProvider>
 						</ConnectivityProvider>
 					</RNPaperThemeProvider>
 				</RNThemeProvider>

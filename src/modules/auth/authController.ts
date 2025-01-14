@@ -1,5 +1,5 @@
 //@ts-ignore
-import { StorageInterface } from "@types/Auth";
+import { StorageInterface } from "@types/Components";
 import {
 	GetSessionResponse,
 	IAuthController,
@@ -10,7 +10,7 @@ import {
 	SignUpOptions,
 	SignUpResponse,
 	//@ts-ignore
-} from "@types/User";
+} from "@types/Auth";
 import { AuthService } from "./AuthService";
 import DeviceStorage from "@utils/deviceStorage";
 import { handleError } from "@utils/common";

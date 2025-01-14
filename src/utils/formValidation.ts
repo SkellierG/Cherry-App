@@ -1,5 +1,5 @@
 //@ts-ignore
-import { ValidationResult } from "@types/Auth";
+import { ValidationResult } from "@types/Components";
 import i18n from "@services/translations";
 
 function validateMinLength(

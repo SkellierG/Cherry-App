@@ -7,7 +7,7 @@ import {
 } from "@assets/themes/tamagui-rnp-adapter";
 import { useDynamicStyles } from "@hooks/useDynamicStyles";
 //@ts-ignore
-import { AuthTextInputProps } from "@types/Auth";
+import { AuthTextInputProps } from "@types/Components";
 
 const AuthTextInput = <T extends unknown>({
 	placeholder = "Enter text",

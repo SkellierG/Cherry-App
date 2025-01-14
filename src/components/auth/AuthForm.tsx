@@ -4,7 +4,7 @@ import { Button } from "tamagui";
 import AuthTextInput from "@components/auth/AuthTextInput";
 import { useDynamicStyles } from "@hooks/useDynamicStyles";
 //@ts-ignore
-import { AuthFormProps } from "@types/Auth";
+import { AuthFormProps } from "@types/Components";
 
 /**
  * AuthForm - A reusable form component to render multiple input fields with validation and a submit button.

@@ -6,7 +6,7 @@ import {
 	SignUpOptions,
 	SignUpResponse,
 	//@ts-ignore
-} from "@types/User";
+} from "@types/Auth";
 
 export class AuthService implements IAuthService {
 	async signInWithPassword(

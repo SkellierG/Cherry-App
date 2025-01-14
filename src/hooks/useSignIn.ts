@@ -3,7 +3,7 @@ import { useState } from "react";
 import { AuthSupabase } from "@modules/auth/authController";
 import { useRouter } from "expo-router";
 import { Alert } from "react-native";
-import { useUser } from "@contexts/user";
+import { useAuth } from "@contexts/auth";
 //@ts-ignore
 import { UseSignInHook } from "@types/hooks";
 import { routes } from "@utils/constants";
@@ -11,7 +11,7 @@ import { routes } from "@utils/constants";
 export function useSignIn(): UseSignInHook {
 	const [isLoading, setIsLoading] = useState(false);
 	const router = useRouter();
-	const { userDispatch } = useUser();
+	const { authDispatch } = useAuth();
 
 	const handleSignIn = async (email: string, password: string) => {
 		setIsLoading(true);
@@ -19,7 +19,7 @@ export function useSignIn(): UseSignInHook {
 			const { signIn: signInData, profile } =
 				await AuthSupabase.signInWithCache(email, password);
 
-			userDispatch({
+			authDispatch({
 				type: "SIGNIN",
 				payload: {
 					user: signInData.user,
@@ -29,7 +29,7 @@ export function useSignIn(): UseSignInHook {
 			});
 
 			if (profile.is_profiled) {
-				userDispatch({ type: "PROFILE", payload: profile });
+				authDispatch({ type: "PROFILE", payload: profile });
 				router.dismiss();
 				router.replace(routes.dashboard.index);
 			} else {

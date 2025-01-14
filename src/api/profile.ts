@@ -1,7 +1,7 @@
 import { supabase } from "@services/supabase";
 import { Alert } from "react-native";
 //@ts-ignore
-import { IProfileService, Profile, ProfileColumns } from "@types/User";
+import { IProfileService, Profile, ProfileColumns } from "@types/Auth";
 
 export class ProfileService implements IProfileService {
 	async fetchProfileById(

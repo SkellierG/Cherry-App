@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useRouter } from "expo-router";
 import { Alert } from "react-native";
-import { useUser } from "@contexts/user";
+import { useAuth } from "@contexts/auth";
 import { ProfileService } from "@api/profile";
 import DeviceStorage from "@utils/deviceStorage";
 import { User } from "@supabase/supabase-js";
 //@ts-ignore
-import { Profile } from "@types/User";
+import { Profile } from "@types/Auth";
 //@ts-ignore
 import { UseProfileHook } from "@types/hooks";
 import { routes } from "@utils/constants";
@@ -14,12 +14,12 @@ import { routes } from "@utils/constants";
 export function useProfile(): UseProfileHook {
 	const [isLoading, setIsLoading] = useState(false);
 	const router = useRouter();
-	const { userState, userDispatch } = useUser();
+	const { authState, authDispatch } = useAuth();
 
 	const handleProfile = async (
 		name: string,
 		lastname: string,
-		avatar_url: string | null = userState.user?.user_metadata.avatar_url,
+		avatar_url: string | null = authState.user?.user_metadata.avatar_url,
 	) => {
 		setIsLoading(true);
 		try {
@@ -41,7 +41,7 @@ export function useProfile(): UseProfileHook {
 
 			await profileService.updateProfile(userData.id, newProfile);
 
-			userDispatch({
+			authDispatch({
 				type: "PROFILE",
 				payload: newProfile,
 			});
