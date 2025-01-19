@@ -5,6 +5,7 @@ import {
 	IAuthController,
 	IAuthService,
 	IProfileService,
+	Jwt,
 	Profile,
 	SignInResponse,
 	SignUpOptions,
@@ -17,7 +18,7 @@ import { handleError } from "@utils/common";
 import { Session, User } from "@supabase/supabase-js";
 // eslint-disable-next-line import/no-unresolved
 import { ProfileService } from "@api/profile";
-import i18n from "@services/translations";
+import { jwtDecode } from "jwt-decode";
 
 export class AuthController implements IAuthController {
 	private authService: IAuthService;
@@ -38,6 +39,7 @@ export class AuthController implements IAuthController {
 		session: Session;
 		user: User;
 		profile: Profile;
+		jwt: Jwt;
 	}> {
 		try {
 			const getSessionData: GetSessionResponse =
@@ -55,23 +57,31 @@ export class AuthController implements IAuthController {
 				getSessionData.session.user.id,
 			);
 
-			await this.cacheService.setItem(
-				"sessionData",
-				JSON.stringify(getSessionData.session),
-			);
-			await this.cacheService.setItem(
-				"userData",
-				JSON.stringify(getSessionData.session.user),
-			);
-			await this.cacheService.setItem(
-				"profileData",
-				JSON.stringify(profileData),
+			const jwt: Jwt = jwtDecode(getSessionData.session.access_token);
+
+			this.cacheService.setItem("session", getSessionData.session);
+			this.cacheService.setItem("user", getSessionData.session.user);
+			this.cacheService.setItem("profile", profileData);
+			this.cacheService.setItem("jwt", jwt);
+
+			console.log(
+				JSON.stringify(
+					{
+						session: getSessionData.session,
+						user: getSessionData.session.user,
+						profile: profileData,
+						jwt,
+					},
+					null,
+					2,
+				),
 			);
 
 			return {
 				session: { ...getSessionData.session },
 				user: { ...getSessionData.session.user },
 				profile: { ...profileData },
+				jwt: { ...jwt },
 			};
 		} catch (error: any) {
 			throw error;
@@ -81,7 +91,7 @@ export class AuthController implements IAuthController {
 	async signInWithCache(
 		email: string,
 		password: string,
-	): Promise<{ signIn: SignInResponse; profile: Profile }> {
+	): Promise<{ signIn: SignInResponse; profile: Profile; jwt: Jwt }> {
 		try {
 			const signInData: SignInResponse =
 				await this.authService.signInWithPassword(email, password);
@@ -99,20 +109,18 @@ export class AuthController implements IAuthController {
 					"no profile data founded in the database after fetching",
 				);
 
-			await this.cacheService.setItem(
-				"sessionData",
-				JSON.stringify(signInData.session),
-			);
-			await this.cacheService.setItem(
-				"userData",
-				JSON.stringify(signInData.user),
-			);
-			await this.cacheService.setItem(
-				"profileData",
-				JSON.stringify(profileData),
-			);
+			const jwt: Jwt = jwtDecode(signInData.session.access_token);
 
-			return { signIn: { ...signInData }, profile: { ...profileData } };
+			this.cacheService.setItem("session", signInData.session);
+			this.cacheService.setItem("user", signInData.user);
+			this.cacheService.setItem("profile", profileData);
+			this.cacheService.setItem("jwt", jwt);
+
+			return {
+				signIn: { ...signInData },
+				profile: { ...profileData },
+				jwt: { ...jwt },
+			};
 		} catch (error: any) {
 			throw error;
 		}
@@ -129,7 +137,7 @@ export class AuthController implements IAuthController {
 		token: string,
 		access_token?: string,
 		nonce?: string,
-	): Promise<{ signIn: SignInResponse; profile: Profile }> {
+	): Promise<{ signIn: SignInResponse; profile: Profile; jwt: Jwt }> {
 		try {
 			const signInData: SignInResponse =
 				await this.authService.signInWitIdTokend(
@@ -157,26 +165,37 @@ export class AuthController implements IAuthController {
 
 				profileData.is_oauth = true;
 
-				if (!update) {
+				if (!update.success) {
 					console.error("Error updating profiles");
 					throw new Error("Unknown error while updating profiles");
 				}
 			}
 
-			await this.cacheService.setItem(
-				"sessionData",
-				JSON.stringify(signInData.session),
-			);
-			await this.cacheService.setItem(
-				"userData",
-				JSON.stringify(signInData.user),
-			);
-			await this.cacheService.setItem(
-				"profileData",
-				JSON.stringify(profileData),
+			const jwt: Jwt = jwtDecode(signInData.session.access_token);
+
+			this.cacheService.setItem("session", signInData.session);
+			this.cacheService.setItem("user", signInData.user);
+			this.cacheService.setItem("profile", profileData);
+			this.cacheService.setItem("jwt", jwt);
+
+			console.log(
+				JSON.stringify(
+					{
+						session: signInData.session,
+						user: signInData.session.user,
+						profile: profileData,
+						jwt,
+					},
+					null,
+					2,
+				),
 			);
 
-			return { signIn: { ...signInData }, profile: { ...profileData } };
+			return {
+				signIn: { ...signInData },
+				profile: { ...profileData },
+				jwt: { ...jwt },
+			};
 		} catch (error: any) {
 			throw error;
 		}
@@ -219,9 +238,10 @@ export class AuthController implements IAuthController {
 
 			if (!signOutSuccess) throw new Error("Sign Out, Unexpected error");
 
-			await this.cacheService.removeItem("sessionData");
-			await this.cacheService.removeItem("userData");
-			await this.cacheService.removeItem("profileData");
+			this.cacheService.removeItem("session");
+			this.cacheService.removeItem("user");
+			this.cacheService.removeItem("profile");
+			this.cacheService.removeItem("jwt");
 
 			return { success: true };
 		} catch (error: any) {

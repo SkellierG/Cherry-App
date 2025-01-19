@@ -5,13 +5,13 @@ import i18n from "@services/translations";
 import { useDynamicStyles } from "@hooks/useDynamicStyles";
 import { useProfile } from "@hooks/useProfile";
 import { Alert } from "react-native";
-import { useUser } from "@contexts/auth";
+import { useAuth } from "@contexts/auth";
 
 export default function ProfileScreen() {
-	const { userState } = useUser();
+	const { authState } = useAuth();
 
 	const [NAME, LASTNAME] = (
-		userState.user?.user_metadata.full_name as string
+		authState.user?.user_metadata.full_name as string
 	).split(" ");
 
 	const [name, setName] = useState(NAME);
@@ -77,7 +77,7 @@ export default function ProfileScreen() {
 				},
 				{
 					name: "email",
-					text: userState.user?.email,
+					text: authState.user?.email,
 					autoComplete: "email",
 					textContentType: "emailAddress",
 					editable: false,

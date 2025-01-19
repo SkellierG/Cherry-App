@@ -1,5 +1,4 @@
 import { supabase } from "@services/supabase";
-import { Alert } from "react-native";
 //@ts-ignore
 import { IProfileService, Profile, ProfileColumns } from "@types/Auth";
 
@@ -7,36 +6,29 @@ export class ProfileService implements IProfileService {
 	async fetchProfileById(
 		userId: string,
 		select: ProfileColumns[] | "*" = "*",
-	): Promise<Profile> {
+	): Promise<Partial<Profile>> {
 		try {
 			const { data: profileData, error: profileError } = await supabase
 				.from("profiles")
-				.select(select.toString())
-				.eq("id", userId)
-				.single();
+				.select(select === "*" ? "*" : select.join(","))
+				.eq("user_id", userId)
+				.single()
+				.setHeader("Accept", "application/json");
 
 			if (profileError) throw profileError;
 
-			return { ...(profileData as unknown as Profile) };
+			return { ...(profileData[0] as unknown as Partial<Profile>) };
 		} catch (error: any) {
-			Alert.alert("Error fetching profile", error.message);
 			console.error(error);
 			throw error;
 		}
 	}
 
-	async fetchProfileByIdAll(userId: string) {
+	async fetchProfileByIdAll(userId: string): Promise<Profile> {
 		try {
-			const { data: profileData, error: profileError } = await supabase
-				.from("profiles")
-				.select("*")
-				.eq("id", userId)
-				.single();
-			if (profileError) throw profileError;
-			return { ...(profileData as Profile) };
+			const profileData = await this.fetchProfileById(userId);
+			return profileData as Profile;
 		} catch (error: any) {
-			Alert.alert(error.message);
-			console.error(error);
 			throw error;
 		}
 	}
@@ -49,14 +41,14 @@ export class ProfileService implements IProfileService {
 			const { error: updateError } = await supabase
 				.from("profiles")
 				.update(updates)
-				.eq("id", userId)
-				.single();
+				.eq("user_id", userId)
+				.single()
+				.setHeader("Accept", "application/json");
 
 			if (updateError) throw updateError;
 
 			return { success: true };
 		} catch (error: any) {
-			Alert.alert("Error updating profile", error.message);
 			console.error(error);
 			throw error;
 		}
@@ -67,11 +59,11 @@ export class ProfileService implements IProfileService {
 			const { error: deleteError } = await supabase
 				.from("profiles")
 				.delete()
-				.eq("id", userId);
+				.eq("user_id", userId)
+				.setHeader("Accept", "application/json");
 
 			if (deleteError) throw deleteError;
 		} catch (error: any) {
-			Alert.alert("Error deleting profile", error.message);
 			console.error(error);
 			throw error;
 		}

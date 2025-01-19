@@ -15,8 +15,6 @@ export const constants = {
 	baseAdress: getBaseAddress().then((adress) => adress),
 };
 
-console.info(JSON.stringify(constants, null, 2));
-
 export const environment = {
 	EXPO_PUBLIC_SUPABASE_URL: process.env.EXPO_PUBLIC_SUPABASE_URL || "NULL",
 	EXPO_PUBLIC_SUPABASE_ANON_KEY:
@@ -24,8 +22,6 @@ export const environment = {
 	EXPO_PUBLIC_GOOGLE_CLIENT_ID:
 		process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || "NULL",
 };
-
-console.log(JSON.stringify(environment, null, 2));
 
 export const routes = {
 	auth: {
@@ -40,3 +36,5 @@ export const routes = {
 		profile: "/dashboard/profile" as "/dashboard/profile",
 	},
 };
+
+console.log(JSON.stringify({ environment, routes, constants }, null, 2));

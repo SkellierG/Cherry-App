@@ -5,14 +5,12 @@ import {
 import { useDynamicStyles } from "@hooks/useDynamicStyles";
 import DefaultHomeScreen from "@screens/DefaultHomeScreen";
 import FirstHomeScreen from "@screens/FirstHomeScreen";
-import LoadingScreen from "@screens/LoadingScreen";
 import DeviceStorage from "@utils/deviceStorage";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Dimensions, SafeAreaView } from "react-native";
 
 export default function DashboardPage() {
-	const [isInCompanie, setIsInCompnie] = useState(null);
-	const [loading, setLoading] = useState(true);
+	const isInCompany = false;
 
 	const styles = useDynamicStyles((theme) => ({
 		view: {
@@ -24,24 +22,9 @@ export default function DashboardPage() {
 		},
 	}));
 
-	useEffect(() => {
-		const fetchData = async () => {
-			const value = JSON.parse(
-				(await DeviceStorage.getItem("isInCompnie")) || "true",
-			);
-			setIsInCompnie(value);
-			setLoading(false);
-		};
-		fetchData();
-	}, []);
-
-	if (loading) {
-		return <LoadingScreen />;
-	}
-
 	return (
 		<SafeAreaView style={styles.view}>
-			{isInCompanie ? <FirstHomeScreen /> : <DefaultHomeScreen />}
+			{isInCompany ? <FirstHomeScreen /> : <DefaultHomeScreen />}
 		</SafeAreaView>
 	);
 }

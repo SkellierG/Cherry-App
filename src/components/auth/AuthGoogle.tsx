@@ -29,22 +29,23 @@ export default function AuthGoogle() {
 			await GoogleSignin.signOut();
 			await GoogleSignin.hasPlayServices();
 			const { type, data } = await GoogleSignin.signIn();
+			console.error(data);
 			if (type === "cancelled")
 				throw new Error("Unexpected error in Google OAuth");
 
 			await handleSignIn("google", data.idToken as string);
 		} catch (error: any) {
 			if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-				console.log(error);
+				console.error(error);
 				Alert.alert("SIGN_IN_CANCELLED", error.message);
 			} else if (error.code === statusCodes.IN_PROGRESS) {
-				console.log(error);
+				console.error(error);
 				Alert.alert("IN_PROGRESS", error.message);
 			} else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-				console.log(error);
+				console.error(error);
 				Alert.alert("PLAY_SERVICES_NOT_AVAILABLE", error.message);
 			} else {
-				console.log(error);
+				console.error(error);
 				Alert.alert("UNEXPECTED_ERROR", error.message);
 			}
 		}

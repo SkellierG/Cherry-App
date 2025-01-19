@@ -16,8 +16,11 @@ export function useSignIn(): UseSignInHook {
 	const handleSignIn = async (email: string, password: string) => {
 		setIsLoading(true);
 		try {
-			const { signIn: signInData, profile } =
-				await AuthSupabase.signInWithCache(email, password);
+			const {
+				signIn: signInData,
+				profile,
+				jwt,
+			} = await AuthSupabase.signInWithCache(email, password);
 
 			authDispatch({
 				type: "SIGNIN",
@@ -26,6 +29,20 @@ export function useSignIn(): UseSignInHook {
 					session: signInData.session,
 					isAuthenticated: true,
 				},
+			});
+
+			authDispatch({
+				type: "JWT",
+				payload: jwt,
+			});
+
+			authDispatch({
+				type: "ROLES",
+				payload: jwt.roles,
+			});
+			authDispatch({
+				type: "COMPANIES",
+				payload: jwt.joined_companies,
 			});
 
 			if (profile.is_profiled) {

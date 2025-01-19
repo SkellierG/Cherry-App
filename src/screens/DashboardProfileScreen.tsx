@@ -2,10 +2,11 @@ import {
 	dark_default_theme,
 	light_default_theme,
 } from "@assets/themes/tamagui-rnp-adapter";
-import EraseSession from "@components/auth/ErsaseSessionTest";
+import EraseSession from "@components/auth/EraseSessionTest";
+import SignOutButton from "@components/auth/SignOutButton";
 import ProfileShow from "@components/ProfileShow";
 import PullToRefresh from "@components/PullToRefresh";
-import { useUser } from "@contexts/auth";
+import { useAuth } from "@contexts/auth";
 import { useDynamicStyles } from "@hooks/useDynamicStyles";
 import { AuthSupabase } from "@modules/auth/authController";
 import React, { useState } from "react";
@@ -46,24 +47,24 @@ const DashboardProfileScreen: React.FC<ProfileScreenProps> = ({
 		},
 	}));
 
-	const { userState } = useUser();
+	const { authState } = useAuth();
 
 	const [finalName, setFinalName] = useState(
-		name || userState.profile?.name || "",
+		name || authState.profile?.name || "",
 	);
 
 	const [finalLastname, setFinalLastname] = useState(
-		lastname || userState.profile?.lastname || "",
+		lastname || authState.profile?.lastname || "",
 	);
 
 	let [finalEmail, setFinalEmail] = useState(
-		email || userState.user?.email || "",
+		email || authState.user?.email || "",
 	);
 
 	let [finalImageSource, setFinalImageSource] = useState(
 		imageSource ||
-			(userState.profile?.avatar_url
-				? { uri: userState.profile?.avatar_url }
+			(authState.profile?.avatar_url
+				? { uri: authState.profile?.avatar_url }
 				: undefined),
 	);
 
@@ -93,6 +94,7 @@ const DashboardProfileScreen: React.FC<ProfileScreenProps> = ({
 						email={finalEmail}
 						imageSource={finalImageSource}
 					>
+						<SignOutButton />
 						<EraseSession />
 					</ProfileShow>
 				</View>

@@ -6,7 +6,7 @@ import { useAuth } from "@contexts/auth";
 import { useConnectivity } from "@contexts/internet";
 import DeviceStorage from "@utils/deviceStorage";
 //@ts-ignore
-import { Profile } from "@types/Auth";
+import { Jwt, Profile } from "@types/Auth";
 import { Session, User } from "@supabase/supabase-js";
 //@ts-ignore
 import { UseGetSessionHook } from "@types/hooks";
@@ -18,18 +18,21 @@ export function useGetSession(): UseGetSessionHook {
 	const { authDispatch } = useAuth();
 	const { isConnected } = useConnectivity();
 
-	const checkAuthNoInternet = async () => {
-		const cachedSession: Session | null = (await DeviceStorage.getItem(
-			"sessionData",
-		)) as Session | null;
-		const cachedUser: User | null = (await DeviceStorage.getItem(
-			"userData",
-		)) as User | null;
-		const cachedProfile: Profile | null = (await DeviceStorage.getItem(
-			"profileData",
-		)) as Profile | null;
+	const checkAuthNoInternet = () => {
+		const cachedSession: Session | null = JSON.parse(
+			(DeviceStorage.getItem("session", "string") as string) || "null",
+		);
+		const cachedUser: User | null = JSON.parse(
+			(DeviceStorage.getItem("user", "string") as string) || "null",
+		);
+		const cachedProfile: Profile | null = JSON.parse(
+			(DeviceStorage.getItem("profile", "string") as string) || "null",
+		);
+		const cachedJwt: Jwt | null = JSON.parse(
+			(DeviceStorage.getItem("jwt", "string") as string) || "null",
+		);
 
-		if (cachedSession && cachedUser && cachedProfile) {
+		if (cachedSession && cachedUser && cachedProfile && cachedJwt) {
 			authDispatch({
 				type: "SIGNIN",
 				payload: {
@@ -38,6 +41,20 @@ export function useGetSession(): UseGetSessionHook {
 					isAuthenticated: true,
 				},
 			});
+			authDispatch({
+				type: "JWT",
+				payload: cachedJwt,
+			});
+
+			authDispatch({
+				type: "ROLES",
+				payload: cachedJwt.roles,
+			});
+			authDispatch({
+				type: "COMPANIES",
+				payload: cachedJwt.joined_companies,
+			});
+
 			if (cachedProfile.is_profiled) {
 				authDispatch({
 					type: "PROFILE",
@@ -63,7 +80,7 @@ export function useGetSession(): UseGetSessionHook {
 			if (!isConnected) {
 				checkAuthNoInternet();
 			} else {
-				const { session, user, profile } =
+				const { session, user, profile, jwt } =
 					await AuthSupabase.getSessionWithCache();
 
 				authDispatch({
@@ -74,6 +91,12 @@ export function useGetSession(): UseGetSessionHook {
 						isAuthenticated: true,
 					},
 				});
+
+				authDispatch({
+					type: "JWT",
+					payload: jwt,
+				});
+
 				if (profile.is_profiled) {
 					authDispatch({
 						type: "PROFILE",

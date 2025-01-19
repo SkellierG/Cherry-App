@@ -3,10 +3,10 @@ import { Tabs } from "expo-router";
 import { Image } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useUser } from "@contexts/auth";
+import { useAuth } from "@contexts/auth";
 
 export default function DashboardLayout() {
-	const { userState } = useUser();
+	const { authState } = useAuth();
 	return (
 		<Tabs>
 			<Tabs.Screen
@@ -39,7 +39,7 @@ export default function DashboardLayout() {
 							height={size}
 							width={size}
 							borderRadius={100}
-							source={{ uri: userState.profile?.avatar_url as string }}
+							source={{ uri: authState.profile?.avatar_url as string }}
 						></Image>
 					),
 				}}

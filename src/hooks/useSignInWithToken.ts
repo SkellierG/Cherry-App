@@ -27,13 +27,16 @@ export function useSignInWithToken(): UseSignInWithTokenHook {
 	) => {
 		setIsLoading(true);
 		try {
-			const { signIn: signInData, profile } =
-				await AuthSupabase.signInWitIdTokendWithCache(
-					provider,
-					token,
-					access_token,
-					nonce,
-				);
+			const {
+				signIn: signInData,
+				profile,
+				jwt,
+			} = await AuthSupabase.signInWitIdTokendWithCache(
+				provider,
+				token,
+				access_token,
+				nonce,
+			);
 
 			authDispatch({
 				type: "SIGNIN",
@@ -42,6 +45,20 @@ export function useSignInWithToken(): UseSignInWithTokenHook {
 					session: signInData.session,
 					isAuthenticated: true,
 				},
+			});
+
+			authDispatch({
+				type: "JWT",
+				payload: jwt,
+			});
+
+			authDispatch({
+				type: "ROLES",
+				payload: jwt.roles,
+			});
+			authDispatch({
+				type: "COMPANIES",
+				payload: jwt.joined_companies,
 			});
 
 			if (profile.is_profiled) {

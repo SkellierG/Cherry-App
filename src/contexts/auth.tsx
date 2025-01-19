@@ -8,12 +8,16 @@ const initialState: AuthState = {
 	profile: {
 		is_profiled: false,
 		is_oauth: false,
-		id: null,
-		name: null,
-		lastname: null,
-		avatar_url: null,
+		id: undefined,
+		user_id: undefined,
+		name: undefined,
+		lastname: undefined,
+		avatar_url: undefined,
 	},
 	isAuthenticated: false,
+	joined_companies: [],
+	roles: [],
+	jwt: undefined,
 };
 
 const AuthReducer = (state: AuthState, action: AuthAction): AuthState => {
@@ -23,6 +27,8 @@ const AuthReducer = (state: AuthState, action: AuthAction): AuthState => {
 				...state,
 				user: action.payload.user,
 				session: action.payload.session,
+				joined_companies: action.payload.joined_companies,
+				roles: action.payload.roles,
 				isAuthenticated: true,
 			};
 		case "SIGNOUT":
@@ -31,12 +37,16 @@ const AuthReducer = (state: AuthState, action: AuthAction): AuthState => {
 				session: null,
 				profile: {
 					is_profiled: false,
-					id: null,
-					name: null,
-					lastname: null,
-					avatar_url: null,
+					id: undefined,
+					user_id: undefined,
+					name: undefined,
+					lastname: undefined,
+					avatar_url: undefined,
 					is_oauth: false,
 				},
+				joined_companies: [],
+				roles: [],
+				jwt: undefined,
 				isAuthenticated: false,
 			};
 		case "PROFILE":
@@ -45,11 +55,56 @@ const AuthReducer = (state: AuthState, action: AuthAction): AuthState => {
 				profile: {
 					is_profiled: action.payload.is_profiled,
 					id: action.payload.id,
+					user_id: action.payload.user_id,
 					name: action.payload.name,
 					lastname: action.payload.lastname,
 					avatar_url: action.payload.avatar_url,
 					is_oauth: action.payload.is_oauth,
 				},
+			};
+		case "COMPANIES":
+			return {
+				...state,
+				joined_companies: action.payload,
+			};
+		case "ADD_JOINED_COMPANY":
+			return {
+				...state,
+				joined_companies: [...(state.joined_companies || []), action.payload],
+			};
+		case "REMOVE_JOINED_COMPANY":
+			return {
+				...state,
+				joined_companies: state.joined_companies?.filter(
+					(company) => company !== action.payload,
+				),
+			};
+		case "ROLES":
+			return {
+				...state,
+				roles: action.payload,
+			};
+		case "ADD_ROLE":
+			return {
+				...state,
+				roles: [...(state.roles || []), action.payload],
+			};
+		case "UPDATE_ROLE":
+			return {
+				...state,
+				roles: state.roles?.map((role) =>
+					role.id === action.payload.id ? { ...role, ...action.payload } : role,
+				),
+			};
+		case "REMOVE_ROLE":
+			return {
+				...state,
+				roles: state.roles?.filter((role) => role.id !== action.payload),
+			};
+		case "JWT":
+			return {
+				...state,
+				jwt: action.payload,
 			};
 		default:
 			return state;

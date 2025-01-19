@@ -8,11 +8,10 @@ import {
 import { supabase } from "@services/supabase";
 import { useRouter } from "expo-router";
 import { Alert } from "react-native";
-import { environment } from "@utils/constants";
-import { useUser } from "@contexts/auth";
+import { environment, routes } from "@utils/constants";
+import { useAuth } from "@contexts/auth";
 import DeviceStorage from "@utils/deviceStorage";
 //@ts-ignore
-import { Profile } from "@types/Auth";
 
 interface GoogleAuthProps {
 	children?: ReactNode;
@@ -25,7 +24,7 @@ const GoogleAuth: React.FC<GoogleAuthProps> = ({
 }) => {
 	const router = useRouter();
 
-	const { userDispatch } = useUser();
+	const { authState, authDispatch } = useAuth();
 
 	GoogleSignin.configure({
 		scopes: ["https://www.googleapis.com/auth/drive.readonly"],
@@ -45,17 +44,20 @@ const GoogleAuth: React.FC<GoogleAuthProps> = ({
 						token: userInfo.data.idToken,
 					});
 					if (error) {
+						console.error("Error with id token:", error);
 						throw error;
 					}
 
-					console.info(data);
+					console.info("data", data);
 					const user = data.session.user;
 
 					if (user) {
 						const { data: profileData, error: profileError } = await supabase
 							.from("profiles")
-							.select("id, is_oauth, is_profiled, name, lastname, avatar_url")
-							.eq("id", user.id)
+							.select(
+								"id, user_id, is_oauth, is_profiled, name, lastname, avatar_url",
+							)
+							.eq("user_id", user.id)
 							.single();
 
 						if (!profileData || profileError) {
@@ -67,7 +69,7 @@ const GoogleAuth: React.FC<GoogleAuthProps> = ({
 							const { error: updateError } = await supabase
 								.from("profiles")
 								.update({ is_oauth: true })
-								.eq("id", user.id);
+								.eq("user_id", user.id);
 
 							profileData.is_oauth = true;
 
@@ -79,7 +81,7 @@ const GoogleAuth: React.FC<GoogleAuthProps> = ({
 
 						console.info("profile", JSON.stringify(profileData, null, 2));
 
-						userDispatch({
+						authDispatch({
 							type: "SIGNIN",
 							payload: {
 								user: user,
@@ -88,21 +90,15 @@ const GoogleAuth: React.FC<GoogleAuthProps> = ({
 							},
 						});
 
-						await DeviceStorage.setItem(
-							"sessionData",
-							JSON.stringify(data.session),
-						);
-						await DeviceStorage.setItem("userData", JSON.stringify(data.user));
-						await DeviceStorage.setItem(
-							"profileData",
-							JSON.stringify(profileData),
-						);
+						DeviceStorage.setItem("session", data.session);
+						DeviceStorage.setItem("user", data.user);
+						DeviceStorage.setItem("profile", profileData);
 
 						if (profileData.is_profiled) {
-							userDispatch({ type: "PROFILE", payload: profileData });
-							router.replace("/home");
+							authDispatch({ type: "PROFILE", payload: profileData });
+							router.replace(routes.dashboard.index);
 						} else {
-							router.push("/auth/profile");
+							router.push(routes.auth.profile);
 						}
 					} else {
 						throw new Error("Unexpected error in Google OAuth");
@@ -116,18 +112,20 @@ const GoogleAuth: React.FC<GoogleAuthProps> = ({
 			}
 		} catch (error: any) {
 			if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-				console.log(error);
+				console.error(error);
 				Alert.alert("SIGN_IN_CANCELLED", error.message);
 			} else if (error.code === statusCodes.IN_PROGRESS) {
-				console.log(error);
+				console.error(error);
 				Alert.alert("IN_PROGRESS", error.message);
 			} else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-				console.log(error);
+				console.error(error);
 				Alert.alert("PLAY_SERVICES_NOT_AVAILABLE", error.message);
 			} else {
-				console.log(error);
+				console.error(error);
 				Alert.alert("UNEXPECTED_ERROR", error.message);
 			}
+		} finally {
+			console.info("authState", authState);
 		}
 	};
 

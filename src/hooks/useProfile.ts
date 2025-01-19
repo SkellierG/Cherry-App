@@ -23,13 +23,16 @@ export function useProfile(): UseProfileHook {
 	) => {
 		setIsLoading(true);
 		try {
-			const userData: User = JSON.parse(
-				(await DeviceStorage.getItem("userData")) as string,
-			) as User;
-			const profileData: Profile = JSON.parse(
-				(await DeviceStorage.getItem("profileData")) as string,
-			) as Profile;
+			const userData: User | null = JSON.parse(
+				(DeviceStorage.getItem("user", "string") as string) || "null",
+			);
+			const profileData: Profile | null = JSON.parse(
+				(DeviceStorage.getItem("profile", "string") as string) || "null",
+			);
 			const profileService = new ProfileService();
+
+			if (!(userData && profileData))
+				throw new Error("use or profile not exists in deviceStorage");
 
 			const newProfile = {
 				...profileData,
@@ -46,7 +49,7 @@ export function useProfile(): UseProfileHook {
 				payload: newProfile,
 			});
 
-			DeviceStorage.setItem("profileData", JSON.stringify(newProfile));
+			DeviceStorage.setItem("profile", newProfile);
 			router.dismiss();
 			router.replace(routes.dashboard.index);
 		} catch (error: any) {

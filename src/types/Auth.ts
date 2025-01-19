@@ -1,24 +1,58 @@
 import { User, Session, WeakPassword } from "@supabase/supabase-js";
 
 export interface Profile {
-	id: string | null;
-	name: string | null;
-	lastname: string | null;
+	id: string;
+	user_id: string;
+	name: string;
+	lastname: string;
 	avatar_url: string | null;
 	is_profiled: boolean;
-	is_oauth?: boolean;
+	is_oauth: boolean;
 }
+
+export interface BaseCompany {
+	id: string;
+	name: string;
+	slogan: string | null;
+	avatar_url: string | null;
+	description: string | null;
+	email: string;
+	phone: string | null;
+}
+
+export type Company = BaseCompany | null;
+
+export interface Role {
+	id: number;
+	name: string;
+	company_id: string | null;
+	permissions: string[];
+}
+
+export type Jwt = any;
+
 export interface AuthState {
 	user: User | null;
 	session: Session | null;
-	profile?: Profile;
+	profile?: Partial<Profile>;
+	joined_companies?: string[];
+	roles?: Partial<Role>[];
+	jwt?: Jwt;
 	isAuthenticated: boolean;
 }
 
 export type AuthAction =
 	| { type: "SIGNIN"; payload: AuthState }
 	| { type: "SIGNOUT" }
-	| { type: "PROFILE"; payload: Profile };
+	| { type: "PROFILE"; payload: Partial<Profile> }
+	| { type: "COMPANIES"; payload: string[] }
+	| { type: "ADD_JOINED_COMPANY"; payload: string }
+	| { type: "REMOVE_JOINED_COMPANY"; payload: string }
+	| { type: "ROLES"; payload: Partial<Role>[] }
+	| { type: "ADD_ROLE"; payload: Role }
+	| { type: "UPDATE_ROLE"; payload: Partial<Role> & { id: number } }
+	| { type: "REMOVE_ROLE"; payload: number }
+	| { type: "JWT"; payload: Jwt };
 
 export interface AuthContextType {
 	authState: AuthState;
@@ -107,6 +141,7 @@ export interface IAuthController {
 		session: Session;
 		user: User;
 		profile: Profile;
+		jwt: Jwt;
 	}>;
 
 	/**
@@ -120,7 +155,7 @@ export interface IAuthController {
 	signInWithCache(
 		email: string,
 		password: string,
-	): Promise<{ signIn: SignInResponse; profile: Profile }>;
+	): Promise<{ signIn: SignInResponse; profile: Profile; jwt: Jwt }>;
 
 	/**
 	 * Signs in the user using a provider (e.g., Google, Apple) and an identity token, then caches the session, user, and profile data.
@@ -143,7 +178,7 @@ export interface IAuthController {
 		token: string,
 		access_token?: string,
 		nonce?: string,
-	): Promise<{ signIn: SignInResponse; profile: Profile }>;
+	): Promise<{ signIn: SignInResponse; profile: Profile; jwt: Jwt }>;
 
 	/**
 	 * Signs up a new user with the provided email, password, and options.
@@ -170,7 +205,7 @@ export interface IAuthController {
 	signOutWithClearCache(): Promise<{ success: boolean }>;
 }
 
-export type ProfileColumns = "id" | "name" | "lastname" | "avatar_url";
+export type ProfileColumns = "user_id" | "name" | "lastname" | "avatar_url";
 
 /**
  * Interface for managing user profiles.
@@ -186,7 +221,7 @@ export interface IProfileService {
 	fetchProfileById(
 		userId: string,
 		select: ProfileColumns[] | "*",
-	): Promise<Profile>;
+	): Promise<Partial<Profile>>;
 
 	/**
 	 * Fetch all columns of a profile by its user ID.
@@ -215,4 +250,112 @@ export interface IProfileService {
 	 * @returns A promise that resolves when the profile is deleted.
 	 */
 	deleteProfile(userId: string): Promise<void>;
+}
+
+export type CompanyColumns =
+	| "name"
+	| "slogan"
+	| "avatar_url"
+	| "description"
+	| "email"
+	| "name";
+export interface ICompanyService {
+	/**
+	 * Retrieves a company's profile by its ID, selecting specific columns.
+	 *
+	 * @param companyId - The unique ID of the company.
+	 * @param select - An array of columns to select or "*" to fetch all columns.
+	 * @returns A promise that resolves to a partial company profile.
+	 */
+	fetchCompanyById(
+		companyId: string[],
+		select: CompanyColumns[] | "*",
+	): Promise<Partial<Company>[]>;
+
+	/**
+	 * Retrieves the full profile of a company by its ID.
+	 *
+	 * @param companyId - The unique ID of the company.
+	 * @returns A promise that resolves to the complete company profile.
+	 */
+	fetchCompanyByIdAll(companyId: string[]): Promise<Company[]>;
+
+	/**
+	 * Updates a company's profile.
+	 *
+	 * @param companyId - The unique ID of the company.
+	 * @param updates - A partial object containing the fields to be updated.
+	 * @returns A promise that resolves to an object indicating whether the operation was successful.
+	 */
+	updateCompany(
+		companyId: string,
+		updates: Partial<Company>,
+	): Promise<{ success: boolean }>;
+
+	/**
+	 * Deletes a company's profile.
+	 *
+	 * @param companyId - The unique ID of the company.
+	 * @returns A promise that resolves when the company profile is deleted.
+	 */
+	deleteCompany(companyId: string): Promise<{ success: boolean }>;
+
+	insertCompany(inserts: Company): Promise<{ success: boolean }>;
+
+	/**
+	 * Fetches all companies a user has joined.
+	 */
+	fetchJoinedCompaniesByUserId(
+		userId: string,
+		select: CompanyColumns[] | "*",
+	): Promise<{ companies: Partial<Company>[]; roles: Role[] }>;
+
+	/**
+	 * Fetches all companies a user has joined.
+	 */
+	fetchJoinedCompaniesByUserIdAll(
+		userId: string,
+	): Promise<{ companies: Company[]; roles: Role[] }>;
+}
+
+export interface ICompanyController {
+	/**
+	 * Allows a user to leave a company.
+	 */
+	exitCompany(userId: string, companyId: string): Promise<void>;
+
+	/**
+	 * Creates a new company and associates it with a user.
+	 */
+	createCompanyForUser(userId: string, companyData: Company): Promise<Company>;
+
+	/**
+	 * Returns a cached version of the user's joined companies.
+	 */
+	getJoinedCompaniesByUserIdWithCache(
+		userId: string,
+		select: CompanyColumns[] | "*",
+	): Promise<{
+		companies: Partial<Company>[];
+		roles: Role[];
+		joined_companies: (string | null)[];
+	}>;
+
+	/**
+	 * Returns a cached version of the user's joined companies.
+	 */
+	getJoinedCompaniesByUserIdAllWithCache(userId: string): Promise<Company[]>;
+
+	/**
+	 * Allows a user to leave a company.
+	 */
+	exitCompanyWithCache(userId: string, companyId: string): Promise<void>;
+
+	/**
+	 * Creates a new company and associates it with a user.
+	 */
+	createCompanyForUserWithCache(
+		userId: string,
+		companyData: Partial<Company>,
+	): Promise<Company>;
 }
