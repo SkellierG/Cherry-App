@@ -1,7 +1,7 @@
 import { useDynamicStyles } from "@hooks/useDynamicStyles";
 import i18n from "@services/translations";
 import React from "react";
-import { Text } from "react-native";
+import { Text, Image } from "react-native";
 import { useTheme } from "react-native-paper";
 import { YStack, Spinner } from "tamagui";
 
@@ -21,9 +21,10 @@ export default function LoadingScreen() {
 			bg={colors.background}
 			padding={16}
 		>
+			<Image source={require("./../../assets/images/cherryappp_XXXHDPI.png")} />
 			<Spinner size="large" />
 
-			<Text style={styles.text}>{i18n.t("gui.loeading")}</Text>
+			<Text style={styles.text}>{i18n.t("gui.loading")}</Text>
 		</YStack>
 	);
 }

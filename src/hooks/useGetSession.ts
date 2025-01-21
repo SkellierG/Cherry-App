@@ -37,9 +37,9 @@ const navigateSafely = async (
 					console.warn(
 						`Navigation failed after ${maxAttempts} attempts: ${error}`,
 					);
-					resolve(); // Resolve after all attempts fail
+					resolve();
 				} else {
-					await new Promise((r) => setTimeout(r, delay)); // Wait before retrying
+					await new Promise((r) => setTimeout(r, delay));
 				}
 			}
 		}
@@ -69,6 +69,20 @@ export function useGetSession(): UseGetSessionHook {
 			JSON.parse(
 				(DeviceStorage.getItem("companies", "string") as string) || "null",
 			);
+
+		console.log(
+			JSON.stringify(
+				{
+					session: cachedSession,
+					user: cachedUser,
+					profile: cachedProfile,
+					jwt: cachedJwt,
+					companies: cachedCompanies,
+				},
+				null,
+				2,
+			),
+		);
 
 		if (
 			cachedSession &&
@@ -127,6 +141,8 @@ export function useGetSession(): UseGetSessionHook {
 				const { session, user, profile, jwt, companies, roles } =
 					await AuthSupabase.getSessionWithCache();
 
+				//console.info( session, user, profile, jwt, companies, roles )
+
 				authDispatch({
 					type: "SIGNIN",
 					payload: {
@@ -165,6 +181,7 @@ export function useGetSession(): UseGetSessionHook {
 			}
 		} catch (error: any) {
 			await navigateSafely(router, routes.auth.sign_in);
+			console.error(error);
 			throw error;
 		} finally {
 			setIsLoading(false);

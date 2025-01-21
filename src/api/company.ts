@@ -6,27 +6,28 @@ export class CompanyService implements ICompanyService {
 	async fetchCompanyById(
 		companyId: string[],
 		select: CompanyColumns[] | "*" = "*",
-	): Promise<Partial<Company>[]> {
+	): Promise<Partial<Company>> {
 		try {
 			const { data: companyData, error: companyError } = await supabase
 				.from("companies")
 				.select(select === "*" ? "*" : select.join(","))
 				.in("id", companyId)
-				.single();
+				.single()
+				.setHeader("Accept", "application/json");
 
 			if (companyError) throw companyError;
 
-			return { ...(companyData as unknown as Partial<Company>[]) };
+			return { ...(companyData[0] as unknown as Partial<Company>) };
 		} catch (error: any) {
 			console.error(error);
 			throw error;
 		}
 	}
 
-	async fetchCompanyByIdAll(companyId: string[]): Promise<Company[]> {
+	async fetchCompanyByIdAll(companyId: string[]): Promise<Company> {
 		try {
 			const companyData = await this.fetchCompanyById(companyId);
-			return companyData as Company[];
+			return companyData as Company;
 		} catch (error: any) {
 			throw error;
 		}
@@ -41,7 +42,8 @@ export class CompanyService implements ICompanyService {
 				.from("companies")
 				.update(updates)
 				.eq("id", companyId)
-				.single();
+				.single()
+				.setHeader("Accept", "application/json");
 
 			if (updateError) throw updateError;
 
@@ -57,7 +59,8 @@ export class CompanyService implements ICompanyService {
 			const { error: deleteError } = await supabase
 				.from("companies")
 				.delete()
-				.eq("id", companyId);
+				.eq("id", companyId)
+				.setHeader("Accept", "application/json");
 
 			if (deleteError) throw deleteError;
 
@@ -73,7 +76,8 @@ export class CompanyService implements ICompanyService {
 			const { error: insertError } = await supabase
 				.from("companies")
 				.insert(inserts)
-				.single();
+				.single()
+				.setHeader("Accept", "application/json");
 
 			if (insertError) throw insertError;
 
@@ -92,7 +96,10 @@ export class CompanyService implements ICompanyService {
 			const { data: rolesId, error: rolesIdError } = await supabase
 				.from("user_roles")
 				.select("role_id")
-				.eq("user_id", userId);
+				.eq("user_id", userId)
+				.setHeader("Accept", "application/json");
+
+			//console.info(rolesId, rolesIdError);
 
 			if (rolesIdError) throw rolesIdError;
 			if (!rolesId || rolesId.length === 0) return { companies: [], roles: [] };
@@ -103,8 +110,10 @@ export class CompanyService implements ICompanyService {
 				.in(
 					"id",
 					rolesId.map((role) => role.role_id),
-				);
+				)
+				.setHeader("Accept", "application/json");
 
+			//console.info(rolesTable, rolesTableError);
 			if (rolesTableError) throw rolesTableError;
 
 			const uniqueCompanyIds = Array.from(
@@ -117,7 +126,8 @@ export class CompanyService implements ICompanyService {
 					await supabase
 						.from("companies")
 						.select(select === "*" ? "*" : select.join(","))
-						.in("id", uniqueCompanyIds);
+						.in("id", uniqueCompanyIds)
+						.setHeader("Accept", "application/json");
 
 				if (companiesTableError) throw companiesTableError;
 				companies = companiesTable as Partial<Company>[];
@@ -125,14 +135,18 @@ export class CompanyService implements ICompanyService {
 				companies = [null];
 			}
 
+			//console.info(companies);
+
 			const { data: permissionsId, error: permissionsIdError } = await supabase
 				.from("role_permissions")
 				.select("*")
 				.in(
 					"role_id",
 					rolesTable.map((roles) => roles.id),
-				);
+				)
+				.setHeader("Accept", "application/json");
 
+			//console.info(permissionsId, permissionsIdError);
 			if (permissionsIdError) throw permissionsIdError;
 
 			const { data: permissions, error: permissionsError } = await supabase
@@ -140,19 +154,29 @@ export class CompanyService implements ICompanyService {
 				.select("*")
 				.in(
 					"id",
-					permissionsId.map((permission) => permission.id),
-				);
+					permissionsId.map((permission) => permission.permission_id),
+				)
+				.setHeader("Accept", "application/json");
 
+			//console.info(permissions, permissionsError);
 			if (permissionsError) throw permissionsError;
 
 			const finalRoles: Role[] = rolesTable.map((role) => {
+				//console.info("role", role);
 				const rolePermissions = permissionsId
-					.filter((perId) => perId.role_id === role.id)
-					.map(
-						(perId) =>
-							permissions.find((permission) => permission.id === perId.id)
-								?.name || "",
-					);
+					.filter((perId) => {
+						//console.info("perId", perId);
+						return perId.role_id === role.id;
+					})
+					.map((perId) => {
+						//console.info("perId_2", perId);
+						return (
+							permissions.find((permission) => {
+								console.info("permission", permission);
+								return permission.id === perId.permission_id;
+							})?.name || ""
+						);
+					});
 				return {
 					id: role.id,
 					name: role.name,
@@ -161,9 +185,11 @@ export class CompanyService implements ICompanyService {
 				};
 			});
 
+			//console.info(companies, finalRoles);
+
 			return {
-				companies: { ...(companies as Partial<Company>[]) },
-				roles: { ...finalRoles },
+				companies: [...(companies as Partial<Company>[])],
+				roles: [...finalRoles],
 			};
 		} catch (error: any) {
 			console.error(error);
@@ -176,11 +202,13 @@ export class CompanyService implements ICompanyService {
 		try {
 			const { companies, roles } =
 				await this.fetchJoinedCompaniesByUserId(userId);
+			//console.info(companies, roles);
 			return {
-				companies: { ...(companies as Company[]) },
-				roles: { ...roles },
+				companies: [...(companies as Company[])],
+				roles: [...roles],
 			};
 		} catch (error: any) {
+			console.error(error);
 			throw error;
 		}
 	}
@@ -194,7 +222,8 @@ export class CompanyService implements ICompanyService {
 				.from("user_roles")
 				.delete()
 				.eq("user_id", userId)
-				.eq("company_id", companyId);
+				.eq("company_id", companyId)
+				.setHeader("Accept", "application/json");
 
 			if (error) throw error;
 

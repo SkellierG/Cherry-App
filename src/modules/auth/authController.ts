@@ -78,6 +78,8 @@ export class AuthController implements IAuthController {
 					getSessionData.session.user.id,
 				);
 
+			console.log(companies, roles);
+
 			this.cacheService.setItem("companies", {
 				companies: companies,
 				roles: roles,
@@ -103,8 +105,8 @@ export class AuthController implements IAuthController {
 				user: { ...getSessionData.session.user },
 				profile: { ...profileData },
 				jwt: { ...jwt },
-				companies: { ...companies },
-				roles: { ...roles },
+				companies: [...companies],
+				roles: [...roles],
 			};
 		} catch (error: any) {
 			throw error;
@@ -236,8 +238,8 @@ export class AuthController implements IAuthController {
 				signIn: { ...signInData },
 				profile: { ...profileData },
 				jwt: { ...jwt },
-				companies: { ...companies },
-				roles: { ...roles },
+				companies: [...companies],
+				roles: [...roles],
 			};
 		} catch (error: any) {
 			throw error;

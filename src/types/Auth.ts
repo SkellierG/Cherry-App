@@ -280,22 +280,22 @@ export interface ICompanyService {
 	 *
 	 * @param companyId - An array of company IDs to retrieve.
 	 * @param select - An array of column names to retrieve or `*` to fetch all columns.
-	 * @returns A promise resolving to an array of partial `Company` objects.
+	 * @returns A promise resolving a partial `Company` object.
 	 * @throws Throws an error if the fetch operation fails.
 	 */
 	fetchCompanyById(
 		companyId: string[],
 		select: CompanyColumns[] | "*",
-	): Promise<Partial<Company>[]>;
+	): Promise<Partial<Company>>;
 
 	/**
 	 * Fetches complete data for companies based on a list of IDs.
 	 *
 	 * @param companyId - An array of company IDs to retrieve.
-	 * @returns A promise resolving to an array of `Company` objects with full data.
+	 * @returns A promise resolving a `Company` object with full data.
 	 * @throws Throws an error if the fetch operation fails.
 	 */
-	fetchCompanyByIdAll(companyId: string[]): Promise<Company[]>;
+	fetchCompanyByIdAll(companyId: string[]): Promise<Company>;
 
 	/**
 	 * Updates a company's information based on its ID.
