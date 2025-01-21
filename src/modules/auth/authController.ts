@@ -1,12 +1,15 @@
 //@ts-ignore
 import { StorageInterface } from "@types/Components";
 import {
+	Company,
 	GetSessionResponse,
 	IAuthController,
 	IAuthService,
+	ICompanyService,
 	IProfileService,
 	Jwt,
 	Profile,
+	Role,
 	SignInResponse,
 	SignUpOptions,
 	SignUpResponse,
@@ -19,20 +22,24 @@ import { Session, User } from "@supabase/supabase-js";
 // eslint-disable-next-line import/no-unresolved
 import { ProfileService } from "@api/profile";
 import { jwtDecode } from "jwt-decode";
+import { CompanyService } from "@api/company";
 
 export class AuthController implements IAuthController {
 	private authService: IAuthService;
 	private cacheService: StorageInterface;
 	private profileService: IProfileService;
+	private companyService: ICompanyService;
 
 	constructor(
 		authService: IAuthService,
 		cacheService: StorageInterface,
 		profileService: IProfileService,
+		companyService: ICompanyService,
 	) {
 		this.authService = authService;
 		this.cacheService = cacheService;
 		this.profileService = profileService;
+		this.companyService = companyService;
 	}
 
 	async getSessionWithCache(): Promise<{
@@ -40,6 +47,8 @@ export class AuthController implements IAuthController {
 		user: User;
 		profile: Profile;
 		jwt: Jwt;
+		companies: Company[];
+		roles: Role[];
 	}> {
 		try {
 			const getSessionData: GetSessionResponse =
@@ -64,6 +73,16 @@ export class AuthController implements IAuthController {
 			this.cacheService.setItem("profile", profileData);
 			this.cacheService.setItem("jwt", jwt);
 
+			const { companies, roles } =
+				await this.companyService.fetchJoinedCompaniesByUserIdAll(
+					getSessionData.session.user.id,
+				);
+
+			this.cacheService.setItem("companies", {
+				companies: companies,
+				roles: roles,
+			});
+
 			console.log(
 				JSON.stringify(
 					{
@@ -71,6 +90,8 @@ export class AuthController implements IAuthController {
 						user: getSessionData.session.user,
 						profile: profileData,
 						jwt,
+						companies,
+						roles,
 					},
 					null,
 					2,
@@ -82,6 +103,8 @@ export class AuthController implements IAuthController {
 				user: { ...getSessionData.session.user },
 				profile: { ...profileData },
 				jwt: { ...jwt },
+				companies: { ...companies },
+				roles: { ...roles },
 			};
 		} catch (error: any) {
 			throw error;
@@ -137,7 +160,13 @@ export class AuthController implements IAuthController {
 		token: string,
 		access_token?: string,
 		nonce?: string,
-	): Promise<{ signIn: SignInResponse; profile: Profile; jwt: Jwt }> {
+	): Promise<{
+		signIn: SignInResponse;
+		profile: Profile;
+		jwt: Jwt;
+		companies: Company[];
+		roles: Role[];
+	}> {
 		try {
 			const signInData: SignInResponse =
 				await this.authService.signInWitIdTokend(
@@ -178,6 +207,16 @@ export class AuthController implements IAuthController {
 			this.cacheService.setItem("profile", profileData);
 			this.cacheService.setItem("jwt", jwt);
 
+			const { companies, roles } =
+				await this.companyService.fetchJoinedCompaniesByUserIdAll(
+					signInData.session.user.id,
+				);
+
+			this.cacheService.setItem("companies", {
+				companies: companies,
+				roles: roles,
+			});
+
 			console.log(
 				JSON.stringify(
 					{
@@ -185,6 +224,8 @@ export class AuthController implements IAuthController {
 						user: signInData.session.user,
 						profile: profileData,
 						jwt,
+						companies,
+						roles,
 					},
 					null,
 					2,
@@ -195,6 +236,8 @@ export class AuthController implements IAuthController {
 				signIn: { ...signInData },
 				profile: { ...profileData },
 				jwt: { ...jwt },
+				companies: { ...companies },
+				roles: { ...roles },
 			};
 		} catch (error: any) {
 			throw error;
@@ -254,4 +297,5 @@ export const AuthSupabase = new AuthController(
 	new AuthService(),
 	DeviceStorage,
 	new ProfileService(),
+	new CompanyService(),
 );

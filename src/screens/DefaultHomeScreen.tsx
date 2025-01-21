@@ -11,7 +11,6 @@ export default function DefaultHomeScreen() {
 	const styles = useDynamicStyles((theme) => ({
 		container: {
 			flex: 1,
-			justifyContent: "center",
 			alignItems: "center",
 			padding: 20,
 			backgroundColor:
@@ -36,12 +35,17 @@ export default function DefaultHomeScreen() {
 		},
 		image: {
 			marginBottom: 20,
+			height: 200,
+			width: 200,
 		},
 	}));
 
 	return (
 		<View style={styles.container}>
-			<Image style={styles.image} />
+			<Image
+				style={styles.image}
+				source={require("../../assets/images/cherryapp_1024.png")}
+			/>
 			<View style={styles.textContainer}>
 				<H1>¡Bienvenido de nuevo!</H1>
 				<Text style={styles.greetingText}>

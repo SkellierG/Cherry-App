@@ -13,7 +13,7 @@ export default function ProfileShow({
 	children,
 	name = "Lorem Ipsum",
 	email = "name@domain.com",
-	imageSource = require("../../assets/images/favicon.png"),
+	imageSource = require("../../assets/images/cherryapp_1024.png"),
 }: ProfileComponentProps) {
 	const styles = useDynamicStyles((theme) => ({
 		main: {

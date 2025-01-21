@@ -3,7 +3,7 @@ import {
 	DefaultTheme,
 	ThemeProvider,
 } from "@react-navigation/native";
-import { Stack } from "expo-router";
+import { Slot } from "expo-router";
 import { useColorScheme } from "react-native";
 import { TamaguiProvider } from "tamagui";
 import { ThemeProvider as RNThemeProvider } from "@contexts/theme";
@@ -23,11 +23,7 @@ export default function RootLayout() {
 					<RNPaperThemeProvider>
 						<ConnectivityProvider>
 							<AuthProvider>
-								<Stack
-									screenOptions={{
-										headerShown: false,
-									}}
-								></Stack>
+								<Slot />
 							</AuthProvider>
 						</ConnectivityProvider>
 					</RNPaperThemeProvider>

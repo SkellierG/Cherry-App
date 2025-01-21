@@ -1,3 +1,4 @@
+import { CompanyService } from "@api/company";
 import {
 	Company,
 	CompanyColumns,
@@ -8,6 +9,7 @@ import {
 } from "@types/Auth";
 //@ts-ignore
 import { StorageInterface } from "@types/Components";
+import DeviceStorage from "@utils/deviceStorage";
 
 export class CompanyController implements ICompanyController {
 	private companyService: ICompanyService;
@@ -16,9 +18,6 @@ export class CompanyController implements ICompanyController {
 	constructor(companyService: ICompanyService, cacheService: StorageInterface) {
 		this.companyService = companyService;
 		this.cacheService = cacheService;
-	}
-	async exitCompany(userId: string, companyId: string): Promise<void> {
-		throw new Error("Method not implemented.");
 	}
 	async createCompanyForUser(
 		userId: string,
@@ -75,18 +74,126 @@ export class CompanyController implements ICompanyController {
 			throw error;
 		}
 	}
-	async getJoinedCompaniesByUserIdAllWithCache(
+	async getJoinedCompaniesByUserIdAllWithCache(userId: string): Promise<{
+		companies: Company[];
+		roles: Role[];
+		joined_companies: (string | null)[];
+	}> {
+		try {
+			const companiesData =
+				await this.companyService.fetchJoinedCompaniesByUserIdAll(userId);
+
+			const joined_companies: (string | null)[] = companiesData.companies.map(
+				(company) => company?.id || null,
+			);
+
+			this.cacheService.setItem("companies", companiesData);
+
+			return {
+				companies: { ...companiesData.companies },
+				roles: { ...companiesData.roles },
+				joined_companies: { ...joined_companies },
+			};
+		} catch (error: any) {
+			console.error(error);
+			throw error;
+		}
+	}
+	async exitCompanyWithCache(
 		userId: string,
-	): Promise<Company[]> {
-		throw new Error("Method not implemented.");
+		companyId: string,
+	): Promise<{ success: boolean }> {
+		try {
+			const { success } = await this.companyService.exitCompany(
+				userId,
+				companyId,
+			);
+			if (!success) throw new Error("cannot exit the company");
+
+			const oldCompanies: { companies: Company[]; roles: Role[] } | null =
+				JSON.parse(
+					(this.cacheService.getItem("companies", "string") as string) ||
+						"null",
+				);
+
+			if (!oldCompanies) throw new Error("error in the cache");
+
+			const newCompanies: { companies: Company[]; roles: Role[] } = {
+				companies: oldCompanies.companies.filter(
+					(company) => company?.id !== companyId,
+				),
+				roles: oldCompanies.roles.filter(
+					(role) => role.company_id !== companyId,
+				),
+			};
+
+			this.cacheService.setItem("companies", newCompanies);
+
+			return { success: true };
+		} catch (error: any) {
+			console.error(error);
+			throw error;
+		}
 	}
-	async exitCompanyWithCache(userId: string, companyId: string): Promise<void> {
-		throw new Error("Method not implemented.");
-	}
+	//TODO: optimize this method in the future
 	async createCompanyForUserWithCache(
 		userId: string,
-		companyData: Partial<Company>,
-	): Promise<Company> {
-		throw new Error("Method not implemented.");
+		companyData: Company,
+	): Promise<{
+		company: Company;
+		roles: Role[];
+		joined_company: string | null;
+	}> {
+		try {
+			const { success } = await this.companyService.insertCompany(companyData);
+
+			if (!success) throw new Error("create company failed");
+
+			const { companies, roles, joined_companies } =
+				await this.getJoinedCompaniesByUserIdAllWithCache(userId);
+
+			if (!companies || !roles || !joined_companies)
+				throw new Error("error fetching companies");
+
+			this.cacheService.setItem("companies", { companies, roles });
+
+			const newCompany: Company | undefined = companies.find(
+				(comp) => comp?.email === companyData?.email,
+			);
+
+			if (!newCompany || !newCompany.id)
+				throw new Error("cannot find recently created company");
+
+			let newRoles: Role[] | undefined = roles.filter(
+				(role) => role.company_id === newCompany?.id,
+			);
+
+			if (newRoles.length === 0)
+				throw new Error("cannot find recently created roles");
+
+			const result: {
+				company: Company;
+				roles: Role[];
+				joined_company: string | null;
+			} = {
+				company: newCompany,
+				roles: newRoles,
+				joined_company: newCompany.id,
+			};
+
+			return {
+				company: result.company,
+				roles: result.roles,
+				joined_company: result.joined_company,
+			};
+		} catch (error: any) {
+			console.error(error);
+			throw error;
+		}
 	}
 }
+
+export const CompanySupabase = new CompanyController(
+	new CompanyService(),
+	DeviceStorage,
+);

@@ -13,7 +13,7 @@ import {
 	H4,
 } from "tamagui";
 import Feather from "@expo/vector-icons/Feather";
-import { Dimensions } from "react-native";
+import { Dimensions, Image } from "react-native";
 import { useDynamicStyles } from "@hooks/useDynamicStyles";
 import {
 	dark_default_theme,
@@ -67,14 +67,19 @@ export default function FirstHomeScreen() {
 		overlay: {
 			flex: 1,
 			position: "absolute",
-			height: Dimensions.get("window").height,
+			height: Dimensions.get("window").height * 2,
 			width: Dimensions.get("window").width * 2,
-			top: -Dimensions.get("window").height / 3,
+			top: -Dimensions.get("window").height,
 			right: -Dimensions.get("window").width / 1.85,
 			left: -Dimensions.get("window").width / 1.85,
 			backgroundColor: "rgba(0, 0, 0, 0.5)",
 			justifyContent: "center",
 			alignItems: "center",
+		},
+		image: {
+			marginBottom: 20,
+			height: 200,
+			width: 200,
 		},
 	}));
 
@@ -89,6 +94,10 @@ export default function FirstHomeScreen() {
 
 	return (
 		<View style={styles.container}>
+			<Image
+				style={styles.image}
+				source={require("./../../assets/images/cherryapp_1024.png")}
+			/>
 			<H1>Welcome</H1>
 			<Paragraph>
 				Join our team and start collaborating! Create or join a company to begin

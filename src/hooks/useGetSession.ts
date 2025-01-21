@@ -6,11 +6,45 @@ import { useAuth } from "@contexts/auth";
 import { useConnectivity } from "@contexts/internet";
 import DeviceStorage from "@utils/deviceStorage";
 //@ts-ignore
-import { Jwt, Profile } from "@types/Auth";
+import { Company, Jwt, Profile, Role } from "@types/Auth";
 import { Session, User } from "@supabase/supabase-js";
 //@ts-ignore
 import { UseGetSessionHook } from "@types/hooks";
 import { routes } from "@utils/constants";
+
+const navigateSafely = async (
+	router: any,
+	route: string,
+	options?: any,
+	maxAttempts: number = 3,
+	delay: number = 1000,
+): Promise<void> => {
+	let attempts = 0;
+
+	return new Promise(async (resolve) => {
+		while (attempts < maxAttempts) {
+			try {
+				if (router && router.replace) {
+					router.replace(route, options);
+					resolve();
+					return;
+				} else {
+					throw new Error("Router not ready for navigation");
+				}
+			} catch (error) {
+				attempts++;
+				if (attempts >= maxAttempts) {
+					console.warn(
+						`Navigation failed after ${maxAttempts} attempts: ${error}`,
+					);
+					resolve(); // Resolve after all attempts fail
+				} else {
+					await new Promise((r) => setTimeout(r, delay)); // Wait before retrying
+				}
+			}
+		}
+	});
+};
 
 export function useGetSession(): UseGetSessionHook {
 	const [isLoading, setIsLoading] = useState(false);
@@ -18,7 +52,7 @@ export function useGetSession(): UseGetSessionHook {
 	const { authDispatch } = useAuth();
 	const { isConnected } = useConnectivity();
 
-	const checkAuthNoInternet = () => {
+	const checkAuthNoInternet = async (): Promise<void> => {
 		const cachedSession: Session | null = JSON.parse(
 			(DeviceStorage.getItem("session", "string") as string) || "null",
 		);
@@ -31,8 +65,18 @@ export function useGetSession(): UseGetSessionHook {
 		const cachedJwt: Jwt | null = JSON.parse(
 			(DeviceStorage.getItem("jwt", "string") as string) || "null",
 		);
+		const cachedCompanies: { companies: Company[]; roles: Role[] } | null =
+			JSON.parse(
+				(DeviceStorage.getItem("companies", "string") as string) || "null",
+			);
 
-		if (cachedSession && cachedUser && cachedProfile && cachedJwt) {
+		if (
+			cachedSession &&
+			cachedUser &&
+			cachedProfile &&
+			cachedJwt &&
+			cachedCompanies
+		) {
 			authDispatch({
 				type: "SIGNIN",
 				payload: {
@@ -45,14 +89,15 @@ export function useGetSession(): UseGetSessionHook {
 				type: "JWT",
 				payload: cachedJwt,
 			});
-
 			authDispatch({
 				type: "ROLES",
-				payload: cachedJwt.roles,
+				payload: cachedCompanies.roles,
 			});
 			authDispatch({
 				type: "COMPANIES",
-				payload: cachedJwt.joined_companies,
+				payload: cachedCompanies.companies.map(
+					(company) => company?.id || null,
+				),
 			});
 
 			if (cachedProfile.is_profiled) {
@@ -60,13 +105,12 @@ export function useGetSession(): UseGetSessionHook {
 					type: "PROFILE",
 					payload: cachedProfile,
 				});
-				router.dismiss();
-				router.replace(routes.dashboard.index);
+				await navigateSafely(router, routes.dashboard.index);
 			} else if (cachedProfile.is_oauth) {
-				router.replace(routes.auth.sign_in);
-				router.push(routes.auth.profile);
+				await navigateSafely(router, routes.auth.sign_in);
+				await navigateSafely(router, routes.auth.profile);
 			} else {
-				router.replace(routes.auth.sign_in);
+				await navigateSafely(router, routes.auth.sign_in);
 				throw new Error("Something went wrong");
 			}
 		} else {
@@ -74,13 +118,13 @@ export function useGetSession(): UseGetSessionHook {
 		}
 	};
 
-	const handleGetSession = async () => {
+	const handleGetSession = async (): Promise<void> => {
 		try {
 			setIsLoading(true);
 			if (!isConnected) {
-				checkAuthNoInternet();
+				await checkAuthNoInternet();
 			} else {
-				const { session, user, profile, jwt } =
+				const { session, user, profile, jwt, companies, roles } =
 					await AuthSupabase.getSessionWithCache();
 
 				authDispatch({
@@ -96,26 +140,31 @@ export function useGetSession(): UseGetSessionHook {
 					type: "JWT",
 					payload: jwt,
 				});
+				authDispatch({
+					type: "ROLES",
+					payload: roles,
+				});
+				authDispatch({
+					type: "COMPANIES",
+					payload: companies.map((company) => company?.id || null),
+				});
 
 				if (profile.is_profiled) {
 					authDispatch({
 						type: "PROFILE",
 						payload: profile,
 					});
-					router.dismiss();
-					router.replace(routes.dashboard.index);
+					await navigateSafely(router, routes.dashboard.index);
 				} else if (profile.is_oauth) {
-					router.replace(routes.auth.sign_in);
-					router.push(routes.auth.profile);
+					await navigateSafely(router, routes.auth.sign_in);
+					await navigateSafely(router, routes.auth.profile);
 				} else {
-					router.dismiss();
-					router.replace(routes.auth.sign_in);
+					await navigateSafely(router, routes.auth.sign_in);
 					throw new Error("Something went wrong");
 				}
 			}
 		} catch (error: any) {
-			router.dismiss();
-			router.replace(routes.auth.sign_in);
+			await navigateSafely(router, routes.auth.sign_in);
 			throw error;
 		} finally {
 			setIsLoading(false);

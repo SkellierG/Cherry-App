@@ -2,9 +2,9 @@
 	"expo": {
 		"name": "Cherry App",
 		"slug": "Cherry-App",
-		"version": "0.1.2",
+		"version": "0.1.4",
 		"orientation": "portrait",
-		"icon": "./assets/images/favicon.png",
+		"icon": "./assets/images/cherryapp_1024.png",
 		"scheme": "cherryapp",
 		"userInterfaceStyle": "automatic",
 		"newArchEnabled": true,
@@ -12,14 +12,19 @@
 		"ios": {
 			"supportsTablet": true
 		},
+		"notification": {
+			"icon": "./assets/images/cherryappp_XHDPI.png"
+		},
 		"android": {
+			"icon": "./assets/images/cherryappp_WEB.png",
 			"permissions": [
 				"INTERNET",
 				"READ_EXTERNAL_STORAGE",
 				"WRITE_EXTERNAL_STORAGE"
 			],
 			"adaptiveIcon": {
-				"foregroundImage": "./assets/images/favicon.png",
+				"foregroundImage": "./assets/images/cherryapp_foreground.png",
+				"backgroundImage": "./assets/images/cherryapp_background.png",
 				"backgroundColor": "#ffffff"
 			},
 			"package": "com.skellierg.cherryapp"
@@ -27,15 +32,15 @@
 		"web": {
 			"bundler": "metro",
 			"output": "static",
-			"favicon": "./assets/images/favicon.png"
+			"favicon": "./assets/images/cherryappp_WEB.png"
 		},
 		"plugins": [
 			"expo-router",
 			[
 				"expo-splash-screen",
 				{
-					"image": "./assets/images/splash-screen.png",
-					"imageWidth": 200,
+					"image": "./assets/images/cherryappp_XXXHDPI.png",
+					"size": 192,
 					"resizeMode": "contain",
 					"backgroundColor": "#ffffff"
 				}

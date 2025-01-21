@@ -122,3 +122,80 @@ export function validateName(
 
 	return { isValid: true };
 }
+
+export function validateCompanyName(name: string): ValidationResult {
+	const minLength = 3;
+
+	const invalidCharsRegex = /[^a-zA-Z0-9\s,.-]/;
+	if (invalidCharsRegex.test(name)) {
+		return {
+			isValid: false,
+			errorMessage: i18n.t("auth.validation.companyName.invalidChars"),
+		};
+	}
+
+	if (!name) {
+		return {
+			isValid: false,
+			errorMessage: i18n.t("auth.validation.companyName.empty"),
+		};
+	}
+
+	const minLengthValidation = validateMinLength(name, minLength, "companyName");
+	if (!minLengthValidation.isValid) return minLengthValidation;
+
+	return { isValid: true };
+}
+
+export function validateSlogan(slogan: string): ValidationResult {
+	if (slogan && slogan.length < 3) {
+		return {
+			isValid: false,
+			errorMessage: i18n.t("auth.validation.slogan.tooShort", {
+				minLength: 3,
+			}),
+		};
+	}
+
+	const invalidCharsRegex = /[^a-zA-Z0-9\s,.-]/;
+	if (slogan && invalidCharsRegex.test(slogan)) {
+		return {
+			isValid: false,
+			errorMessage: i18n.t("auth.validation.slogan.invalidChars"),
+		};
+	}
+
+	return { isValid: true };
+}
+
+export function validateDescription(description: string): ValidationResult {
+	if (description && description.length < 10) {
+		return {
+			isValid: false,
+			errorMessage: i18n.t("auth.validation.description.tooShort", {
+				minLength: 10,
+			}),
+		};
+	}
+
+	const invalidCharsRegex = /[^a-zA-Z0-9\s,.-]/;
+	if (description && invalidCharsRegex.test(description)) {
+		return {
+			isValid: false,
+			errorMessage: i18n.t("auth.validation.description.invalidChars"),
+		};
+	}
+
+	return { isValid: true };
+}
+
+export function validatePhone(phone: string): ValidationResult {
+	if (phone && !/^[0-9]{10}$/.test(phone)) {
+		return {
+			isValid: false,
+			errorMessage: i18n.t("auth.validation.phone.invalid"),
+		};
+	}
+
+	return { isValid: true };
+}

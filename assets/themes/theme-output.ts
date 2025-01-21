@@ -1,4 +1,4 @@
-import { convertHslaToRgba } from "src/unused/hslatorgba";
+import { convertHslaToRgba } from "src/helper/hslatorgba";
 
 type Theme = {
 	accentBackground: string;

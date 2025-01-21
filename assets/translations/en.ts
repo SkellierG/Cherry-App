@@ -1,6 +1,6 @@
-import auth from "./en/auth.json";
-import users from "./en/users.json";
+import auth from "./en/auth";
+import gui from "./en/gui";
 export default {
 	auth: auth,
-	users: users,
+	gui: gui,
 };

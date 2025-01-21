@@ -1,22 +1,44 @@
 import React, { useState } from "react";
 import { Alert } from "react-native";
-import { useRouter } from "expo-router";
 import AuthForm from "@components/auth/AuthForm";
-import { validateEmail, validatePassword } from "@utils/formValidation";
+import {
+	validateCompanyName,
+	validateDescription,
+	validateEmail,
+	validatePhone,
+	validateSlogan,
+} from "@utils/formValidation";
 import i18n from "@services/translations";
-import { useSignIn } from "@hooks/useSignIn";
+import { useCreateCompany } from "@hooks/useCreateCompany";
 
 export default function CompanyCreateScreen() {
+	const { isLoading, handleCreateCompany } = useCreateCompany();
+
 	const [name, setName] = useState("");
 	const [slogan, setSlogan] = useState("");
 	const [description, setDescription] = useState("");
 	const [email, setEmail] = useState("");
-	const [number, setNumber] = useState("");
+	const [phone, setPhone] = useState("");
 	const [formErrors, setFormErrors] = useState<Record<string, string>>({});
-	const { isLoading, handleSignIn } = useSignIn();
 
 	const validateFields = () => {
 		const errors: Record<string, string> = {};
+
+		const nameValidation = validateCompanyName(name);
+		const sloganValidation = validateSlogan(slogan);
+		const descriptionValidation = validateDescription(description);
+		const emailValidation = validateEmail(email);
+		const phoneValidation = validatePhone(phone);
+		if (!nameValidation.isValid)
+			errors.name = nameValidation.errorMessage || "";
+		if (!sloganValidation.isValid)
+			errors.slogan = sloganValidation.errorMessage || "";
+		if (!descriptionValidation.isValid)
+			errors.description = descriptionValidation.errorMessage || "";
+		if (!emailValidation.isValid)
+			errors.email = emailValidation.errorMessage || "";
+		if (!phoneValidation.isValid)
+			errors.phone = phoneValidation.errorMessage || "";
 
 		setFormErrors(errors);
 
@@ -25,6 +47,20 @@ export default function CompanyCreateScreen() {
 
 	const handleSubmit = async () => {
 		if (!validateFields()) return;
+
+		try {
+			await handleCreateCompany(
+				name,
+				slogan,
+				description,
+				email,
+				phone,
+				"https://placehold.co/200x200/png",
+			);
+		} catch (error: any) {
+			Alert.alert("Unexpected error", error);
+			throw error;
+		}
 	};
 
 	return (
@@ -61,10 +97,10 @@ export default function CompanyCreateScreen() {
 					textContentType: "emailAddress",
 				},
 				{
-					name: "number",
-					placeholder: i18n.t("auth.number"),
-					setValue: setNumber,
-					error: formErrors.number,
+					name: "phone",
+					placeholder: i18n.t("auth.phone"),
+					setValue: setPhone,
+					error: formErrors.phone,
 					autoComplete: "tel",
 					textContentType: "telephoneNumber",
 				},

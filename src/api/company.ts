@@ -67,6 +67,7 @@ export class CompanyService implements ICompanyService {
 			throw error;
 		}
 	}
+
 	async insertCompany(inserts: Company): Promise<{ success: boolean }> {
 		try {
 			const { error: insertError } = await supabase
@@ -82,6 +83,7 @@ export class CompanyService implements ICompanyService {
 			throw error;
 		}
 	}
+
 	async fetchJoinedCompaniesByUserId(
 		userId: string,
 		select: CompanyColumns[] | "*" = "*",
@@ -179,6 +181,26 @@ export class CompanyService implements ICompanyService {
 				roles: { ...roles },
 			};
 		} catch (error: any) {
+			throw error;
+		}
+	}
+
+	async exitCompany(
+		userId: string,
+		companyId: string,
+	): Promise<{ success: boolean }> {
+		try {
+			const { error } = await supabase
+				.from("user_roles")
+				.delete()
+				.eq("user_id", userId)
+				.eq("company_id", companyId);
+
+			if (error) throw error;
+
+			return { success: true };
+		} catch (error: any) {
+			console.error("Error creating company for user:", error);
 			throw error;
 		}
 	}

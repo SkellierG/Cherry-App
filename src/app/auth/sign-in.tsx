@@ -6,7 +6,7 @@ import {
 	light_default_theme,
 } from "@assets/themes/tamagui-rnp-adapter";
 import { useDynamicStyles } from "@hooks/useDynamicStyles";
-import AuthGoogle from "@components/auth/AuthGoogle";
+import AuthGoogle from "@services/AuthGoogle";
 
 export default function SignInPage() {
 	const styles = useDynamicStyles((theme) => ({
