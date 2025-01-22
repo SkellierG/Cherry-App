@@ -7,7 +7,7 @@ import DeviceStorage from "@utils/deviceStorage";
 import { Company, Role } from "@types/Auth";
 import { routes } from "@utils/constants";
 import { CompanySupabase } from "@modules/companies/companyController";
-import { User } from "@react-native-google-signin/google-signin";
+import { User } from "@supabase/supabase-js";
 
 export function useCreateCompany() {
 	const [isLoading, setIsLoading] = useState(false);
@@ -32,15 +32,14 @@ export function useCreateCompany() {
 					(DeviceStorage.getItem("companies", "string") as string) || "null",
 				);
 
-			if (
-				!(
-					companiesData &&
-					companiesData.companies &&
-					companiesData.roles &&
-					userData &&
-					userData?.user
-				)
-			)
+			console.info(
+				companiesData,
+				companiesData?.roles,
+				JSON.stringify(userData, null, 2),
+				userData?.id,
+			);
+
+			if (!(companiesData && companiesData.roles && userData && userData?.id))
 				throw new Error("comapanies or roles or user not exists in cache");
 
 			const newCompany: Company = {
@@ -54,7 +53,7 @@ export function useCreateCompany() {
 
 			const { company, roles, joined_company } =
 				await CompanySupabase.createCompanyForUserWithCache(
-					userData?.user?.id,
+					userData?.id,
 					newCompany,
 				);
 

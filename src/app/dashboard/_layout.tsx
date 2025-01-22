@@ -10,7 +10,7 @@ export default function DashboardLayout() {
 	return (
 		<Tabs>
 			<Tabs.Screen
-				name="work"
+				name="company"
 				options={{
 					title: "Home",
 					headerShown: false,

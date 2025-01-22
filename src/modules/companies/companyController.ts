@@ -32,6 +32,9 @@ export class CompanyController implements ICompanyController {
 			if (companies.length === 1 && companies[0] === null)
 				throw new Error("The newly created company could not be found.");
 
+			if (typeof companies !== "object")
+				throw new Error("The newly created company could not be found.");
+
 			const createdCompany = companies.find(
 				(company) => company?.email === companyData?.email,
 			);
@@ -83,6 +86,8 @@ export class CompanyController implements ICompanyController {
 			const companiesData =
 				await this.companyService.fetchJoinedCompaniesByUserIdAll(userId);
 
+			console.warn(companiesData);
+
 			const joined_companies: (string | null)[] = companiesData.companies.map(
 				(company) => company?.id || null,
 			);
@@ -90,8 +95,8 @@ export class CompanyController implements ICompanyController {
 			this.cacheService.setItem("companies", companiesData);
 
 			return {
-				companies: { ...companiesData.companies },
-				roles: { ...companiesData.roles },
+				companies: [...companiesData.companies],
+				roles: [...companiesData.roles],
 				joined_companies: { ...joined_companies },
 			};
 		} catch (error: any) {
@@ -149,20 +154,53 @@ export class CompanyController implements ICompanyController {
 
 			if (!success) throw new Error("create company failed");
 
+			const fetchCompaniesWithRetry = async (
+				retries: number,
+				delay: number,
+			) => {
+				console.log(userId);
+				try {
+					await new Promise((resolve) => setTimeout(resolve, delay));
+
+					const result =
+						await this.getJoinedCompaniesByUserIdAllWithCache(userId);
+
+					if (result.companies.length === 1 && result.companies[0] === null)
+						throw new Error("companies is just NULL");
+
+					console.log(result);
+					return result;
+				} catch (error) {
+					if (retries > 0) {
+						console.warn(`Retrying... (${retries} retries left)`);
+						return fetchCompaniesWithRetry(retries - 1, delay);
+					} else {
+						throw error;
+					}
+				}
+			};
+
 			const { companies, roles, joined_companies } =
-				await this.getJoinedCompaniesByUserIdAllWithCache(userId);
+				await fetchCompaniesWithRetry(1, 3000);
+
+			console.log(companies);
 
 			if (!companies || !roles || !joined_companies)
 				throw new Error("error fetching companies");
 
 			this.cacheService.setItem("companies", { companies, roles });
 
+			if (typeof companies !== "object")
+				throw new Error("error fetching companies");
+
 			const newCompany: Company | undefined = companies.find(
 				(comp) => comp?.email === companyData?.email,
 			);
 
 			if (!newCompany || !newCompany.id)
-				throw new Error("cannot find recently created company");
+				throw new Error(
+					"cannot find recently created company, please Refresh main Page",
+				);
 
 			let newRoles: Role[] | undefined = roles.filter(
 				(role) => role.company_id === newCompany?.id,

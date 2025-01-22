@@ -99,7 +99,7 @@ export class CompanyService implements ICompanyService {
 				.eq("user_id", userId)
 				.setHeader("Accept", "application/json");
 
-			//console.info(rolesId, rolesIdError);
+			console.info(rolesId, rolesIdError);
 
 			if (rolesIdError) throw rolesIdError;
 			if (!rolesId || rolesId.length === 0) return { companies: [], roles: [] };
@@ -113,11 +113,16 @@ export class CompanyService implements ICompanyService {
 				)
 				.setHeader("Accept", "application/json");
 
-			//console.info(rolesTable, rolesTableError);
+			console.info(rolesId.map((role) => role.role_id));
+			console.info(rolesTable, rolesTableError);
 			if (rolesTableError) throw rolesTableError;
 
 			const uniqueCompanyIds = Array.from(
-				new Set(rolesTable.map((role) => role.company_id)),
+				new Set(
+					rolesTable
+						.map((role) => role.company_id)
+						.filter((ids) => ids !== null),
+				),
 			);
 
 			let companies: Partial<Company>[];
@@ -135,7 +140,8 @@ export class CompanyService implements ICompanyService {
 				companies = [null];
 			}
 
-			//console.info(companies);
+			console.info(companies);
+			console.info(rolesTable);
 
 			const { data: permissionsId, error: permissionsIdError } = await supabase
 				.from("role_permissions")
@@ -146,7 +152,7 @@ export class CompanyService implements ICompanyService {
 				)
 				.setHeader("Accept", "application/json");
 
-			//console.info(permissionsId, permissionsIdError);
+			console.info(permissionsId, permissionsIdError);
 			if (permissionsIdError) throw permissionsIdError;
 
 			const { data: permissions, error: permissionsError } = await supabase
@@ -158,18 +164,18 @@ export class CompanyService implements ICompanyService {
 				)
 				.setHeader("Accept", "application/json");
 
-			//console.info(permissions, permissionsError);
+			console.info(permissions, permissionsError);
 			if (permissionsError) throw permissionsError;
 
 			const finalRoles: Role[] = rolesTable.map((role) => {
-				//console.info("role", role);
+				console.info("role", role);
 				const rolePermissions = permissionsId
 					.filter((perId) => {
-						//console.info("perId", perId);
+						console.info("perId", perId);
 						return perId.role_id === role.id;
 					})
 					.map((perId) => {
-						//console.info("perId_2", perId);
+						console.info("perId_2", perId);
 						return (
 							permissions.find((permission) => {
 								console.info("permission", permission);
@@ -185,7 +191,9 @@ export class CompanyService implements ICompanyService {
 				};
 			});
 
-			//console.info(companies, finalRoles);
+			console.info(companies, finalRoles);
+
+			companies.unshift(null);
 
 			return {
 				companies: [...(companies as Partial<Company>[])],
@@ -202,7 +210,7 @@ export class CompanyService implements ICompanyService {
 		try {
 			const { companies, roles } =
 				await this.fetchJoinedCompaniesByUserId(userId);
-			//console.info(companies, roles);
+			console.info(companies, roles);
 			return {
 				companies: [...(companies as Company[])],
 				roles: [...roles],

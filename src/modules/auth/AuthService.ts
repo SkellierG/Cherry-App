@@ -21,7 +21,7 @@ export class AuthService implements IAuthService {
 		return { ...data };
 	}
 
-	async signInWitIdTokend(
+	async signInWithIdTokend(
 		provider:
 			| "google"
 			| "apple"

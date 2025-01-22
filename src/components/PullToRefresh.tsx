@@ -5,7 +5,7 @@ type PullToRefreshProps = {
 	children: ReactNode;
 	onRefreshCallback?: (
 		setRefreshing: React.Dispatch<React.SetStateAction<boolean>>,
-	) => void;
+	) => Promise<void>;
 };
 
 const PullToRefresh: React.FC<PullToRefreshProps> = ({
@@ -14,10 +14,10 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({
 }) => {
 	const [refreshing, setRefreshing] = useState(false);
 
-	const onRefresh = () => {
+	const onRefresh = async () => {
 		setRefreshing(true);
 		if (onRefreshCallback) {
-			onRefreshCallback(setRefreshing);
+			await onRefreshCallback(setRefreshing);
 		}
 		setTimeout(() => setRefreshing(false), 1000); // Fallback timeout
 	};

@@ -12,6 +12,8 @@ export default function DefaultHomeScreen() {
 		container: {
 			flex: 1,
 			alignItems: "center",
+			justifyContent: "center",
+			alignConent: "center",
 			padding: 20,
 			backgroundColor:
 				theme === "dark"

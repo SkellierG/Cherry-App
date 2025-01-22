@@ -105,7 +105,7 @@ export type SignUpResponse = {
 export interface IAuthService {
 	signInWithPassword(email: string, password: string): Promise<SignInResponse>;
 
-	signInWitIdTokend(
+	signInWithIdTokend(
 		provider:
 			| "google"
 			| "apple"
@@ -173,7 +173,7 @@ export interface IAuthController {
 	 * @returns A promise that resolves with the sign-in response and profile data.
 	 * @throws Throws an error if sign-in or profile fetching fails.
 	 */
-	signInWitIdTokendWithCache(
+	signInWithIdTokendWithCache(
 		provider:
 			| "google"
 			| "apple"
@@ -270,7 +270,7 @@ export type CompanyColumns =
 	| "avatar_url"
 	| "description"
 	| "email"
-	| "name";
+	| "phone";
 /**
  * Interface for managing operations related to companies and their associated data.
  */

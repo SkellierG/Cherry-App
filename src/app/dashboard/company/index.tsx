@@ -3,19 +3,23 @@ import {
 	light_default_theme,
 } from "@assets/themes/tamagui-rnp-adapter";
 import { useDynamicStyles } from "@hooks/useDynamicStyles";
-import DefaultHomeScreen from "@screens/DefaultHomeScreen";
 import FirstHomeScreen from "@screens/FirstHomeScreen";
 import { useAuth } from "@contexts/auth";
 import React from "react";
 import { Dimensions, SafeAreaView } from "react-native";
+import { useRouter } from "expo-router";
 
 export default function DashboardPage() {
+	const router = useRouter();
 	const { authState } = useAuth();
-	const isInCompany = !(
+
+	//TODO: useCompany
+	const isInCompany =
 		(authState.joined_companies?.length
 			? authState.joined_companies?.length
-			: 0) >= 2
-	);
+			: 0) >= 2;
+
+	console.log(authState.joined_companies);
 
 	const styles = useDynamicStyles((theme) => ({
 		view: {
@@ -27,9 +31,14 @@ export default function DashboardPage() {
 		},
 	}));
 
-	return (
-		<SafeAreaView style={styles.view}>
-			{isInCompany ? <FirstHomeScreen /> : <DefaultHomeScreen />}
-		</SafeAreaView>
-	);
+	if (!isInCompany) {
+		return (
+			<SafeAreaView style={styles.view}>
+				<FirstHomeScreen />
+			</SafeAreaView>
+		);
+	}
+
+	router.dismiss();
+	router.replace(`dashboard/company/${authState.joined_companies[1]}`);
 }

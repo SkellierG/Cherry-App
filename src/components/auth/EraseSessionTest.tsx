@@ -32,7 +32,8 @@ const EraseSession: React.FC = () => {
 					is_oauth: false,
 					is_profiled: false,
 				})
-				.eq("user_id", user.id);
+				//@ts-ignore
+				.eq("user_id", user.identities[0].user_id);
 
 			if (profileError) {
 				console.error("Error updating profile:", profileError);

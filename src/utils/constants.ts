@@ -31,7 +31,7 @@ export const routes = {
 		companies: "/auth/companies" as "/auth/companies",
 	},
 	dashboard: {
-		index: "/dashboard" as "/dashboard",
+		index: "/dashboard/company" as "/dashboard/company",
 		notifications: "/dashboard/notifications" as "/dashboard/notifications",
 		profile: "/dashboard/profile" as "/dashboard/profile",
 	},

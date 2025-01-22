@@ -61,9 +61,12 @@ export class AuthController implements IAuthController {
 					"no previous session founded, probably user is signOut or first signIn",
 				);
 			}
+			//@ts-ignore
+			console.log(getSessionData.session.user.identities[0].user_id);
 
 			const profileData = await this.profileService.fetchProfileByIdAll(
-				getSessionData.session.user.id,
+				//@ts-ignore
+				getSessionData.session.user.identities[0].user_id,
 			);
 
 			const jwt: Jwt = jwtDecode(getSessionData.session.access_token);
@@ -75,7 +78,8 @@ export class AuthController implements IAuthController {
 
 			const { companies, roles } =
 				await this.companyService.fetchJoinedCompaniesByUserIdAll(
-					getSessionData.session.user.id,
+					//@ts-ignore
+					getSessionData.session.user.identities[0].user_id,
 				);
 
 			console.log(companies, roles);
@@ -126,7 +130,8 @@ export class AuthController implements IAuthController {
 				);
 
 			const profileData = await this.profileService.fetchProfileByIdAll(
-				signInData.user.id,
+				//@ts-ignore
+				signInData.user.identities[0].user_id,
 			);
 
 			if (!profileData)
@@ -151,7 +156,7 @@ export class AuthController implements IAuthController {
 		}
 	}
 
-	async signInWitIdTokendWithCache(
+	async signInWithIdTokendWithCache(
 		provider:
 			| "google"
 			| "apple"
@@ -171,7 +176,7 @@ export class AuthController implements IAuthController {
 	}> {
 		try {
 			const signInData: SignInResponse =
-				await this.authService.signInWitIdTokend(
+				await this.authService.signInWithIdTokend(
 					provider,
 					token,
 					access_token,
@@ -180,7 +185,8 @@ export class AuthController implements IAuthController {
 			if (!signInData.user) throw new Error("Sign In error, user not found");
 
 			const profileData = await this.profileService.fetchProfileByIdAll(
-				signInData.user.id,
+				//@ts-ignore
+				signInData.user.identities[0].user_id,
 			);
 
 			if (!profileData)
@@ -190,7 +196,8 @@ export class AuthController implements IAuthController {
 
 			if (!profileData.is_oauth) {
 				const update = await this.profileService.updateProfile(
-					signInData.user.id,
+					//@ts-ignore
+					signInData.user.identities[0].user_id,
 					{ is_oauth: true },
 				);
 
@@ -209,9 +216,13 @@ export class AuthController implements IAuthController {
 			this.cacheService.setItem("profile", profileData);
 			this.cacheService.setItem("jwt", jwt);
 
+			//@ts-ignore
+			console.log(signInData.session.user.identities[0]);
+
 			const { companies, roles } =
 				await this.companyService.fetchJoinedCompaniesByUserIdAll(
-					signInData.session.user.id,
+					//@ts-ignore
+					signInData.session.user.identities[0].user_id,
 				);
 
 			this.cacheService.setItem("companies", {

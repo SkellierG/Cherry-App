@@ -31,7 +31,7 @@ export function useSignInWithToken(): UseSignInWithTokenHook {
 				signIn: signInData,
 				profile,
 				jwt,
-			} = await AuthSupabase.signInWitIdTokendWithCache(
+			} = await AuthSupabase.signInWithIdTokendWithCache(
 				provider,
 				token,
 				access_token,
