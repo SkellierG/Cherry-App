@@ -5,21 +5,47 @@ import {
 import { useDynamicStyles } from "@hooks/useDynamicStyles";
 import FirstHomeScreen from "@screens/FirstHomeScreen";
 import { useAuth } from "@contexts/auth";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Dimensions, SafeAreaView } from "react-native";
 import { useRouter } from "expo-router";
+import { useCompany } from "@hooks/useCompany";
+import LoadingScreen from "@screens/LoadingScreen";
+import PullToRefresh from "@components/PullToRefresh";
 
 export default function DashboardPage() {
 	const router = useRouter();
 	const { authState } = useAuth();
+	const { isLoading, handleCompany } = useCompany();
+	const [isInCompany, setIsInCompany] = useState(false);
 
-	//TODO: useCompany
-	const isInCompany =
-		(authState.joined_companies?.length
-			? authState.joined_companies?.length
-			: 0) >= 2;
+	const fetchCompanies = async () => {
+		try {
+			const { joined_companies } = await handleCompany();
+			setIsInCompany(joined_companies.length > 1);
 
-	console.log(authState.joined_companies);
+			if (
+				authState &&
+				authState.joined_companies &&
+				authState.joined_companies[1]
+			) {
+				//@ts-ignore
+				router.replace(`dashboard/company/${authState.joined_companies[1]}`);
+			}
+		} catch (error) {
+			console.error("Error fetching companies:", error);
+		}
+	};
+
+	useEffect(() => {
+		if (!isLoading) {
+			fetchCompanies();
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
+	const onRefresh = async () => {
+		await fetchCompanies();
+	};
 
 	const styles = useDynamicStyles((theme) => ({
 		view: {
@@ -31,14 +57,19 @@ export default function DashboardPage() {
 		},
 	}));
 
+	if (isLoading) {
+		return <LoadingScreen />;
+	}
+
 	if (!isInCompany) {
 		return (
 			<SafeAreaView style={styles.view}>
-				<FirstHomeScreen />
+				<PullToRefresh onRefreshCallback={onRefresh}>
+					<FirstHomeScreen />
+				</PullToRefresh>
 			</SafeAreaView>
 		);
 	}
 
-	router.dismiss();
-	router.replace(`dashboard/company/${authState.joined_companies[1]}`);
+	return null;
 }

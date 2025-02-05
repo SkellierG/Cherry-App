@@ -9,10 +9,10 @@ import {
 	validateSlogan,
 } from "@utils/formValidation";
 import i18n from "@services/translations";
-import { useCreateCompany } from "@hooks/useCreateCompany";
+import { useCompany } from "@hooks/useCompany";
 
 export default function CompanyCreateScreen() {
-	const { isLoading, handleCreateCompany } = useCreateCompany();
+	const { isLoading, handleCreateCompany } = useCompany();
 
 	const [name, setName] = useState("");
 	const [slogan, setSlogan] = useState("");

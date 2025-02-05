@@ -11,7 +11,7 @@ export class CompanyService implements ICompanyService {
 			const { data: companyData, error: companyError } = await supabase
 				.from("companies")
 				.select(select === "*" ? "*" : select.join(","))
-				.in("id", companyId)
+				.eq("id", companyId)
 				.single()
 				.setHeader("Accept", "application/json");
 
@@ -93,6 +93,7 @@ export class CompanyService implements ICompanyService {
 		select: CompanyColumns[] | "*" = "*",
 	): Promise<{ companies: Partial<Company>[]; roles: Role[] }> {
 		try {
+			console.info("fetchJoinedCompaniesByUserId", userId, select);
 			const { data: rolesId, error: rolesIdError } = await supabase
 				.from("user_roles")
 				.select("role_id")
@@ -102,7 +103,8 @@ export class CompanyService implements ICompanyService {
 			console.info(rolesId, rolesIdError);
 
 			if (rolesIdError) throw rolesIdError;
-			if (!rolesId || rolesId.length === 0) return { companies: [], roles: [] };
+			if (!rolesId || rolesId.length === 0)
+				return { companies: [null], roles: [] };
 
 			const { data: rolesTable, error: rolesTableError } = await supabase
 				.from("roles")
@@ -113,7 +115,6 @@ export class CompanyService implements ICompanyService {
 				)
 				.setHeader("Accept", "application/json");
 
-			console.info(rolesId.map((role) => role.role_id));
 			console.info(rolesTable, rolesTableError);
 			if (rolesTableError) throw rolesTableError;
 
@@ -187,11 +188,12 @@ export class CompanyService implements ICompanyService {
 					id: role.id,
 					name: role.name,
 					company_id: role.company_id,
+					priority: role.priority,
 					permissions: rolePermissions,
 				};
 			});
 
-			console.info(companies, finalRoles);
+			console.info("fetchJoinedCompaniesByUserId", companies, finalRoles);
 
 			companies.unshift(null);
 
@@ -210,7 +212,7 @@ export class CompanyService implements ICompanyService {
 		try {
 			const { companies, roles } =
 				await this.fetchJoinedCompaniesByUserId(userId);
-			console.info(companies, roles);
+			console.info("fetchJoinedCompaniesByUserIdAll", companies, roles);
 			return {
 				companies: [...(companies as Company[])],
 				roles: [...roles],

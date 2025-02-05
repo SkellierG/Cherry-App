@@ -2,6 +2,7 @@ import { User, Session, WeakPassword } from "@supabase/supabase-js";
 
 export interface Profile {
 	id?: string;
+	public_id?: string;
 	user_id: string;
 	name: string;
 	lastname: string;
@@ -26,6 +27,7 @@ export interface Role {
 	id: number;
 	name: string;
 	company_id: string | null;
+	priority: number;
 	permissions: string[];
 }
 
@@ -35,10 +37,15 @@ export interface AuthState {
 	user: User | null;
 	session: Session | null;
 	profile?: Partial<Profile>;
-	joined_companies?: string[];
+	joined_companies?: (string | null)[];
 	roles?: Partial<Role>[];
 	jwt?: Jwt;
 	isAuthenticated: boolean;
+}
+
+export interface Member {
+	profile: Profile;
+	roles: Role[];
 }
 
 export type AuthAction =

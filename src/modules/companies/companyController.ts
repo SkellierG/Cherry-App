@@ -16,27 +16,53 @@ export class CompanyController implements ICompanyController {
 	private cacheService: StorageInterface;
 
 	constructor(companyService: ICompanyService, cacheService: StorageInterface) {
+		if (!companyService) {
+			throw new Error("Invalid parameter: companyService is required.");
+		}
+		if (!cacheService) {
+			throw new Error("Invalid parameter: cacheService is required.");
+		}
 		this.companyService = companyService;
 		this.cacheService = cacheService;
 	}
+
 	async createCompanyForUser(
 		userId: string,
 		companyData: Company,
 	): Promise<Company> {
+		if (typeof userId !== "string" || userId.trim() === "") {
+			throw new Error("Invalid parameter: userId must be a non-empty string.");
+		}
+		if (!companyData || typeof companyData !== "object") {
+			throw new Error("Invalid parameter: companyData must be an object.");
+		}
+		if (!companyData.email) {
+			throw new Error(
+				"Invalid parameter: companyData must have an email property.",
+			);
+		}
+
 		try {
-			await this.companyService.insertCompany(companyData);
+			const insertResult = await this.companyService.insertCompany(companyData);
+			if (!insertResult || !insertResult.success) {
+				throw new Error("Error inserting company data.");
+			}
 
 			const { companies } =
 				await this.companyService.fetchJoinedCompaniesByUserIdAll(userId);
 
-			if (companies.length === 1 && companies[0] === null)
-				throw new Error("The newly created company could not be found.");
+			if (!Array.isArray(companies)) {
+				throw new Error(
+					"Unexpected data format: companies should be an array.",
+				);
+			}
 
-			if (typeof companies !== "object")
+			if (companies.length === 1 && companies[0] === null) {
 				throw new Error("The newly created company could not be found.");
+			}
 
 			const createdCompany = companies.find(
-				(company) => company?.email === companyData?.email,
+				(company) => company && company.email === companyData.email,
 			);
 
 			if (!createdCompany) {
@@ -49,6 +75,7 @@ export class CompanyController implements ICompanyController {
 			throw error;
 		}
 	}
+
 	async getJoinedCompaniesByUserIdWithCache(
 		userId: string,
 		select: CompanyColumns[] | "*" = "*",
@@ -57,39 +84,64 @@ export class CompanyController implements ICompanyController {
 		roles: Role[];
 		joined_companies: (string | null)[];
 	}> {
+		if (typeof userId !== "string" || userId.trim() === "") {
+			throw new Error("Invalid parameter: userId must be a non-empty string.");
+		}
 		try {
 			const companiesData =
 				await this.companyService.fetchJoinedCompaniesByUserId(userId, select);
 
+			if (
+				!companiesData ||
+				!Array.isArray(companiesData.companies) ||
+				!Array.isArray(companiesData.roles)
+			) {
+				throw new Error(
+					"Unexpected data format from fetchJoinedCompaniesByUserId.",
+				);
+			}
+
 			const joined_companies: (string | null)[] = companiesData.companies.map(
-				(company) => (company?.id as string) || null,
+				(company) => (company && company.id ? String(company.id) : null),
 			);
 
 			this.cacheService.setItem("companies", companiesData);
 
 			return {
-				companies: { ...companiesData.companies },
-				roles: { ...companiesData.roles },
-				joined_companies: { ...joined_companies },
+				companies: companiesData.companies,
+				roles: companiesData.roles,
+				joined_companies: joined_companies,
 			};
 		} catch (error: any) {
 			console.error(error);
 			throw error;
 		}
 	}
+
 	async getJoinedCompaniesByUserIdAllWithCache(userId: string): Promise<{
 		companies: Company[];
 		roles: Role[];
 		joined_companies: (string | null)[];
 	}> {
+		if (typeof userId !== "string" || userId.trim() === "") {
+			throw new Error("Invalid parameter: userId must be a non-empty string.");
+		}
 		try {
 			const companiesData =
 				await this.companyService.fetchJoinedCompaniesByUserIdAll(userId);
 
-			console.warn(companiesData);
+			if (
+				!companiesData ||
+				!Array.isArray(companiesData.companies) ||
+				!Array.isArray(companiesData.roles)
+			) {
+				throw new Error(
+					"Unexpected data format from fetchJoinedCompaniesByUserIdAll.",
+				);
+			}
 
 			const joined_companies: (string | null)[] = companiesData.companies.map(
-				(company) => company?.id || null,
+				(company) => (company && company.id ? String(company.id) : null),
 			);
 
 			this.cacheService.setItem("companies", companiesData);
@@ -97,35 +149,49 @@ export class CompanyController implements ICompanyController {
 			return {
 				companies: [...companiesData.companies],
 				roles: [...companiesData.roles],
-				joined_companies: { ...joined_companies },
+				joined_companies: joined_companies,
 			};
 		} catch (error: any) {
 			console.error(error);
 			throw error;
 		}
 	}
+
 	async exitCompanyWithCache(
 		userId: string,
 		companyId: string,
 	): Promise<{ success: boolean }> {
+		if (typeof userId !== "string" || userId.trim() === "") {
+			throw new Error("Invalid parameter: userId must be a non-empty string.");
+		}
+		if (typeof companyId !== "string" || companyId.trim() === "") {
+			throw new Error(
+				"Invalid parameter: companyId must be a non-empty string.",
+			);
+		}
 		try {
 			const { success } = await this.companyService.exitCompany(
 				userId,
 				companyId,
 			);
-			if (!success) throw new Error("cannot exit the company");
+			if (!success) {
+				throw new Error("Cannot exit the company.");
+			}
 
+			const cachedItem = this.cacheService.getItem(
+				"companies",
+				"string",
+			) as string;
 			const oldCompanies: { companies: Company[]; roles: Role[] } | null =
-				JSON.parse(
-					(this.cacheService.getItem("companies", "string") as string) ||
-						"null",
-				);
+				cachedItem ? JSON.parse(cachedItem) : null;
 
-			if (!oldCompanies) throw new Error("error in the cache");
+			if (!oldCompanies || !Array.isArray(oldCompanies.companies)) {
+				throw new Error("Error in the cache: companies data is invalid.");
+			}
 
 			const newCompanies: { companies: Company[]; roles: Role[] } = {
 				companies: oldCompanies.companies.filter(
-					(company) => company?.id !== companyId,
+					(company) => company && company.id !== companyId,
 				),
 				roles: oldCompanies.roles.filter(
 					(role) => role.company_id !== companyId,
@@ -140,7 +206,7 @@ export class CompanyController implements ICompanyController {
 			throw error;
 		}
 	}
-	//TODO: optimize this method in the future
+
 	async createCompanyForUserWithCache(
 		userId: string,
 		companyData: Company,
@@ -149,26 +215,39 @@ export class CompanyController implements ICompanyController {
 		roles: Role[];
 		joined_company: string | null;
 	}> {
-		try {
-			const { success } = await this.companyService.insertCompany(companyData);
+		if (typeof userId !== "string" || userId.trim() === "") {
+			throw new Error("Invalid parameter: userId must be a non-empty string.");
+		}
+		if (!companyData || typeof companyData !== "object") {
+			throw new Error("Invalid parameter: companyData must be an object.");
+		}
+		if (!companyData.email) {
+			throw new Error(
+				"Invalid parameter: companyData must have an email property.",
+			);
+		}
 
-			if (!success) throw new Error("create company failed");
+		try {
+			const insertResult = await this.companyService.insertCompany(companyData);
+			if (!insertResult || !insertResult.success) {
+				throw new Error("Create company failed: insertion unsuccessful.");
+			}
 
 			const fetchCompaniesWithRetry = async (
 				retries: number,
 				delay: number,
 			) => {
-				console.log(userId);
 				try {
 					await new Promise((resolve) => setTimeout(resolve, delay));
-
 					const result =
 						await this.getJoinedCompaniesByUserIdAllWithCache(userId);
-
-					if (result.companies.length === 1 && result.companies[0] === null)
-						throw new Error("companies is just NULL");
-
-					console.log(result);
+					if (
+						Array.isArray(result.companies) &&
+						result.companies.length === 1 &&
+						result.companies[0] === null
+					) {
+						throw new Error("Companies data is invalid (only NULL returned).");
+					}
 					return result;
 				} catch (error) {
 					if (retries > 0) {
@@ -180,49 +259,20 @@ export class CompanyController implements ICompanyController {
 				}
 			};
 
-			const { companies, roles, joined_companies } =
-				await fetchCompaniesWithRetry(1, 3000);
-
-			console.log(companies);
-
-			if (!companies || !roles || !joined_companies)
-				throw new Error("error fetching companies");
-
+			const { companies, roles } = await fetchCompaniesWithRetry(1, 3000);
 			this.cacheService.setItem("companies", { companies, roles });
 
-			if (typeof companies !== "object")
-				throw new Error("error fetching companies");
-
-			const newCompany: Company | undefined = companies.find(
-				(comp) => comp?.email === companyData?.email,
+			const newCompany = companies.find(
+				(comp) => comp && comp.email === companyData.email,
 			);
-
-			if (!newCompany || !newCompany.id)
-				throw new Error(
-					"cannot find recently created company, please Refresh main Page",
-				);
-
-			let newRoles: Role[] | undefined = roles.filter(
-				(role) => role.company_id === newCompany?.id,
-			);
-
-			if (newRoles.length === 0)
-				throw new Error("cannot find recently created roles");
-
-			const result: {
-				company: Company;
-				roles: Role[];
-				joined_company: string | null;
-			} = {
-				company: newCompany,
-				roles: newRoles,
-				joined_company: newCompany.id,
-			};
+			if (!newCompany || !newCompany.id) {
+				throw new Error("Cannot find the recently created company.");
+			}
 
 			return {
-				company: result.company,
-				roles: result.roles,
-				joined_company: result.joined_company,
+				company: newCompany,
+				roles: roles.filter((role) => role.company_id === newCompany.id),
+				joined_company: newCompany.id,
 			};
 		} catch (error: any) {
 			console.error(error);

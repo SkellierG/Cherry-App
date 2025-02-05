@@ -9,7 +9,7 @@ import { routes } from "@utils/constants";
 import { CompanySupabase } from "@modules/companies/companyController";
 import { User } from "@supabase/supabase-js";
 
-export function useCreateCompany() {
+export function useCompany() {
 	const [isLoading, setIsLoading] = useState(false);
 	const router = useRouter();
 	const { authDispatch } = useAuth();
@@ -82,5 +82,45 @@ export function useCreateCompany() {
 		}
 	};
 
-	return { isLoading, handleCreateCompany };
+	const handleCompany = async () => {
+		setIsLoading(true);
+		try {
+			const userData: User | null = JSON.parse(
+				(DeviceStorage.getItem("user", "string") as string) || "null",
+			);
+
+			//@ts-ignore
+			if (!userData || !userData.identities[0].user_id)
+				throw new Error("user_id not exists in cache");
+
+			const { companies, roles, joined_companies } =
+				await CompanySupabase.getJoinedCompaniesByUserIdAllWithCache(
+					//@ts-ignore
+					userData.identities[0].user_id,
+				);
+
+			authDispatch({
+				type: "COMPANIES",
+				payload: joined_companies,
+			});
+
+			authDispatch({
+				type: "ROLES",
+				payload: roles,
+			});
+
+			return {
+				companies: [...companies],
+				roles: [...roles],
+				joined_companies: [...joined_companies],
+			};
+		} catch (error: any) {
+			console.error(error);
+			throw error;
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	return { isLoading, handleCreateCompany, handleCompany };
 }

@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { Alert, View } from "react-native";
 import { Drawer } from "expo-router/drawer";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { DrawerContentComponentProps } from "@react-navigation/drawer";
 //@ts-ignore
 import { BaseCompany, Company, Role } from "@types/Auth";
 import DeviceStorage from "@utils/deviceStorage";
 import WelcomeDrawer from "@components/WelcomeDrawer";
 import CustomDrawerHeader from "@components/CustomDrawerHeader";
-import LoadingScreen from "last-old-src/screens/Loading";
+import LoadingScreen from "@screens/LoadingScreen";
 import CustomDrawerBody from "@components/CustomDrawerBody";
+import { PreviosControllerSupabase } from "@modules/previos/previosController";
 
 export default function TabsLayout() {
+	const previoController = PreviosControllerSupabase;
+
 	const [companies, setCompanies] = useState<(Company | null)[]>([]);
 	const [notNullCompanies, setNotNullCompanies] = useState<BaseCompany[]>([]);
 	const [selectedCompany, setSelectedCompany] = useState<BaseCompany | null>(
@@ -22,101 +24,92 @@ export default function TabsLayout() {
 	>({});
 
 	useEffect(() => {
-		const loadCompanies = () => {
-			const companiesData: { companies: Company[]; roles: Role[] } = JSON.parse(
-				DeviceStorage.getItem("companies", "string") as string | "null",
-			);
+		const loadCompanies = async () => {
+			try {
+				const companiesString = DeviceStorage.getItem(
+					"companies",
+					"string",
+				) as string;
+				if (!companiesString || companiesString === "null") {
+					setCompanies([]);
+					return;
+				}
+				const companiesData = JSON.parse(companiesString) as {
+					companies: Company[];
+					roles: Role[];
+				};
 
-			// const companiesData = {
-			// 	companies: [
-			// 		null,
-			// 		{
-			// 			id: "abc123",
-			// 			name: "AgroHarvest Co.",
-			// 			slogan: "Cosechando calidad para el futuro.",
-			// 			avatar_url: "https://placehold.co/100x100/png",
-			// 		},
-			// 		{
-			// 			id: "xyz123",
-			// 			name: "FruitCollect Ltd.",
-			// 			slogan: "Frutas frescas directo del campo.",
-			// 			avatar_url: "https://placehold.co/100x100/png",
-			// 		},
-			// 		{
-			// 			id: "abc321",
-			// 			name: "GreenFields Agri.",
-			// 			slogan: "Cultivando soluciones sostenibles.",
-			// 			avatar_url: "https://placehold.co/100x100/png",
-			// 		},
-			// 		{
-			// 			id: "xyz321",
-			// 			name: "HarvestPro Inc.",
-			// 			slogan: "Innovación en cada cosecha.",
-			// 			avatar_url: "https://placehold.co/100x100/png",
-			// 		},
-			// 	],
-			// };
+				const loadedCompanies: (Company | null)[] =
+					companiesData?.companies || [null];
+				setCompanies(loadedCompanies);
 
-			const loadedCompanies: Company[] = companiesData?.companies || [null];
-			setCompanies(loadedCompanies);
+				const filteredNotNullCompanies = loadedCompanies.filter(
+					(company): company is BaseCompany => company !== null,
+				);
+				setNotNullCompanies(filteredNotNullCompanies);
 
-			const filteredNotNullCompanies = loadedCompanies.filter(
-				(company): company is BaseCompany => company !== null,
-			);
-			setNotNullCompanies(filteredNotNullCompanies);
+				if (filteredNotNullCompanies.length > 0) {
+					setSelectedCompany(filteredNotNullCompanies[0]);
+				}
 
-			if (filteredNotNullCompanies.length > 0) {
-				setSelectedCompany(filteredNotNullCompanies[0]);
+				const chats: Record<
+					string,
+					{ name: string; title: string; icon: string }[]
+				> = {};
+
+				for (const company of filteredNotNullCompanies) {
+					let fetchedChats: { name: string; title: string; icon: string }[] =
+						[];
+					try {
+						fetchedChats =
+							await previoController.getCompletePreviosByCompanyIdAllWithCache(
+								company.id as string,
+							);
+					} catch (error) {
+						console.error(
+							`Error fetching chats for company ${company.id}:`,
+							error,
+						);
+					}
+					fetchedChats.unshift({
+						name: "members",
+						title: "Members",
+						icon: "person",
+					});
+					fetchedChats.push({
+						name: "stats",
+						title: "Stats",
+						icon: "bar-chart",
+					});
+					fetchedChats.unshift({
+						name: "index",
+						title: "Home",
+						icon: "home",
+					});
+					fetchedChats.push({
+						name: "settings",
+						title: "Settings",
+						icon: "settings",
+					});
+
+					chats[company.id as string] = fetchedChats;
+				}
+				setCompaniesChats(chats);
+			} catch (error: any) {
+				Alert.alert("Error", "No se pudieron cargar las compañías.");
+				console.error("Error in loadCompanies:", error);
 			}
-
-			const chats: Record<
-				string,
-				{ name: string; title: string; icon: string }[]
-			> = {
-				abc123: [
-					{ name: "previos/aaaa", title: "aaaa", icon: "chat" },
-					{ name: "previos/zzzz", title: "zzzz", icon: "chat" },
-				],
-				xyz123: [{ name: "previos/bbbb", title: "bbbb", icon: "chat" }],
-				abc321: [{ name: "previos/cccc", title: "cccc", icon: "chat" }],
-				xyz321: [{ name: "previos/dddd", title: "dddd", icon: "chat" }],
-			};
-
-			filteredNotNullCompanies.forEach((company) => {
-				chats[company.id as string] = [];
-			});
-
-			filteredNotNullCompanies.forEach((company) => {
-				chats[company.id as string].push({
-					name: "settings",
-					title: "Settings",
-					icon: "settings",
-				});
-				chats[company.id as string].unshift({
-					name: "members",
-					title: "Members",
-					icon: "person",
-				});
-				chats[company.id as string].unshift({
-					name: "index",
-					title: "Home",
-					icon: "home",
-				});
-			});
-
-			setCompaniesChats(chats);
 		};
 
 		loadCompanies();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const onRefresh = async (
 		setRefreshing: React.Dispatch<React.SetStateAction<boolean>>,
 	) => {
 		try {
-			// Placeholder for refresh logic
 			setRefreshing(true);
-			// Simulate API call or data fetching
 			setTimeout(() => {
 				setRefreshing(false);
 			}, 1500);

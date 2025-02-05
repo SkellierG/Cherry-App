@@ -22,7 +22,7 @@ export default function DashboardPage() {
 	}));
 	return (
 		<SafeAreaView style={styles.view}>
-			<DummyScreen screenName={params ? params.previo_id : "LOL"} />
+			<DummyScreen screenName={params ? (params.previo_id as string) : "LOL"} />
 		</SafeAreaView>
 	);
 }

@@ -15,6 +15,7 @@ import { View, KeyboardAvoidingView, Platform, Alert } from "react-native";
 type ProfileScreenProps = {
 	name?: string;
 	lastname?: string;
+	publicId?: string;
 	email?: string;
 	imageSource?: { uri: string };
 };
@@ -22,6 +23,7 @@ type ProfileScreenProps = {
 const DashboardProfileScreen: React.FC<ProfileScreenProps> = ({
 	name,
 	lastname,
+	publicId,
 	email,
 	imageSource,
 }) => {
@@ -57,11 +59,15 @@ const DashboardProfileScreen: React.FC<ProfileScreenProps> = ({
 		lastname || authState.profile?.lastname || "",
 	);
 
-	let [finalEmail, setFinalEmail] = useState(
+	const [finalPublicId, setFinalPublicId] = useState(
+		publicId || authState.profile?.public_id || "",
+	);
+
+	const [finalEmail, setFinalEmail] = useState(
 		email || authState.user?.email || "",
 	);
 
-	let [finalImageSource, setFinalImageSource] = useState(
+	const [finalImageSource, setFinalImageSource] = useState(
 		imageSource ||
 			(authState.profile?.avatar_url
 				? { uri: authState.profile?.avatar_url }
@@ -71,9 +77,9 @@ const DashboardProfileScreen: React.FC<ProfileScreenProps> = ({
 	const onRefresh = async () => {
 		try {
 			const { user, profile } = await AuthSupabase.getSessionWithCache();
-
 			setFinalName(profile.name as string);
 			setFinalLastname(profile.lastname as string);
+			setFinalPublicId(profile.public_id as string);
 			setFinalEmail(user.email as string);
 			setFinalImageSource({ uri: profile.avatar_url as string });
 		} catch (error: any) {
@@ -91,6 +97,7 @@ const DashboardProfileScreen: React.FC<ProfileScreenProps> = ({
 				<View style={styles.content}>
 					<ProfileShow
 						name={`${finalName} ${finalLastname}`}
+						publicId={finalPublicId}
 						email={finalEmail}
 						imageSource={finalImageSource}
 					>

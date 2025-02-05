@@ -56,6 +56,7 @@ const AuthReducer = (state: AuthState, action: AuthAction): AuthState => {
 					is_profiled: action.payload.is_profiled,
 					id: action.payload.id,
 					user_id: action.payload.user_id,
+					public_id: action.payload.public_id,
 					name: action.payload.name,
 					lastname: action.payload.lastname,
 					avatar_url: action.payload.avatar_url,
