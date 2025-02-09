@@ -36,93 +36,100 @@ export default function MuestrasListScreen() {
 				theme === "dark"
 					? dark_default_theme.colors.background
 					: light_default_theme.colors.background,
-			padding: 16,
+			paddingHorizontal: 16,
 		},
 		card: {
-			backgroundColor: theme === "dark" ? "#2c2c2c" : "#ffffff",
-			borderRadius: 8,
-			marginBottom: 12,
+			backgroundColor: theme === "dark" ? "#2A2A2A" : "#FFF",
+			borderRadius: 12,
+			marginVertical: 8,
 			padding: 16,
 			shadowColor: "#000",
 			shadowOffset: { width: 0, height: 2 },
 			shadowOpacity: 0.1,
-			shadowRadius: 4,
-			elevation: 2,
+			shadowRadius: 6,
+			elevation: 3,
 		},
-		cardHeader: {
-			flexDirection: "row",
-			justifyContent: "space-between",
-			alignItems: "center",
-		},
-		cardTitle: {
-			fontSize: 16,
-			fontWeight: "bold",
-			color: theme === "dark" ? "#fff" : "#000",
-		},
-		deleteButton: {
-			backgroundColor: "red",
-			paddingVertical: 6,
-			paddingHorizontal: 12,
-			borderRadius: 4,
-		},
-		deleteButtonText: {
-			color: "#fff",
-			fontSize: 14,
-		},
-		cardBody: {
-			marginTop: 8,
-		},
-		label: {
-			fontSize: 14,
+		sectionTitle: {
+			fontSize: 18,
 			fontWeight: "600",
-			color: theme === "dark" ? "#ddd" : "#333",
-			marginBottom: 4,
+			color: theme === "dark" ? "#FFF" : "#1A1A1A",
+			marginBottom: 12,
 		},
-		detail: {
+		inputContainer: {
+			flexDirection: "row",
+			alignItems: "center",
+			marginBottom: 12,
+		},
+		inputLabel: {
+			width: 80,
 			fontSize: 14,
-			color: theme === "dark" ? "#aaa" : "#666",
-			marginBottom: 4,
+			color: theme === "dark" ? "#AAA" : "#666",
+			marginRight: 8,
 		},
 		input: {
-			borderWidth: 1,
-			borderColor: theme === "dark" ? "#555" : "#ccc",
-			borderRadius: 4,
-			padding: 4,
-			marginBottom: 4,
-			color: theme === "dark" ? "#fff" : "#000",
-			fontSize: 14,
 			flex: 1,
+			borderWidth: 1,
+			borderColor: theme === "dark" ? "#404040" : "#DDD",
+			borderRadius: 8,
+			paddingVertical: 10,
+			paddingHorizontal: 12,
+			fontSize: 16,
+			color: theme === "dark" ? "#FFF" : "#000",
+			backgroundColor: theme === "dark" ? "#333" : "#FAFAFA",
 		},
 		floatingButton: {
 			position: "absolute",
-			bottom: 20,
-			left: 20,
+			bottom: 30,
 			right: 20,
-			backgroundColor: theme === "dark" ? "#444" : "#007AFF",
-			paddingVertical: 12,
-			borderRadius: 6,
+			backgroundColor: theme === "dark" ? "#4A90E2" : "#007AFF",
+			width: 56,
+			height: 56,
+			borderRadius: 28,
+			justifyContent: "center",
 			alignItems: "center",
+			shadowColor: "#000",
+			shadowOffset: { width: 0, height: 4 },
+			shadowOpacity: 0.2,
+			shadowRadius: 6,
+			elevation: 5,
 		},
-		floatingButtonText: {
-			color: "#fff",
-			fontSize: 18,
-		},
-		row: {
+		actionBar: {
 			flexDirection: "row",
+			justifyContent: "space-between",
 			alignItems: "center",
-			marginBottom: 4,
+			marginBottom: 16,
+		},
+		deleteButton: {
+			backgroundColor: theme === "dark" ? "#D32F2F" : "#FF4444",
+			paddingVertical: 8,
+			paddingHorizontal: 12,
+			borderRadius: 6,
 		},
 		confirmButton: {
-			backgroundColor: "green",
-			paddingVertical: 8,
-			paddingHorizontal: 16,
-			borderRadius: 4,
-			marginTop: 8,
-			alignSelf: "flex-start",
+			backgroundColor: theme === "dark" ? "#388E3C" : "#28A745",
+			paddingVertical: 10,
+			paddingHorizontal: 20,
+			borderRadius: 8,
+			alignSelf: "flex-end",
 		},
-		confirmButtonText: {
-			color: "#fff",
-			fontSize: 14,
+		badge: {
+			position: "absolute",
+			top: -8,
+			right: -8,
+			backgroundColor: "#FF1744",
+			borderRadius: 10,
+			width: 20,
+			height: 20,
+			justifyContent: "center",
+			alignItems: "center",
+		},
+		badgeText: {
+			color: "#FFF",
+			fontSize: 12,
+			fontWeight: "bold",
+		},
+		placeholderTextColor: {
+			color: theme === "dark" ? "#666" : "#AAA",
 		},
 	}));
 
@@ -338,103 +345,134 @@ export default function MuestrasListScreen() {
 		return <LoadingScreen />;
 	}
 
+	// Estilos actualizados para MuestrasListScreen
+
+	// Componente actualizado
 	return (
 		<SafeAreaView style={styles.container}>
 			<View style={{ flex: 1 }}>
 				<PullToRefresh onRefreshCallback={loadMuestras}>
-					<ScrollView contentContainerStyle={{ paddingBottom: 140 }}>
+					<ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
 						{muestras.map((muestra) => (
 							<View key={muestra.id} style={styles.card}>
-								<View style={styles.cardHeader}>
-									<Text style={styles.cardTitle}>Muestra:</Text>
+								<View style={styles.actionBar}>
+									<Text style={[styles.sectionTitle, { marginBottom: 0 }]}>
+										Muestra #{muestra.id.slice(-4)}
+									</Text>
 									<TouchableOpacity
 										style={styles.deleteButton}
 										onPress={() => handleDelete(muestra.id)}
 									>
-										<Text style={styles.deleteButtonText}>Eliminar</Text>
+										<Text style={{ color: "#FFF", fontWeight: "500" }}>
+											Eliminar
+										</Text>
 									</TouchableOpacity>
 								</View>
-								<View style={styles.cardBody}>
-									<Text style={styles.detail}>{muestra.id}</Text>
-									<Text style={styles.label}>Fruto:</Text>
-									<Text style={styles.detail}>
-										ID: {muestra.fruto?.[0]?.id || "N/A"}
-									</Text>
-									<View style={styles.row}>
-										<Text style={styles.detail}>Nivel 1:</Text>
-										<TextInput
-											style={styles.input}
-											keyboardType="numeric"
-											value={String(muestra.fruto?.[0]?.nivel_1 || "")}
-											onChangeText={(text) =>
-												updateMuestraField(muestra.id, "nivel_1", text, "fruto")
-											}
-										/>
-									</View>
-									<View style={styles.row}>
-										<Text style={styles.detail}>Nivel 2:</Text>
-										<TextInput
-											style={styles.input}
-											keyboardType="numeric"
-											value={String(muestra.fruto?.[0]?.nivel_2 || "")}
-											onChangeText={(text) =>
-												updateMuestraField(muestra.id, "nivel_2", text, "fruto")
-											}
-										/>
-									</View>
-									<Text style={styles.label}>Centro Frutal:</Text>
-									<Text style={styles.detail}>
-										ID: {muestra.centro_frutal?.[0]?.id || "N/A"}
-									</Text>
-									<View style={styles.row}>
-										<Text style={styles.detail}>Nivel 1:</Text>
-										<TextInput
-											style={styles.input}
-											keyboardType="numeric"
-											value={String(muestra.centro_frutal?.[0]?.nivel_1 || "")}
-											onChangeText={(text) =>
-												updateMuestraField(
-													muestra.id,
-													"nivel_1",
-													text,
-													"centro_frutal",
-												)
-											}
-										/>
-									</View>
-									<View style={styles.row}>
-										<Text style={styles.detail}>Nivel 2:</Text>
-										<TextInput
-											style={styles.input}
-											keyboardType="numeric"
-											value={String(muestra.centro_frutal?.[0]?.nivel_2 || "")}
-											onChangeText={(text) =>
-												updateMuestraField(
-													muestra.id,
-													"nivel_2",
-													text,
-													"centro_frutal",
-												)
-											}
-										/>
-									</View>
-									{muestra.hasChanges && (
-										<TouchableOpacity
-											style={styles.confirmButton}
-											onPress={() => handleConfirmChanges(muestra.id)}
-										>
-											<Text style={styles.confirmButtonText}>
-												Confirmar cambios
-											</Text>
-										</TouchableOpacity>
-									)}
+
+								<Text
+									style={[
+										styles.sectionTitle,
+										{ fontSize: 16, marginBottom: 8 },
+									]}
+								>
+									Datos Fruto
+								</Text>
+								<View style={styles.inputContainer}>
+									<Text style={styles.inputLabel}>Nivel 1</Text>
+									<TextInput
+										style={styles.input}
+										keyboardType="numeric"
+										value={String(muestra.fruto?.[0]?.nivel_1 || "")}
+										onChangeText={(text) =>
+											updateMuestraField(muestra.id, "nivel_1", text, "fruto")
+										}
+										placeholder="Ingrese valor..."
+										placeholderTextColor={styles.placeholderTextColor.color}
+									/>
 								</View>
+
+								<View style={styles.inputContainer}>
+									<Text style={styles.inputLabel}>Nivel 2</Text>
+									<TextInput
+										style={styles.input}
+										keyboardType="numeric"
+										value={String(muestra.fruto?.[0]?.nivel_2 || "")}
+										onChangeText={(text) =>
+											updateMuestraField(muestra.id, "nivel_2", text, "fruto")
+										}
+										placeholder="Ingrese valor..."
+										placeholderTextColor={styles.placeholderTextColor.color}
+									/>
+								</View>
+
+								<Text
+									style={[
+										styles.sectionTitle,
+										{ fontSize: 16, marginBottom: 8 },
+									]}
+								>
+									Datos Centro Frutal
+								</Text>
+								<View style={styles.inputContainer}>
+									<Text style={styles.inputLabel}>Nivel 1</Text>
+									<TextInput
+										style={styles.input}
+										keyboardType="numeric"
+										value={String(muestra.centro_frutal?.[0]?.nivel_1 || "")}
+										onChangeText={(text) =>
+											updateMuestraField(
+												muestra.id,
+												"nivel_1",
+												text,
+												"centro_frutal",
+											)
+										}
+										placeholder="Ingrese valor..."
+										placeholderTextColor={styles.placeholderTextColor.color}
+									/>
+								</View>
+
+								<View style={styles.inputContainer}>
+									<Text style={styles.inputLabel}>Nivel 2</Text>
+									<TextInput
+										style={styles.input}
+										keyboardType="numeric"
+										value={String(muestra.centro_frutal?.[0]?.nivel_2 || "")}
+										onChangeText={(text) =>
+											updateMuestraField(
+												muestra.id,
+												"nivel_2",
+												text,
+												"centro_frutal",
+											)
+										}
+										placeholder="Ingrese valor..."
+										placeholderTextColor={styles.placeholderTextColor.color}
+									/>
+								</View>
+
+								{muestra.hasChanges && (
+									<TouchableOpacity
+										style={styles.confirmButton}
+										onPress={() => handleConfirmChanges(muestra.id)}
+									>
+										<Text style={{ color: "#FFF", fontWeight: "600" }}>
+											Guardar Cambios
+										</Text>
+									</TouchableOpacity>
+								)}
 							</View>
 						))}
 					</ScrollView>
 				</PullToRefresh>
+
 				<TouchableOpacity style={styles.floatingButton} onPress={handleCreate}>
-					<Text style={styles.floatingButtonText}>Crear Muestra</Text>
+					<Text style={{ color: "#FFF", fontSize: 24 }}>+</Text>
+					{muestras.length > 0 && (
+						<View style={styles.badge}>
+							<Text style={styles.badgeText}>{muestras.length}</Text>
+						</View>
+					)}
 				</TouchableOpacity>
 			</View>
 		</SafeAreaView>

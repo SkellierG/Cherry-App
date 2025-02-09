@@ -259,9 +259,11 @@ export class PreviosController {
 						previoResult.previo_id,
 					);
 
-					if (!result || result[0] || result[0].nombre || result[0].id) {
-						throw new Error("Invalid previo data returned.");
-					}
+					console.info(result);
+
+					// if (!result || result[0] || result[0].nombre || result[0].id) {
+					// 	throw new Error("Invalid previo data returned.");
+					// }
 
 					console.log(result);
 

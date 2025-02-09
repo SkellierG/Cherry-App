@@ -17,37 +17,14 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import LoadingScreen from "@screens/LoadingScreen";
 import PullToRefresh from "last-old-src/components/PullToRefresh";
 import { PreviosControllerSupabase } from "@modules/previos/previosController";
+import * as XLSX from "xlsx";
+import { writeSheetFile } from "@services/sheetjs";
+import { Button } from "tamagui";
 
-const fetchPrevios = async (): Promise<any[]> => {
-	return new Promise((resolve) =>
-		setTimeout(() => {
-			resolve([
-				{
-					id: "1",
-					name: "El previesito",
-					fecha: "2023-01-01T12:00:00Z",
-					created_at: "2023-01-01T12:00:00Z",
-				},
-				{
-					id: "2",
-					name: "LOLOLOLOL",
-					fecha: "2023-02-15T09:30:00Z",
-					created_at: "2023-02-15T09:30:00Z",
-				},
-				{
-					id: "3",
-					name: "mi papu miau",
-					fecha: "2023-03-20T17:45:00Z",
-					created_at: "2023-03-20T17:45:00Z",
-				},
-			]);
-		}, 1000),
-	);
-};
-
-const deletePrevio = async (id: string): Promise<boolean> => {
+// Función dummy para eliminar un previo (puedes reemplazarla por la lógica real)
+async function deletePrevio(id: string): Promise<boolean> {
 	return new Promise((resolve) => setTimeout(() => resolve(true), 500));
-};
+}
 
 export default function PreviosListScreen() {
 	const params = useLocalSearchParams();
@@ -65,50 +42,69 @@ export default function PreviosListScreen() {
 			padding: 16,
 			flex: 1,
 		},
-		item: {
+		card: {
+			backgroundColor: theme === "dark" ? "#2c2c2c" : "#ffffff",
+			borderRadius: 8,
+			marginBottom: 16,
+			padding: 16,
+			shadowColor: "#000",
+			shadowOffset: { width: 0, height: 2 },
+			shadowOpacity: 0.1,
+			shadowRadius: 4,
+			elevation: 2,
+		},
+		cardHeader: {
 			flexDirection: "row",
-			alignItems: "center",
 			justifyContent: "space-between",
-			paddingVertical: 12,
-			borderBottomWidth: 1,
-			borderBottomColor: theme === "dark" ? "#aaa" : "#888",
+			alignItems: "center",
 		},
-		itemTextContainer: {
-			flex: 1,
-		},
-		itemName: {
+		cardTitle: {
 			fontSize: 18,
+			fontWeight: "bold",
 			color: theme === "dark" ? "#fff" : "#000",
 		},
-		itemDate: {
+		cardBody: {
+			marginTop: 8,
+		},
+		detailText: {
 			fontSize: 14,
-			color: theme === "dark" ? "#ddd" : "#666",
-			marginTop: 4,
+			color: theme === "dark" ? "#aaa" : "#666",
+			marginVertical: 2,
 		},
-		itemCreated: {
-			fontSize: 10,
-			color: theme === "dark" ? "#aaa" : "#888",
-			marginTop: 4,
+		cardFooter: {
+			flexDirection: "row",
+			justifyContent: "space-between",
+			marginTop: 12,
 		},
-		deleteButton: {
-			backgroundColor: "red",
-			paddingVertical: 6,
+		button: {
+			backgroundColor: theme === "dark" ? "#444" : "#007AFF",
+			paddingVertical: 8,
 			paddingHorizontal: 12,
-			borderRadius: 4,
-			marginLeft: 8,
+			borderRadius: 6,
+			alignItems: "center",
+			marginHorizontal: 4,
 		},
-		deleteButtonText: {
+		buttonText: {
 			color: "#fff",
 			fontSize: 14,
 		},
-		createButton: {
-			marginTop: 20,
+		floatingButton: {
+			position: "absolute",
+			bottom: 190,
+			left: 20,
+			right: 20,
 			backgroundColor: theme === "dark" ? "#444" : "#007AFF",
 			paddingVertical: 12,
 			borderRadius: 6,
 			alignItems: "center",
+			shadowColor: "#000",
+			shadowOffset: { width: 0, height: 2 },
+			shadowOpacity: 0.3,
+			shadowRadius: 4,
+			elevation: 5,
+			zIndex: 1000,
 		},
-		createButtonText: {
+		floatingButtonText: {
 			color: "#fff",
 			fontSize: 18,
 		},
@@ -118,10 +114,9 @@ export default function PreviosListScreen() {
 		setLoading(true);
 		try {
 			const data =
-				await PreviosControllerSupabase.getPreviosByCompanyIdAllWithCache(
+				await PreviosControllerSupabase.getCompletePreviosByCompanyIdAllWithCache(
 					params.company_id as string,
 				);
-			console.log(data);
 			setPrevios(data);
 		} catch (err) {
 			console.error("Error fetching previos", err);
@@ -162,6 +157,49 @@ export default function PreviosListScreen() {
 		);
 	};
 
+	const handleExportSingle = async (previo: any, type: "csv" | "xlsx") => {
+		if (!previo) {
+			Alert.alert("Error", "No hay datos para exportar.");
+			return;
+		}
+
+		const headers = [
+			["Nombre del previo", "Fecha"],
+			["Centro Frutal", "Frutos"],
+			["Nivel 1", "Nivel 2", "Nivel 1", "Nivel 2"],
+		];
+
+		console.log(previo);
+
+		const data = [
+			[
+				previo.muestras[0].centro_frutal[0].nivel_1 || "",
+				previo.muestras[0].centro_frutal[0].nivel_2 || "",
+				previo.muestras[0].fruto[0].nivel_1 || "",
+				previo.muestras[0].fruto[0].nivel_2 || "",
+			],
+		];
+
+		console.log(data);
+
+		const worksheet = XLSX.utils.aoa_to_sheet([...headers, ...data]);
+		console.log(worksheet);
+		const workbook = XLSX.utils.book_new();
+		console.log(workbook);
+		XLSX.utils.book_append_sheet(workbook, worksheet, "Previo");
+
+		try {
+			await writeSheetFile(workbook, `previo_${previo.id}.${type}`, type);
+			Alert.alert(
+				"Exportación completada",
+				`Archivo previo_${previo.id}.${type} guardado.`,
+			);
+		} catch (error) {
+			Alert.alert("Error", "No se pudo exportar el previo.");
+			console.error(error);
+		}
+	};
+
 	const handleCreate = () => {
 		router.push(`/auth/create/previo?company_id=${params.company_id}`);
 	};
@@ -172,32 +210,47 @@ export default function PreviosListScreen() {
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<PullToRefresh onRefreshCallback={loadPrevios}>
-				<ScrollView>
-					{previos.map((previo) => (
-						<View key={previo.id} style={styles.item}>
-							<View style={styles.itemTextContainer}>
-								<Text style={styles.itemName}>{previo.nombre}</Text>
-								<Text style={styles.itemCreated}>
-									{new Date(previo.created_at).toLocaleDateString()}
-								</Text>
-								<Text style={styles.itemDate}>
-									{new Date(previo.fecha).toLocaleDateString()}
-								</Text>
+			<View style={{ flex: 1 }}>
+				<PullToRefresh onRefreshCallback={loadPrevios}>
+					<ScrollView contentContainerStyle={{ paddingBottom: 160 }}>
+						{previos.map((previo) => (
+							<View key={previo.id} style={styles.card}>
+								<View style={styles.cardHeader}>
+									<Text style={styles.cardTitle}>{previo.nombre}</Text>
+									<Button
+										theme={"red_active"}
+										onPress={() => handleDelete(previo.id)}
+									>
+										<Text style={styles.buttonText}>Eliminar</Text>
+									</Button>
+								</View>
+								<View style={styles.cardBody}>
+									<Text style={styles.detailText}>
+										Fecha: {new Date(previo.fecha).toLocaleDateString()}
+									</Text>
+								</View>
+								<View style={styles.cardFooter}>
+									<TouchableOpacity
+										style={styles.button}
+										onPress={() => handleExportSingle(previo, "csv")}
+									>
+										<Text style={styles.buttonText}>Exportar CSV</Text>
+									</TouchableOpacity>
+									<TouchableOpacity
+										style={styles.button}
+										onPress={() => handleExportSingle(previo, "xlsx")}
+									>
+										<Text style={styles.buttonText}>Exportar XLSX</Text>
+									</TouchableOpacity>
+								</View>
 							</View>
-							<TouchableOpacity
-								style={styles.deleteButton}
-								onPress={() => handleDelete(previo.id)}
-							>
-								<Text style={styles.deleteButtonText}>Eliminar</Text>
-							</TouchableOpacity>
-						</View>
-					))}
-				</ScrollView>
-				<TouchableOpacity style={styles.createButton} onPress={handleCreate}>
-					<Text style={styles.createButtonText}>Crear Previo</Text>
+						))}
+					</ScrollView>
+				</PullToRefresh>
+				<TouchableOpacity style={styles.floatingButton} onPress={handleCreate}>
+					<Text style={styles.floatingButtonText}>Crear Previo</Text>
 				</TouchableOpacity>
-			</PullToRefresh>
+			</View>
 		</SafeAreaView>
 	);
 }
