@@ -121,6 +121,7 @@ export default function PreviosListScreen() {
 				await PreviosControllerSupabase.getPreviosByCompanyIdAllWithCache(
 					params.company_id as string,
 				);
+			console.log(data);
 			setPrevios(data);
 		} catch (err) {
 			console.error("Error fetching previos", err);
@@ -162,7 +163,7 @@ export default function PreviosListScreen() {
 	};
 
 	const handleCreate = () => {
-		router.push("/previos/create");
+		router.push(`/auth/create/previo?company_id=${params.company_id}`);
 	};
 
 	if (loading) {
@@ -171,12 +172,12 @@ export default function PreviosListScreen() {
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<PullToRefresh>
+			<PullToRefresh onRefreshCallback={loadPrevios}>
 				<ScrollView>
 					{previos.map((previo) => (
 						<View key={previo.id} style={styles.item}>
 							<View style={styles.itemTextContainer}>
-								<Text style={styles.itemName}>{previo.name}</Text>
+								<Text style={styles.itemName}>{previo.nombre}</Text>
 								<Text style={styles.itemCreated}>
 									{new Date(previo.created_at).toLocaleDateString()}
 								</Text>

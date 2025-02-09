@@ -44,7 +44,7 @@ export class CentrosFrutalesService {
 
 		try {
 			const { data, error } = await supabase
-				.from("centros_frutales")
+				.from("centro_frutal")
 				.select(typeof select === "string" ? select : select.join(","))
 				.eq("id", centroFrutalId)
 				.single()
@@ -91,7 +91,7 @@ export class CentrosFrutalesService {
 
 		try {
 			const { error } = await supabase
-				.from("centros_frutales")
+				.from("centro_frutal")
 				.update(updates)
 				.eq("id", centroFrutalId)
 				.single()
@@ -113,7 +113,7 @@ export class CentrosFrutalesService {
 
 		try {
 			const { error } = await supabase
-				.from("centros_frutales")
+				.from("centro_frutal")
 				.delete()
 				.eq("id", centroFrutalId)
 				.setHeader("Accept", "application/json");

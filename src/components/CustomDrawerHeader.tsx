@@ -1,11 +1,12 @@
+import React, { useEffect, useState } from "react";
+import { TouchableOpacity, View, Image, Text, Alert } from "react-native";
+import PullToRefresh from "./PullToRefresh";
+import { supabase } from "@services/supabase";
 import {
 	dark_default_theme,
 	light_default_theme,
 } from "@assets/themes/tamagui-rnp-adapter";
 import { useDynamicStyles } from "@hooks/useDynamicStyles";
-import React from "react";
-import PullToRefresh from "./PullToRefresh";
-import { TouchableOpacity, View, Image, Text } from "react-native";
 
 export default function CustomDrawerHeader({
 	onRefreshCallback,
@@ -14,6 +15,35 @@ export default function CustomDrawerHeader({
 	onCompanyChange,
 	...props
 }: any): any {
+	const [avatarUrl, setAvatarUrl] = useState(
+		"https://placehold.co/200x200/png",
+	);
+
+	useEffect(() => {
+		async function fetchAvatar() {
+			try {
+				if (!selectedCompany?.avatar_url) {
+					setAvatarUrl("https://placehold.co/200x200/png");
+					return;
+				}
+				const { data, error } = await supabase.storage
+					.from("avatars")
+					.createSignedUrl(selectedCompany.avatar_url, 60);
+
+				if (error) {
+					throw error;
+				}
+				console.log(data);
+				setAvatarUrl(data.signedUrl);
+			} catch (error: any) {
+				console.error("Error getting avatar URL:", error.message);
+				Alert.alert("Error", error.message);
+				setAvatarUrl("https://placehold.co/200x200/png");
+			}
+		}
+		fetchAvatar();
+	}, [selectedCompany?.avatar_url]);
+
 	const styles = useDynamicStyles((theme) => ({
 		header: {
 			backgroundColor: "#d03434",
@@ -64,10 +94,7 @@ export default function CustomDrawerHeader({
 		<PullToRefresh onRefreshCallback={onRefreshCallback}>
 			<View style={{ zIndex: 9999 }}>
 				<View style={styles.header}>
-					<Image
-						source={{ uri: selectedCompany.avatar_url }}
-						style={styles.profileImage}
-					/>
+					<Image source={{ uri: avatarUrl }} style={styles.profileImage} />
 					<Text style={styles.accountName}>{selectedCompany.name}</Text>
 					<Text style={styles.accountEmail}>{selectedCompany.slogan}</Text>
 				</View>
@@ -79,7 +106,7 @@ export default function CustomDrawerHeader({
 							onPress={() => onCompanyChange(company)}
 						>
 							<Image
-								source={{ uri: company.avatar_url }}
+								source={{ uri: avatarUrl }}
 								style={[
 									styles.accountAvatar,
 									company.id === selectedCompany.id && styles.selectedAvatar,

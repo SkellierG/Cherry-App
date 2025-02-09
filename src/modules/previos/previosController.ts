@@ -64,12 +64,14 @@ export class PreviosController {
 				"Invalid parameter: companyId must be a non-empty string.",
 			);
 		try {
+			console.log(companyId);
 			const cacheKey = `previos_company_all_${companyId}`;
-			const cached = this.cacheService.getItem(cacheKey, "string");
-			if (cached) {
-				const parsed = JSON.parse(cached);
-				if (Array.isArray(parsed)) return parsed;
-			}
+			// const cached = this.cacheService.getItem(cacheKey, "string");
+			// if (cached) {
+			// 	const parsed = JSON.parse(cached);
+			// 	console.log("parsed", parsed);
+			// 	if (Array.isArray(parsed)) return parsed;
+			// }
 			const data =
 				await this.previosService.fetchPreviosByCompanyIdAll(companyId);
 			this.cacheService.setItem(cacheKey, JSON.stringify(data));
@@ -227,6 +229,96 @@ export class PreviosController {
 				}),
 			);
 			return enrichedPrevios;
+		} catch (error: any) {
+			console.error(error);
+			throw error;
+		}
+	}
+
+	async createPrevioByCompanyIdWithCache(
+		companyId: string,
+		name: string,
+		date: string,
+	) {
+		try {
+			console.log(companyId, name, date);
+			const previoResult = await this.previosService.createPrevioByCompanyId(
+				companyId,
+				name,
+				date,
+			);
+
+			const fetchPrevioDetailsWithRetry = async (
+				retries: number,
+				delay: number,
+			) => {
+				try {
+					await new Promise((resolve) => setTimeout(resolve, delay));
+
+					const result = await this.getPrevioByIdAllWithCache(
+						previoResult.previo_id,
+					);
+
+					if (!result || result[0] || result[0].nombre || result[0].id) {
+						throw new Error("Invalid previo data returned.");
+					}
+
+					console.log(result);
+
+					return result;
+				} catch (error) {
+					if (retries > 0) {
+						console.warn(`Retrying... (${retries} retries left)`);
+						return fetchPrevioDetailsWithRetry(retries - 1, delay);
+					} else {
+						throw error;
+					}
+				}
+			};
+
+			const previoDetails = await fetchPrevioDetailsWithRetry(2, 2000);
+			return previoDetails;
+		} catch (error: any) {
+			console.error(error);
+			throw error;
+		}
+	}
+
+	async createMuestraByPrevioIdWithCache(previoId: string) {
+		try {
+			const muestraResult =
+				await this.muestrasService.createMuestraByPrevioId(previoId);
+
+			console.log("muestraResult", muestraResult);
+
+			const fetchMuestraDetailsWithRetry = async (
+				retries: number,
+				delay: number,
+			) => {
+				try {
+					await new Promise((resolve) => setTimeout(resolve, delay));
+
+					const result = await this.muestrasService.fetchMuestraById(
+						muestraResult.muestra_id,
+					);
+
+					// if (!result || !result[0] || result[0].id) {
+					// 	throw new Error("Invalid muestra data returned.");
+					// }
+
+					return result;
+				} catch (error) {
+					if (retries > 0) {
+						console.warn(`Retrying... (${retries} retries left)`);
+						return fetchMuestraDetailsWithRetry(retries - 1, delay);
+					} else {
+						throw error;
+					}
+				}
+			};
+
+			const muestraDetails = await fetchMuestraDetailsWithRetry(2, 2000);
+			return muestraDetails;
 		} catch (error: any) {
 			console.error(error);
 			throw error;

@@ -1,8 +1,15 @@
-import React from "react";
-import { View, Text } from "react-native";
+import React, { useState } from "react";
+import { View, Text, Image, TouchableOpacity } from "react-native";
 import { Button } from "tamagui";
 import AuthTextInput from "@components/auth/AuthTextInput";
 import { useDynamicStyles } from "@hooks/useDynamicStyles";
+import * as ImagePicker from "expo-image-picker";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import i18n from "@services/translations";
+import {
+	dark_default_theme,
+	light_default_theme,
+} from "@assets/themes/tamagui-rnp-adapter";
 //@ts-ignore
 import { AuthFormProps } from "@types/Components";
 
@@ -24,6 +31,7 @@ import { AuthFormProps } from "@types/Components";
  *
  * @returns {JSX.Element} A JSX element that renders the dynamic form with fields and submit functionality.
  */
+
 const AuthForm = <T extends unknown>({
 	fields,
 	isLoading,
@@ -33,6 +41,9 @@ const AuthForm = <T extends unknown>({
 	redirectLinkLabel,
 	onRedirect,
 }: AuthFormProps<T>) => {
+	// Estado interno solo para controlar la visibilidad del selector de fecha
+	const [showDatePicker, setShowDatePicker] = useState(false);
+
 	const styles = useDynamicStyles((theme) => ({
 		formContainer: {
 			marginTop: 40,
@@ -59,33 +70,106 @@ const AuthForm = <T extends unknown>({
 			color: "blue",
 			fontWeight: "bold",
 		},
+		imagePreview: {
+			width: 100,
+			height: 100,
+			borderRadius: 50,
+			marginBottom: 10,
+			backgroundColor: theme === "dark" ? "white" : "black",
+		},
+		imageContainer: {
+			alignItems: "center",
+		},
+		dateInput: {
+			padding: 10,
+			borderWidth: 1,
+			borderRadius: 8,
+			borderColor:
+				theme === "dark"
+					? dark_default_theme.colors.onBackground
+					: light_default_theme.colors.onBackground,
+			backgroundColor:
+				theme === "dark"
+					? dark_default_theme.colors.backdrop
+					: light_default_theme.colors.backdrop,
+			textAlign: "center",
+			color: theme === "dark" ? "white" : "black",
+		},
 	}));
+
+	// Función para seleccionar la imagen y actualizarla vía el setValue pasado en el campo
+	const pickImage = async (setValue: (value: string) => void) => {
+		const result = await ImagePicker.launchImageLibraryAsync({
+			mediaTypes: ImagePicker.MediaTypeOptions.Images,
+			allowsEditing: true,
+			aspect: [1, 1],
+			quality: 1,
+		});
+		if (!result.canceled) {
+			setValue(result.assets[0].uri);
+		}
+	};
 
 	return (
 		<View style={styles.formContainer}>
-			{fields.map((field, index) => (
+			{fields.map((field: any, index: number) => (
 				<View
 					key={field.name || index.toString()}
 					style={styles.fieldContainer}
 				>
-					<AuthTextInput
-						placeholder={field.placeholder}
-						stateFormError={field.error || null}
-						setValue={field.setValue}
-						text={field.text}
-						secureTextEntry={field.secureTextEntry}
-						autoCapitalize={field.autoCapitalize}
-						autoComplete={field.autoComplete}
-						textContentType={field.textContentType}
-						maxLength={field.maxLength}
-						editable={field.editable}
-						customStyle={field.customStyle}
-						onChangeText={field.onChangeText}
-					/>
+					{field.type === "image" ? (
+						<View style={styles.imageContainer}>
+							<Image
+								source={{
+									uri: field.text || "https://placehold.co/400",
+								}}
+								style={styles.imagePreview}
+							/>
+							<Button onPress={() => pickImage(field.setValue)}>
+								{i18n.t("auth.form.image")}
+							</Button>
+						</View>
+					) : field.type === "date" ? (
+						<View>
+							<TouchableOpacity onPress={() => setShowDatePicker(true)}>
+								<Text style={styles.dateInput}>
+									{field.text ? field.text : i18n.t("auth.form.selectDate")}
+								</Text>
+							</TouchableOpacity>
+							{showDatePicker && (
+								<DateTimePicker
+									value={field.text ? new Date(field.text) : new Date()}
+									mode="date"
+									display="default"
+									onChange={(event, selectedDate) => {
+										if (selectedDate) {
+											field.setValue(selectedDate.toISOString().split("T")[0]);
+										}
+										setShowDatePicker(false);
+									}}
+								/>
+							)}
+						</View>
+					) : (
+						<AuthTextInput
+							placeholder={field.placeholder}
+							stateFormError={field.error || null}
+							setValue={field.setValue}
+							text={field.text}
+							secureTextEntry={field.secureTextEntry}
+							autoCapitalize={field.autoCapitalize}
+							autoComplete={field.autoComplete}
+							textContentType={field.textContentType}
+							maxLength={field.maxLength}
+							editable={field.editable}
+							customStyle={field.customStyle}
+							onChangeText={field.onChangeText}
+						/>
+					)}
 				</View>
 			))}
 			<View style={styles.buttonContainer}>
-				<Button theme={"red_active"} disabled={isLoading} onPress={onSubmit}>
+				<Button theme="red_active" disabled={isLoading} onPress={onSubmit}>
 					{submitLabel}
 				</Button>
 			</View>

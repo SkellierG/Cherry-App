@@ -23,6 +23,7 @@
     "@expo/logger": "^1.0.117",
     "@expo/vector-icons": "^14.0.2",
     "@react-native-async-storage/async-storage": "1.23.1",
+    "@react-native-community/datetimepicker": "8.2.0",
     "@react-native-community/netinfo": "11.4.1",
     "@react-native-google-signin/google-signin": "^13.1.0",
     "@react-navigation/bottom-tabs": "^7.0.0",
@@ -35,12 +36,15 @@
     "@tamagui/babel-plugin": "^1.120.2",
     "@tamagui/cli": "^1.121.0",
     "@tamagui/config": "^1.120.2",
+    "base-64": "^1.0.0",
     "expo": "~52.0.26",
     "expo-auth-session": "~6.0.2",
     "expo-blur": "~14.0.2",
+    "expo-clipboard": "~7.0.1",
     "expo-constants": "~17.0.3",
     "expo-font": "~13.0.2",
     "expo-haptics": "~14.0.1",
+    "expo-image-picker": "~16.0.5",
     "expo-linking": "~7.0.4",
     "expo-localization": "~16.0.1",
     "expo-router": "~4.0.17",
@@ -66,8 +70,7 @@
     "react-native-web": "~0.19.13",
     "react-native-webview": "13.12.5",
     "tamagui": "^1.120.2",
-    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
-    "expo-clipboard": "~7.0.1"
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

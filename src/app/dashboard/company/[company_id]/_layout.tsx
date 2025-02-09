@@ -23,96 +23,105 @@ export default function TabsLayout() {
 		Record<string, { name: string; title: string; icon: string }[]>
 	>({});
 
-	useEffect(() => {
-		const loadCompanies = async () => {
-			try {
-				const companiesString = DeviceStorage.getItem(
-					"companies",
-					"string",
-				) as string;
-				if (!companiesString || companiesString === "null") {
-					setCompanies([]);
-					return;
-				}
-				const companiesData = JSON.parse(companiesString) as {
-					companies: Company[];
-					roles: Role[];
-				};
-
-				const loadedCompanies: (Company | null)[] =
-					companiesData?.companies || [null];
-				setCompanies(loadedCompanies);
-
-				const filteredNotNullCompanies = loadedCompanies.filter(
-					(company): company is BaseCompany => company !== null,
-				);
-				setNotNullCompanies(filteredNotNullCompanies);
-
-				if (filteredNotNullCompanies.length > 0) {
-					setSelectedCompany(filteredNotNullCompanies[0]);
-				}
-
-				const chats: Record<
-					string,
-					{ name: string; title: string; icon: string }[]
-				> = {};
-
-				for (const company of filteredNotNullCompanies) {
-					let fetchedChats: { name: string; title: string; icon: string }[] =
-						[];
-					try {
-						fetchedChats =
-							await previoController.getCompletePreviosByCompanyIdAllWithCache(
-								company.id as string,
-							);
-					} catch (error) {
-						console.error(
-							`Error fetching chats for company ${company.id}:`,
-							error,
-						);
-					}
-					fetchedChats.unshift({
-						name: "members",
-						title: "Members",
-						icon: "person",
-					});
-					fetchedChats.push({
-						name: "stats",
-						title: "Stats",
-						icon: "bar-chart",
-					});
-					fetchedChats.unshift({
-						name: "index",
-						title: "Home",
-						icon: "home",
-					});
-					fetchedChats.push({
-						name: "settings",
-						title: "Settings",
-						icon: "settings",
-					});
-
-					chats[company.id as string] = fetchedChats;
-				}
-				setCompaniesChats(chats);
-			} catch (error: any) {
-				Alert.alert("Error", "No se pudieron cargar las compañías.");
-				console.error("Error in loadCompanies:", error);
+	const loadCompanies = async () => {
+		try {
+			const companiesString = DeviceStorage.getItem(
+				"companies",
+				"string",
+			) as string;
+			if (!companiesString || companiesString === "null") {
+				setCompanies([]);
+				return;
 			}
-		};
+			const companiesData = JSON.parse(companiesString) as {
+				companies: Company[];
+				roles: Role[];
+			};
 
+			const loadedCompanies: (Company | null)[] = companiesData?.companies || [
+				null,
+			];
+			setCompanies(loadedCompanies);
+
+			const filteredNotNullCompanies = loadedCompanies.filter(
+				(company): company is BaseCompany => company !== null,
+			);
+			setNotNullCompanies(filteredNotNullCompanies);
+
+			if (filteredNotNullCompanies.length > 0) {
+				setSelectedCompany(filteredNotNullCompanies[0]);
+			}
+
+			const chats: Record<
+				string,
+				{ name: string; title: string; icon: string }[]
+			> = {};
+
+			for (const company of filteredNotNullCompanies) {
+				let fetchedChats = [];
+				try {
+					fetchedChats =
+						await previoController.getCompletePreviosByCompanyIdAllWithCache(
+							company.id as string,
+						);
+				} catch (error) {
+					console.error(
+						`Error fetching chats for company ${company.id}:`,
+						error,
+					);
+				}
+
+				console.log("fetchedChats", fetchedChats);
+
+				fetchedChats.forEach((chat, index) => {
+					console.log("chat", chat);
+					fetchedChats[index] = {
+						name: chat.id,
+						title: chat.nombre,
+						icon: "article",
+					};
+				});
+
+				console.log("fetchedChats", fetchedChats);
+
+				fetchedChats.unshift({
+					name: "members",
+					title: "Members",
+					icon: "person",
+				});
+				fetchedChats.push({
+					name: "stats",
+					title: "Stats",
+					icon: "bar-chart",
+				});
+				fetchedChats.unshift({
+					name: "index",
+					title: "Home",
+					icon: "home",
+				});
+				fetchedChats.push({
+					name: "settings",
+					title: "Settings",
+					icon: "settings",
+				});
+
+				chats[company.id as string] = fetchedChats;
+			}
+			setCompaniesChats(chats);
+		} catch (error: any) {
+			Alert.alert("Error", "No se pudieron cargar las compañías.");
+			console.error("Error in loadCompanies:", error);
+		}
+	};
+
+	useEffect(() => {
 		loadCompanies();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	const onRefresh = async (
-		setRefreshing: React.Dispatch<React.SetStateAction<boolean>>,
-	) => {
+	const onRefresh = async () => {
 		try {
-			setRefreshing(true);
-			setTimeout(() => {
-				setRefreshing(false);
-			}, 1500);
+			loadCompanies();
 		} catch (error: any) {
 			Alert.alert("Error fetching companies", error.message);
 			console.error(error);

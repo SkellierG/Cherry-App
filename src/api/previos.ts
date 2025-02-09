@@ -3,9 +3,11 @@ import { supabase } from "@services/supabase";
 export class PreviosService {
 	async fetchPreviosByCompanyId(
 		companyId: string,
-		select: string | string[] = "*",
+		select: "*" | string[] = "*",
 	): Promise<any[]> {
 		if (!companyId) throw new Error("Invalid company_id provided");
+
+		console.info("HOLA", companyId, select);
 
 		try {
 			const { data: previosId, error: previosIdError } = await supabase
@@ -13,6 +15,8 @@ export class PreviosService {
 				.select("previo_id")
 				.eq("company_id", companyId)
 				.setHeader("Accept", "application/json");
+
+			console.log(previosId);
 
 			if (previosIdError) throw previosIdError;
 			if (!previosId || previosId.length === 0) return [];
@@ -117,6 +121,37 @@ export class PreviosService {
 			if (error) throw error;
 
 			return { success: true };
+		} catch (error: any) {
+			console.error(error);
+			throw error;
+		}
+	}
+
+	/**
+	{
+		"entity_type": "previo",
+		"previo_id": "uuid-generado"
+	}
+	*/
+	async createPrevioByCompanyId(
+		company_id: string,
+		name: string,
+		date: string,
+	) {
+		try {
+			const { data, error } = await supabase.rpc(
+				"insert_with_dependencies_for_entity",
+				{
+					p_entity_type: "previo",
+					p_company_id: company_id,
+					p_nombre: name,
+					p_fecha: date,
+				},
+			);
+
+			if (error) throw error;
+
+			if (data) return { ...data };
 		} catch (error: any) {
 			console.error(error);
 			throw error;

@@ -10,6 +10,55 @@ import {
 } from "@utils/formValidation";
 import i18n from "@services/translations";
 import { useCompany } from "@hooks/useCompany";
+import { supabase } from "@services/supabase";
+import * as FileSystem from "expo-file-system";
+import { Buffer } from "buffer";
+
+async function uriToBuffer(uri: string): Promise<Buffer> {
+	try {
+		console.info("URI:", uri);
+		const base64 = await FileSystem.readAsStringAsync(uri, {
+			encoding: FileSystem.EncodingType.Base64,
+		});
+		console.info("base64", base64);
+		const buffer = Buffer.from(base64, "base64");
+		console.info("buffer", buffer);
+		return buffer;
+	} catch (error: any) {
+		console.error("uriToBuffer error", error);
+		throw error;
+	}
+}
+
+async function uploadAvatarToSupabase(uri: string): Promise<string> {
+	try {
+		console.log("URI:", uri);
+		const buffer = await uriToBuffer(uri);
+		console.log("Buffer obtenido:", buffer);
+
+		let fileExt = uri.split(".").pop();
+		if (!fileExt) {
+			fileExt = "jpeg";
+		}
+		const fileName = `${Math.floor(Math.random() * 1e16)}.${fileExt}`;
+		const filePath = fileName;
+		console.log("Subiendo archivo:", filePath);
+
+		const { data, error } = await supabase.storage
+			.from("avatars")
+			.upload(filePath, buffer, {
+				contentType: "image/jpeg",
+			});
+
+		if (error) {
+			throw error;
+		}
+		console.log("Archivo subido en:", data?.path);
+		return data.path;
+	} catch (error: any) {
+		throw new Error(`Error uploading image: ${error.message}`);
+	}
+}
 
 export default function CompanyCreateScreen() {
 	const { isLoading, handleCreateCompany } = useCompany();
@@ -19,9 +68,11 @@ export default function CompanyCreateScreen() {
 	const [description, setDescription] = useState("");
 	const [email, setEmail] = useState("");
 	const [phone, setPhone] = useState("");
+	const [image, setImage] = useState("");
 	const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
 	const validateFields = () => {
+		console.log("Validando campos...");
 		const errors: Record<string, string> = {};
 
 		const nameValidation = validateCompanyName(name);
@@ -29,6 +80,7 @@ export default function CompanyCreateScreen() {
 		const descriptionValidation = validateDescription(description);
 		const emailValidation = validateEmail(email);
 		const phoneValidation = validatePhone(phone);
+
 		if (!nameValidation.isValid)
 			errors.name = nameValidation.errorMessage || "";
 		if (!sloganValidation.isValid)
@@ -41,24 +93,28 @@ export default function CompanyCreateScreen() {
 			errors.phone = phoneValidation.errorMessage || "";
 
 		setFormErrors(errors);
-
 		return Object.keys(errors).length === 0;
 	};
 
 	const handleSubmit = async () => {
 		if (!validateFields()) return;
+		console.log("Enviando formulario...");
 
 		try {
+			let uploadedAvatarPath = image;
+			if (image && image !== "https://placehold.co/400") {
+				uploadedAvatarPath = await uploadAvatarToSupabase(image);
+			}
 			await handleCreateCompany(
 				name,
 				slogan,
 				description,
 				email,
 				phone,
-				"https://placehold.co/200x200/png",
+				uploadedAvatarPath,
 			);
 		} catch (error: any) {
-			Alert.alert("Unexpected error", error);
+			Alert.alert("Unexpected error", error.message);
 			throw error;
 		}
 	};
@@ -66,6 +122,12 @@ export default function CompanyCreateScreen() {
 	return (
 		<AuthForm
 			fields={[
+				{
+					name: "avatar",
+					type: "image",
+					text: image,
+					setValue: setImage,
+				},
 				{
 					name: "name",
 					placeholder: i18n.t("auth.name"),

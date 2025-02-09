@@ -141,4 +141,31 @@ export class MuestrasService {
 			throw error;
 		}
 	}
+
+	/**
+		{
+			"entity_type": "muestra",
+			"muestra_id": "uuid-generado",
+			"fruto_id": "uuid-generado",
+			"centro_frutal_id": "uuid-generado"
+		}
+	 */
+	async createMuestraByPrevioId(previo_id: string) {
+		try {
+			const { data, error } = await supabase.rpc(
+				"insert_with_dependencies_for_entity",
+				{
+					p_entity_type: "muestra",
+					p_previo_id: previo_id,
+				},
+			);
+
+			if (error) throw error;
+
+			if (data) return { ...data };
+		} catch (error: any) {
+			console.error(error);
+			throw error;
+		}
+	}
 }

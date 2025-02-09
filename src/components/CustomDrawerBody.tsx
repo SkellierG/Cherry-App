@@ -69,9 +69,21 @@ export default function CustomDrawerBody({
 					onPress={() => {
 						if (screen.name === "index") {
 							router.push(routes.dashboard.index);
+						} else if (screen.name === "members") {
+							router.push(
+								`${routes.dashboard.index}/${selectedCompany.id}/members`,
+							);
+						} else if (screen.name === "settings") {
+							router.push(
+								`${routes.dashboard.index}/${selectedCompany.id}/settings`,
+							);
+						} else if (screen.name === "stats") {
+							router.push(
+								`${routes.dashboard.index}/${selectedCompany.id}/stats`,
+							);
 						} else {
 							router.push(
-								`${routes.dashboard.index}/${selectedCompany.id}/${screen.name}`,
+								`${routes.dashboard.index}/${selectedCompany.id}/previos/${screen.name}`,
 							);
 						}
 					}}

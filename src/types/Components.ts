@@ -41,6 +41,7 @@ export interface AuthFormProps<T> {
 	 * @type {Array}
 	 */
 	fields: {
+		type?: string;
 		/**
 		 * The unique name of the field. It is used as the key to identify the field in the form.
 		 *
